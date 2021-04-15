@@ -108,29 +108,23 @@ export class TrackingService {
       await this.trackingRepository.save(tracking);
 
       //한 개 저장된 경우 off 로 변환
-      try {
-        await Campaign.update(
-          { mecrossTrackingStatus: 'off' },
-          { where: { token: req.query.token } },
-        );
-      } catch (error) {
-        console.log(error);
-      }
+      const campaignEntity: Campaign = await this.campaignRepository.findOne({
+        where: { token: req.query.token },
+      });
+      campaignEntity.mecrossTrackingStatus = false;
+      await this.campaignRepository.save(campaignEntity);
     }
+
     //6-2) 트래커 트래킹 로그 확인
-    if (resultToken.trackerTrackingStatus === 'on') {
-      try {
-        await Tracking.create({
-          type: 'tracker',
-          advertisingCode: advertisingCode,
-          campaignCode: campaignCode,
-          mediaCode: mediaCode,
-          trackerCode: trackerCode,
-          trackingUrl: convertedTrackingUrl,
-        });
-      } catch (error) {
-        console.log(error);
-      }
+    if (campaignEntity.trackerTrackingStatus) {
+      const tracking: Tracking = new Tracking();
+      tracking.type = 'tracker';
+      tracking.advertisingCode = advertisingCode;
+      tracking.campaignCode = campaignCode;
+      tracking.mediaCode = mediaCode;
+      tracking.trackerCode = trackerCode;
+      tracking.trackingUrl = convertedTrackingUrl;
+      await this.trackingRepository.save(tracking);
 
       //한 개 저장된 경우 off 로 변환
       const campaignEntity: Campaign = await this.campaignRepository.findOne({
