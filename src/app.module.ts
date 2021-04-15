@@ -15,7 +15,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
       synchronize: Boolean(process.env.DB_SYNCHRONIZE),
-      entities: [__dirname + '/**/*{.ts,.js}'],
+      entities: [__dirname + '/entities/*{.ts,.js}'],
     }),
     TrackingModule,
     PostbackModule,
