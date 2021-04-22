@@ -6,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { UserLog } from '../entities/userLog';
+import { UserLog } from '../entities/UserLog';
 
 @Entity('mcp_user')
 export class User {
