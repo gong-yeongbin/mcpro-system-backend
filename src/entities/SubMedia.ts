@@ -1,45 +1,57 @@
+import { Advertising } from '../entities/Advertising';
+import { Campaign } from '../entities/Campaign';
+import { PostBackLog } from '../entities/PostBackLog';
+import { Media } from '../entities/Media';
+import { Tracker } from '../entities/Tracker';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   Unique,
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity('submedia')
+@Entity('mcp_submedia')
 @Unique(['viewCode'])
 export class SubMedia {
-  @PrimaryGeneratedColumn({ type: 'bigint', name: 'id' })
-  id: string;
+  @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
+  idx: string;
 
-  @Column({ type: 'nvarchar', name: 'campaignToken', length: 30 })
-  campaignToken: string;
+  @Column({ type: 'nvarchar', name: 'cp_token', length: 45 })
+  cpToken: string;
 
-  @Column({ type: 'nvarchar', name: 'mediaCode', length: 30 })
-  mediaCode: string;
+  @Column({ type: 'nvarchar', name: 'sb_code', length: 150 })
+  sbCode: string;
 
-  @Column({ type: 'nvarchar', name: 'submediaCode', length: 150 })
-  submediaCode: string;
-
-  @Column({ type: 'nvarchar', name: 'viewCode', unique: true, length: 30 })
+  @Column({ type: 'nvarchar', name: 'view_code', length: 30 })
   viewCode: string;
 
-  @Column({ type: 'nvarchar', name: 'trackerCode', length: 30 })
-  trackerCode: string;
-
-  @Column({ type: 'nvarchar', name: 'advertisingCode', length: 30 })
-  advertisingCode: string;
-
-  @Column({ type: 'nvarchar', name: 'campaignCode', length: 30 })
-  campaignCode: string;
-
-  @Column({ name: 'registeredAt' })
-  registeredAt: Date;
-
-  @CreateDateColumn({ name: 'createdAt' })
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updatedAt' })
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
+
+  @ManyToOne(() => Tracker, (tracker) => tracker.subMedia)
+  @JoinColumn({ name: 'tk_code' })
+  tkCode: Tracker;
+
+  @ManyToOne(() => Advertising, (advertising) => advertising.subMedia)
+  @JoinColumn({ name: 'ad_code' })
+  adCode: Advertising;
+
+  @ManyToOne(() => Campaign, (campaign) => campaign.subMedia)
+  @JoinColumn({ name: 'cp_code' })
+  cpCode: Campaign;
+
+  @ManyToOne(() => Media, (media) => media.subMedia)
+  @JoinColumn({ name: 'md_code' })
+  mdCode: Media;
+
+  @OneToMany(() => PostBackLog, (postBackLog) => postBackLog.sbCode)
+  postBackLog: PostBackLog;
 }

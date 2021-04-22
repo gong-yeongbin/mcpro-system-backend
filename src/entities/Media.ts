@@ -1,3 +1,5 @@
+import { PostBackLog } from '../entities/PostBackLog';
+import { SubMedia } from '../entities/SubMedia';
 import {
   Column,
   Entity,
@@ -9,40 +11,51 @@ import {
 } from 'typeorm';
 import { Campaign } from './Campaign';
 
-@Entity('media')
-@Unique(['code'])
+@Entity('mcp_media')
+@Unique(['mdCode'])
 export class Media {
-  @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
-  id: number;
+  @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
+  idx: number;
 
-  @Column({ type: 'nvarchar', name: 'code', length: 100 })
-  code: string;
+  @Column({ type: 'nvarchar', name: 'md_code', length: 20 })
+  mdCode: string;
 
-  @Column({ type: 'nvarchar', name: 'name', length: 100 })
-  name: string;
-
-  @Column({ type: 'nvarchar', name: 'mecrossTrackingUrlTemplate' })
-  mecrossTrackingUrlTemplate: string;
-
-  @Column({ type: 'nvarchar', name: 'mediaPostbackInstallUrlTemplate' })
-  mediaPostbackInstallUrlTemplate: string;
-
-  @Column({ type: 'nvarchar', name: 'mediaPostbackEventUrlTemplate' })
-  mediaPostbackEventUrlTemplate: string;
+  @Column({ type: 'nvarchar', name: 'md_name', length: 45 })
+  mdName: string;
 
   @Column({
     type: 'boolean',
-    name: 'status',
+    name: 'md_status',
     default: true,
   })
-  status: boolean;
+  mdStatus: boolean;
 
-  @CreateDateColumn({ name: 'createdAt' })
+  @Column({
+    type: 'nvarchar',
+    name: 'mediaPostbackInstallUrlTemplate',
+    length: 200,
+  })
+  mediaPostbackInstallUrlTemplate: string;
+
+  @Column({
+    type: 'nvarchar',
+    name: 'mediaPostbackEventUrlTemplate',
+    length: 200,
+  })
+  mediaPostbackEventUrlTemplate: string;
+
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updatedAt' })
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
   @OneToMany(() => Campaign, (campaign) => campaign.media)
   campaign: Campaign[];
+
+  @OneToMany(() => SubMedia, (subMedia) => subMedia.mdCode)
+  subMedia: SubMedia;
+
+  @OneToMany(() => PostBackLog, (postBackLog) => postBackLog.tkCode)
+  postBackLog: PostBackLog;
 }

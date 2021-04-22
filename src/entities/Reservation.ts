@@ -10,36 +10,36 @@ import {
 import { Advertising } from './Advertising';
 import { Campaign } from './Campaign';
 
-@Entity('reservation')
+@Entity('mcp_reservation')
 export class Reservation {
-  @PrimaryGeneratedColumn({ type: 'bigint', name: 'id' })
-  id: number;
+  @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
+  idx: number;
 
-  @Column({ type: 'nvarchar', name: 'groupCode' })
-  groupCode: string;
+  @Column({ type: 'nvarchar', name: 'reserve_code', length: 45 })
+  reserveCode: string;
 
-  @Column({ type: 'nvarchar', name: 'oldCampaignName' })
+  @Column({ type: 'nvarchar', name: 'oldCampaignName', length: 45 })
   oldCampaignName: string;
 
-  @Column({ type: 'nvarchar', name: 'newCampaignName' })
+  @Column({ type: 'nvarchar', name: 'newCampaignName', length: 45 })
   newCampaignName: string;
 
-  @Column({ type: 'nvarchar', name: 'oldTrackerTrackingUrl' })
+  @Column({ type: 'nvarchar', name: 'oldTrackerTrackingUrl', length: 200 })
   oldTrackerTrackingUrl: string;
 
-  @Column({ type: 'nvarchar', name: 'newTrackerTrackingUrl' })
+  @Column({ type: 'nvarchar', name: 'newTrackerTrackingUrl', length: 200 })
   newTrackerTrackingUrl: string;
 
-  @Column({ name: 'reservedAt' })
-  reservedAt: Date;
-
-  @Column({ type: 'boolean', name: 'status' })
+  @Column({ type: 'boolean', name: 'status', default: false })
   status: boolean;
 
-  @CreateDateColumn({ name: 'createdAt' })
+  @Column({ name: 'reserved_at' })
+  reservedAt: Date;
+
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updatedAt' })
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
   @ManyToOne(() => Advertising, (advertising) => advertising.reservation, {
@@ -49,7 +49,7 @@ export class Reservation {
   @JoinColumn({ name: 'advertising' })
   advertising: Advertising;
 
-  @ManyToOne(() => Campaign, (campaign) => campaign.reservations, {
+  @ManyToOne(() => Campaign, (campaign) => campaign.reservation, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })

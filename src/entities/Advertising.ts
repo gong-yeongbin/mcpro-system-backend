@@ -12,47 +12,43 @@ import { Advertiser } from './Advertiser';
 import { Tracker } from './Tracker';
 import { Campaign } from './Campaign';
 import { Reservation } from './Reservation';
+import { SubMedia } from '../entities/SubMedia';
+import { PostBackLog } from 'src/entities/PostBackLog';
 
-@Entity('advertising')
-@Unique(['code'])
+@Entity('mcp_advertising')
+@Unique(['adCode'])
 export class Advertising {
-  @PrimaryGeneratedColumn({ type: 'bigint', name: 'id' })
-  id: number;
+  @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
+  idx: number;
 
-  @Column({ type: 'nvarchar', name: 'code', length: 100 })
-  code: string;
+  @Column({ type: 'nvarchar', name: 'ad_code', length: 20 })
+  adCode: string;
 
-  @Column({ type: 'nvarchar', name: 'name', length: 100 })
-  name: string;
+  @Column({ type: 'nvarchar', name: 'ad_name', length: 45 })
+  adName: string;
 
-  @Column({ type: 'nvarchar', name: 'platform', length: 100 })
-  platform: string;
-
-  @Column({ type: 'nvarchar', name: 'icon', nullable: true, length: 100 })
-  icon: string;
-
-  @Column({ type: 'nvarchar', name: 'type', nullable: true, length: 10 })
-  type: string;
+  @Column({ type: 'nvarchar', name: 'ad_platform', length: 10 })
+  adPlatform: string;
 
   @Column({
-    type: 'bigint',
-    name: 'price',
-    default: 0,
+    type: 'nvarchar',
+    name: 'ad_image_url',
+    nullable: true,
+    length: 100,
   })
-  price: number;
+  adImageUrl: string;
 
   @Column({
     type: 'boolean',
-    name: 'status',
-    nullable: true,
+    name: 'ad_status',
     default: true,
   })
-  status: boolean;
+  adStatus: boolean;
 
-  @CreateDateColumn({ name: 'createdAt' })
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updatedAt' })
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
   @OneToMany(() => Campaign, (campaign) => campaign.advertising)
@@ -69,7 +65,12 @@ export class Advertising {
 
   @ManyToOne(() => Tracker, (tracker) => tracker.advertising, {
     onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
   })
   tracker: Tracker;
+
+  @OneToMany(() => SubMedia, (subMedia) => subMedia.adCode)
+  subMedia: SubMedia;
+
+  @OneToMany(() => PostBackLog, (postBackLog) => postBackLog.adCode)
+  postBackLog: PostBackLog;
 }

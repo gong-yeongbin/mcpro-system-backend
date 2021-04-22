@@ -9,24 +9,26 @@ import {
 } from 'typeorm';
 import { Advertising } from './Advertising';
 
-@Entity('advertiser')
-@Unique(['code', 'name'])
+@Entity('mcp_advertiser')
+@Unique(['arCode', 'arName'])
 export class Advertiser {
-  @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
-  id: number;
+  @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
+  idx: number;
 
-  @Column({ type: 'nvarchar', name: 'code', length: 100 })
-  code: string;
+  @Column({ type: 'nvarchar', name: 'ar_code', length: 20 })
+  arCode: string;
 
-  @Column({ type: 'nvarchar', name: 'name', length: 100 })
-  name: string;
+  @Column({ type: 'nvarchar', name: 'ar_name', length: 45 })
+  arName: string;
 
-  @CreateDateColumn({ name: 'createdAt' })
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updatedAt' })
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
-  @OneToMany(() => Advertising, (advertising) => advertising.advertiser)
+  @OneToMany(() => Advertising, (advertising) => advertising.advertiser, {
+    onDelete: 'CASCADE',
+  })
   advertising: Advertising[];
 }

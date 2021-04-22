@@ -1,37 +1,33 @@
 import {
   Column,
+  CreateDateColumn,
   Entity,
   OneToMany,
   PrimaryGeneratedColumn,
-  CreateDateColumn,
   UpdateDateColumn,
-  Unique,
-  JoinColumn,
 } from 'typeorm';
-import { UserLog } from './UserLog';
+import { UserLog } from './userLog';
 
-@Entity('user')
-@Unique(['email'])
+@Entity('mcp_user')
 export class User {
-  @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
-  id: number;
+  @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
+  idx: number;
 
-  @Column({ type: 'nvarchar', name: 'email', length: 50 })
-  email: string;
+  @Column({ type: 'nvarchar', name: 'id' })
+  id: string;
 
-  @Column({ type: 'nvarchar', name: 'password', length: 100 })
+  @Column({ type: 'nvarchar', name: 'password' })
   password: string;
 
-  @Column({ type: 'nvarchar', name: 'type', length: 100 })
+  @Column({ type: 'nvarchar', name: 'type' })
   type: string;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
   @OneToMany(() => UserLog, (userLog) => userLog.user)
-  @JoinColumn({ name: 'userLog' })
-  userLog: UserLog[];
+  userLog: UserLog;
 }

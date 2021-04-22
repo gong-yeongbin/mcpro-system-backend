@@ -1,31 +1,29 @@
 import {
   Column,
-  CreateDateColumn,
   Entity,
-  JoinColumn,
-  ManyToOne,
   PrimaryGeneratedColumn,
+  CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
 } from 'typeorm';
-import { User } from './User';
+import { User } from '../entities/User';
 
-@Entity('user_log')
+@Entity('mcp_user_log')
 export class UserLog {
-  @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
-  id: number;
+  @PrimaryGeneratedColumn({ name: 'idx', type: 'bigint' })
+  idx: number;
 
-  @Column('varchar', { name: 'ipAddress', length: 100 })
+  @Column({ type: 'nvarchar', name: 'ipAddress' })
   ipAddress: string;
 
-  @CreateDateColumn({ name: 'createdAt' })
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updatedAt' })
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
-  @ManyToOne(() => User, (user) => user.userLog, {
+  @ManyToOne(() => User, (User) => User.userLog, {
     onDelete: 'CASCADE',
   })
-  @JoinColumn({ name: 'user' })
   user: User;
 }

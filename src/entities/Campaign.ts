@@ -10,38 +10,40 @@ import {
 } from 'typeorm';
 import { Advertising } from './Advertising';
 import { Media } from './Media';
-import { Postback } from './Postback';
+import { PostBackEvent } from './PostBackEvent';
 import { Reservation } from './Reservation';
+import { SubMedia } from '../entities/SubMedia';
+import { PostBackLog } from 'src/entities/PostBackLog';
 
-@Entity('campaign')
-@Unique(['code', 'token'])
+@Entity('mcp_campaign')
+@Unique(['cpCode', 'cpToken'])
 export class Campaign {
-  @PrimaryGeneratedColumn({ type: 'bigint', name: 'id' })
-  id: number;
+  @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
+  idx: number;
 
-  @Column({ type: 'nvarchar', name: 'token' })
-  token: string;
+  @Column({ type: 'nvarchar', name: 'cp_token', length: 45 })
+  cpToken: string;
 
-  @Column({ type: 'nvarchar', name: 'appkey' })
-  appkey: string;
+  @Column({ type: 'nvarchar', name: 'cp_appkey', length: 20 })
+  cpAppkey: string;
 
   @Column({
     type: 'nvarchar',
-    name: 'code',
-    nullable: true,
+    name: 'cp_code',
+    length: 20,
   })
-  code: string;
+  cpCode: string;
 
-  @Column({ type: 'nvarchar', name: 'name' })
-  name: string;
+  @Column({ type: 'nvarchar', name: 'cp_name', length: 45 })
+  cpName: string;
 
-  @Column({ type: 'nvarchar', name: 'type' })
+  @Column({ type: 'nvarchar', name: 'type', length: 10 })
   type: string;
 
-  @Column({ type: 'nvarchar', name: 'trackerTrackingUrl' })
+  @Column({ type: 'nvarchar', name: 'trackerTrackingUrl', length: 200 })
   trackerTrackingUrl: string;
 
-  @Column({ type: 'nvarchar', name: 'mecrossTrackingUrl', nullable: true })
+  @Column({ type: 'nvarchar', name: 'mecrossTrackingUrl', length: 200 })
   mecrossTrackingUrl: string;
 
   @Column({
@@ -60,10 +62,10 @@ export class Campaign {
 
   @Column({
     type: 'boolean',
-    name: 'status',
+    name: 'cp_status',
     default: true,
   })
-  status: boolean;
+  cpStatus: boolean;
 
   @CreateDateColumn({ name: 'createdAt' })
   createdAt: Date;
@@ -83,9 +85,15 @@ export class Campaign {
   })
   media: Media;
 
-  @OneToMany(() => Postback, (postback) => postback.campaign)
-  postback: Postback[];
+  @OneToMany(() => PostBackEvent, (postBackEvent) => postBackEvent.campaign)
+  postBackEvent: PostBackEvent[];
 
   @OneToMany(() => Reservation, (reservation) => reservation.campaign)
-  reservations: Reservation[];
+  reservation: Reservation[];
+
+  @OneToMany(() => SubMedia, (subMedia) => subMedia.cpCode)
+  subMedia: SubMedia;
+
+  @OneToMany(() => PostBackLog, (postBackLog) => postBackLog.cpCode)
+  postBackLog: PostBackLog;
 }

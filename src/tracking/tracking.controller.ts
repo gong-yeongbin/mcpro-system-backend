@@ -1,4 +1,5 @@
-import { Controller, Get, Request } from '@nestjs/common';
+import { Controller, Get, Query, Redirect } from '@nestjs/common';
+import { TrackingDto } from './dto/tracking.dto';
 import { TrackingService } from './tracking.service';
 
 @Controller('tracking')
@@ -6,7 +7,12 @@ export class TrackingController {
   constructor(private readonly trackingService: TrackingService) {}
 
   @Get()
-  tracking(@Request() req: any) {
-    return this.trackingService.tracking(req);
+  @Redirect()
+  async tracking(@Query() requestQuery: TrackingDto) {
+    const redirectUrl: string = await this.trackingService.tracking(
+      requestQuery,
+    );
+
+    return { url: redirectUrl, status: 302 };
   }
 }

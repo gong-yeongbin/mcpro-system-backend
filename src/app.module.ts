@@ -4,9 +4,14 @@ import { AppService } from './app.service';
 import { TrackingModule } from './tracking/tracking.module';
 import { PostbackModule } from './postback/postback.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      envFilePath: ['.env.dev', '.env.staging', '.env.prod'],
+      isGlobal: true,
+    }),
     TypeOrmModule.forRoot({
       type: process.env.DB_TYPE as 'mysql',
       host: process.env.DB_HOST,
@@ -15,7 +20,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
       synchronize: Boolean(process.env.DB_SYNCHRONIZE),
-      entities: [__dirname + '/entities/*{.ts,.js}'],
+      entities: [__dirname + '/**/*{.ts,.js}'],
     }),
     TrackingModule,
     PostbackModule,
