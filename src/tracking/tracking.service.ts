@@ -15,6 +15,9 @@ export class TrackingService {
   // {}
 
   async tracking(requestQuery: TrackingDto): Promise<string> {
+    console.log(
+      'cloudwatch log test!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!',
+    );
     // //2. 캠페인 토큰 검증 (캠페인 및 광고앱 차단 여부 확인)
     // const campaignEntity: Campaign = await this.campaignRepository.findOne({
     //   where: {
