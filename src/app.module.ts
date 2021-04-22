@@ -8,10 +8,10 @@ import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      envFilePath: ['.env.dev', '.env.staging', '.env.prod'],
-      isGlobal: true,
-    }),
+    // ConfigModule.forRoot({
+    //   envFilePath: ['.env.dev', '.env.staging', '.env.prod'],
+    //   isGlobal: true,
+    // }),
     TypeOrmModule.forRoot({
       type: process.env.DB_TYPE as 'mysql',
       host: process.env.DB_HOST,
