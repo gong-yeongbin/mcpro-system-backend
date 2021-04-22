@@ -68,9 +68,9 @@ export class Advertising {
   })
   tracker: Tracker;
 
-  @OneToMany(() => SubMedia, (subMedia) => subMedia.adCode)
+  @OneToMany(() => SubMedia, (subMedia) => subMedia.advertising)
   subMedia: SubMedia;
 
-  @OneToMany(() => PostBackLog, (postBackLog) => postBackLog.adCode)
+  @OneToMany(() => PostBackLog, (postBackLog) => postBackLog.advertising)
   postBackLog: PostBackLog;
 }

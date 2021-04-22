@@ -144,22 +144,22 @@ export class PostBackLog {
   updatedAt: Date;
 
   @ManyToOne(() => Tracker, (tracker) => tracker.postBackLog)
-  @JoinColumn({ name: 'tk_code' })
-  tkCode: Tracker;
+  @JoinColumn({ name: 'tracker' })
+  tracker: Tracker;
 
   @ManyToOne(() => Media, (media) => media.postBackLog)
-  @JoinColumn({ name: 'md_code' })
-  mdCode: Media;
+  @JoinColumn({ name: 'media' })
+  media: Media;
 
   @ManyToOne(() => Advertising, (advertising) => advertising.postBackLog)
-  @JoinColumn({ name: 'ad_code' })
-  adCode: Advertising;
+  @JoinColumn({ name: 'advertising' })
+  advertising: Advertising;
 
   @ManyToOne(() => Campaign, (campaign) => campaign.postBackLog)
-  @JoinColumn({ name: 'cp_code' })
-  cpCode: Campaign;
+  @JoinColumn({ name: 'campaign' })
+  campaign: Campaign;
 
   @ManyToOne(() => SubMedia, (subMedia) => subMedia.postBackLog)
-  @JoinColumn({ name: 'sb_code' })
-  sbCode: SubMedia;
+  @JoinColumn({ name: 'subMedia' })
+  subMedia: SubMedia;
 }

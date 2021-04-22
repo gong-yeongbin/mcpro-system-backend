@@ -91,9 +91,9 @@ export class Campaign {
   @OneToMany(() => Reservation, (reservation) => reservation.campaign)
   reservation: Reservation[];
 
-  @OneToMany(() => SubMedia, (subMedia) => subMedia.cpCode)
+  @OneToMany(() => SubMedia, (subMedia) => subMedia.campaign)
   subMedia: SubMedia;
 
-  @OneToMany(() => PostBackLog, (postBackLog) => postBackLog.cpCode)
+  @OneToMany(() => PostBackLog, (postBackLog) => postBackLog.campaign)
   postBackLog: PostBackLog;
 }

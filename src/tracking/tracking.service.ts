@@ -31,18 +31,20 @@ export class TrackingService {
     }
 
     //3. 노출용코드 관련
-    let sbCode: string;
-
-    if (!requestQuery.sub_id || requestQuery.sub_id === '{sub_id}') {
-      sbCode = requestQuery.pub_id;
-    } else {
-      sbCode = `${requestQuery.pub_id}_||_${requestQuery.sub_id}`;
-    }
+    const pubId: string = requestQuery.pub_id;
+    const subId: string =
+      requestQuery.sub_id == '' ||
+      requestQuery.sub_id == undefined ||
+      requestQuery.sub_id == '{sub_id}'
+        ? ''
+        : requestQuery.sub_id;
 
     const submediaEntity: SubMedia = await this.submediaRepository.findOne({
       where: {
-        sbCode: sbCode,
+        pubId: pubId,
+        subId: subId,
       },
+      relations: ['advertising', 'media', 'advertising.tracker'],
     });
 
     //새로운 노출용코드 생성
@@ -52,13 +54,13 @@ export class TrackingService {
     if (!submediaEntity) {
       //캐시 메모리 처리(v2)
       const submedia: SubMedia = new SubMedia();
-      submedia.mdCode = campaignEntity.media;
+      submedia.media = campaignEntity.media;
       submedia.cpToken = requestQuery.token;
       submedia.viewCode = viewCode;
-      submedia.sbCode = sbCode;
-      submedia.tkCode = campaignEntity.advertising.tracker;
-      submedia.cpCode = campaignEntity;
-      submedia.adCode = campaignEntity.advertising;
+      submedia.pubId = pubId;
+      submedia.subId = subId;
+      submedia.campaign = campaignEntity;
+      submedia.advertising = campaignEntity.advertising;
 
       await this.submediaRepository.save(submedia);
     }
@@ -73,10 +75,6 @@ export class TrackingService {
 
     //5. 트래커 트래킹 URL를 실행
     if (convertedTrackingUrl !== null) {
-      // res.statusCode = 302;
-      // res.setHeader("Location", convertedTrackingUrl);
-      // res.redirect('https://www.naver.com/');
-      // res.end();
       return convertedTrackingUrl;
     }
 

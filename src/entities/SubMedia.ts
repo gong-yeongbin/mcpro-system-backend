@@ -2,7 +2,7 @@ import { Advertising } from '../entities/Advertising';
 import { Campaign } from '../entities/Campaign';
 import { PostBackLog } from '../entities/PostBackLog';
 import { Media } from '../entities/Media';
-import { Tracker } from '../entities/Tracker';
+
 import {
   Column,
   CreateDateColumn,
@@ -24,8 +24,11 @@ export class SubMedia {
   @Column({ type: 'nvarchar', name: 'cp_token', length: 45 })
   cpToken: string;
 
-  @Column({ type: 'nvarchar', name: 'sb_code', length: 150 })
-  sbCode: string;
+  @Column({ type: 'nvarchar', name: 'pub_id', length: 45 })
+  pubId: string;
+
+  @Column({ type: 'nvarchar', name: 'sub_id', length: 45, nullable: true })
+  subId: string;
 
   @Column({ type: 'nvarchar', name: 'view_code', length: 30 })
   viewCode: string;
@@ -36,22 +39,18 @@ export class SubMedia {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
-  @ManyToOne(() => Tracker, (tracker) => tracker.subMedia)
-  @JoinColumn({ name: 'tk_code' })
-  tkCode: Tracker;
-
   @ManyToOne(() => Advertising, (advertising) => advertising.subMedia)
-  @JoinColumn({ name: 'ad_code' })
-  adCode: Advertising;
+  @JoinColumn({ name: 'advertising' })
+  advertising: Advertising;
 
   @ManyToOne(() => Campaign, (campaign) => campaign.subMedia)
-  @JoinColumn({ name: 'cp_code' })
-  cpCode: Campaign;
+  @JoinColumn({ name: 'campaign' })
+  campaign: Campaign;
 
   @ManyToOne(() => Media, (media) => media.subMedia)
-  @JoinColumn({ name: 'md_code' })
-  mdCode: Media;
+  @JoinColumn({ name: 'media' })
+  media: Media;
 
-  @OneToMany(() => PostBackLog, (postBackLog) => postBackLog.sbCode)
+  @OneToMany(() => PostBackLog, (postBackLog) => postBackLog.subMedia)
   postBackLog: PostBackLog;
 }

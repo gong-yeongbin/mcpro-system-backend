@@ -8,7 +8,6 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Advertising } from '../entities/Advertising';
-import { SubMedia } from '../entities/SubMedia';
 import { PostBackLog } from '../entities/PostBackLog';
 
 @Entity('mcp_tracker')
@@ -60,9 +59,6 @@ export class Tracker {
   @OneToMany(() => Advertising, (advertising) => advertising.tracker)
   advertising: Advertising[];
 
-  @OneToMany(() => SubMedia, (subMedia) => subMedia.tkCode)
-  subMedia: SubMedia;
-
-  @OneToMany(() => PostBackLog, (postBackLog) => postBackLog.tkCode)
+  @OneToMany(() => PostBackLog, (postBackLog) => postBackLog.tracker)
   postBackLog: PostBackLog;
 }

@@ -53,9 +53,9 @@ export class Media {
   @OneToMany(() => Campaign, (campaign) => campaign.media)
   campaign: Campaign[];
 
-  @OneToMany(() => SubMedia, (subMedia) => subMedia.mdCode)
+  @OneToMany(() => SubMedia, (subMedia) => subMedia.media)
   subMedia: SubMedia;
 
-  @OneToMany(() => PostBackLog, (postBackLog) => postBackLog.tkCode)
+  @OneToMany(() => PostBackLog, (postBackLog) => postBackLog.media)
   postBackLog: PostBackLog;
 }
