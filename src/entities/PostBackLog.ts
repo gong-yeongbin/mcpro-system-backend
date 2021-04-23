@@ -22,27 +22,25 @@ export class PostBackLog {
     type: 'nvarchar',
     name: 'campaignToken',
     nullable: true,
-    length: 30,
   })
   campaignToken: string;
 
-  @Column({ type: 'nvarchar', name: 'viewCode', nullable: true, length: 30 })
+  @Column({ type: 'nvarchar', name: 'viewCode', nullable: true })
   viewCode: string;
 
-  @Column({ type: 'nvarchar', name: 'type', nullable: true, length: 30 })
+  @Column({ type: 'nvarchar', name: 'type', nullable: true })
   type: string;
 
-  @Column({ type: 'nvarchar', name: 'platform', nullable: true, length: 300 })
+  @Column({ type: 'nvarchar', name: 'platform', nullable: true })
   platform: string;
 
-  @Column({ type: 'nvarchar', name: 'appkey', nullable: true, length: 300 })
+  @Column({ type: 'nvarchar', name: 'appkey', nullable: true })
   appkey: string;
 
   @Column({
     type: 'nvarchar',
     name: 'packageName',
     nullable: true,
-    length: 300,
   })
   packageName: string;
 
@@ -50,7 +48,6 @@ export class PostBackLog {
     type: 'nvarchar',
     name: 'deviceCountry',
     nullable: true,
-    length: 30,
   })
   deviceCountry: string;
 
@@ -58,7 +55,6 @@ export class PostBackLog {
     type: 'nvarchar',
     name: 'deviceLanguage',
     nullable: true,
-    length: 30,
   })
   deviceLanguage: string;
 
@@ -66,24 +62,22 @@ export class PostBackLog {
     type: 'nvarchar',
     name: 'deviceCarrier',
     nullable: true,
-    length: 30,
   })
   deviceCarrier: string;
 
-  @Column({ type: 'nvarchar', name: 'deviceIp', nullable: true, length: 30 })
+  @Column({ type: 'nvarchar', name: 'deviceIp', nullable: true })
   deviceIp: string;
 
-  @Column({ type: 'nvarchar', name: 'userAgent', nullable: true, length: 300 })
+  @Column({ type: 'nvarchar', name: 'userAgent', nullable: true })
   userAgent: string;
 
-  @Column({ type: 'nvarchar', name: 'deviceId', nullable: true, length: 100 })
+  @Column({ type: 'nvarchar', name: 'deviceId', nullable: true })
   deviceId: string;
 
   @Column({
     type: 'nvarchar',
     name: 'deviceAndroidId',
     nullable: true,
-    length: 100,
   })
   deviceAndroidId: string;
 
@@ -91,11 +85,10 @@ export class PostBackLog {
     type: 'nvarchar',
     name: 'deviceIosId',
     nullable: true,
-    length: 100,
   })
   deviceIosId: string;
 
-  @Column({ type: 'nvarchar', name: 'clickId', nullable: true, length: 300 })
+  @Column({ type: 'nvarchar', name: 'clickId', nullable: true })
   clickId: string;
 
   @Column('datetime', { name: 'clickDatetime', nullable: true })
@@ -110,25 +103,25 @@ export class PostBackLog {
   @Column('datetime', { name: 'mediaSendDatetime', nullable: true })
   mediaSendDatetime: Date;
 
-  @Column('varchar', { name: 'eventName', nullable: true, length: 100 })
+  @Column('varchar', { name: 'eventName', nullable: true })
   eventName: string;
 
-  @Column('varchar', { name: 'mediaSendUrl', nullable: true, length: 1000 })
+  @Column('varchar', { name: 'mediaSendUrl', nullable: true })
   mediaSendUrl: string;
 
-  @Column('varchar', { name: 'product', nullable: true, length: 1000 })
+  @Column('varchar', { name: 'product', nullable: true })
   product: string;
 
-  @Column('varchar', { name: 'productId', nullable: true, length: 100 })
+  @Column('varchar', { name: 'productId', nullable: true })
   productId: string;
 
-  @Column('varchar', { name: 'price', nullable: true, length: 100 })
+  @Column('varchar', { name: 'price', nullable: true })
   price: string;
 
-  @Column('varchar', { name: 'currency', nullable: true, length: 100 })
+  @Column('varchar', { name: 'currency', nullable: true })
   currency: string;
 
-  @Column('varchar', { name: 'firstPurchase', nullable: true, length: 100 })
+  @Column('varchar', { name: 'firstPurchase', nullable: true })
   firstPurchase: string;
 
   @Column('text', { name: 'originalUrl', nullable: true })

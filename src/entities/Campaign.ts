@@ -21,29 +21,28 @@ export class Campaign {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
   idx: number;
 
-  @Column({ type: 'nvarchar', name: 'cp_token', length: 45 })
+  @Column({ type: 'nvarchar', name: 'cp_token' })
   cpToken: string;
 
-  @Column({ type: 'nvarchar', name: 'cp_appkey', length: 20 })
+  @Column({ type: 'nvarchar', name: 'cp_appkey' })
   cpAppkey: string;
 
   @Column({
     type: 'nvarchar',
     name: 'cp_code',
-    length: 20,
   })
   cpCode: string;
 
-  @Column({ type: 'nvarchar', name: 'cp_name', length: 45 })
+  @Column({ type: 'nvarchar', name: 'cp_name' })
   cpName: string;
 
-  @Column({ type: 'nvarchar', name: 'type', length: 10 })
+  @Column({ type: 'nvarchar', name: 'type' })
   type: string;
 
-  @Column({ type: 'nvarchar', name: 'trackerTrackingUrl', length: 200 })
+  @Column({ type: 'nvarchar', name: 'trackerTrackingUrl' })
   trackerTrackingUrl: string;
 
-  @Column({ type: 'nvarchar', name: 'mecrossTrackingUrl', length: 200 })
+  @Column({ type: 'nvarchar', name: 'mecrossTrackingUrl' })
   mecrossTrackingUrl: string;
 
   @Column({

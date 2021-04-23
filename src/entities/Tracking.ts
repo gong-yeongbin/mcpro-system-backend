@@ -11,22 +11,22 @@
 //   @PrimaryGeneratedColumn({ type: 'bigint', name: 'id' })
 //   id: number;
 
-//   @Column({ type: 'nvarchar', name: 'type', length: 30 })
+//   @Column({ type: 'nvarchar', name: 'type' })
 //   type: string;
 
-//   @Column({ type: 'nvarchar', name: 'advertisingCode', length: 30 })
+//   @Column({ type: 'nvarchar', name: 'advertisingCode' })
 //   advertisingCode: string;
 
-//   @Column({ type: 'nvarchar', name: 'campaignCode', length: 30 })
+//   @Column({ type: 'nvarchar', name: 'campaignCode' })
 //   campaignCode: string;
 
-//   @Column({ type: 'nvarchar', name: 'mediaCode', length: 30 })
+//   @Column({ type: 'nvarchar', name: 'mediaCode' })
 //   mediaCode: string;
 
-//   @Column({ type: 'nvarchar', name: 'trackerCode', length: 30 })
+//   @Column({ type: 'nvarchar', name: 'trackerCode' })
 //   trackerCode: string;
 
-//   @Column({ type: 'nvarchar', name: 'trackingUrl', length: 500 })
+//   @Column({ type: 'nvarchar', name: 'trackingUrl' })
 //   trackingUrl: string;
 
 //   @CreateDateColumn({ name: 'createdAt' })

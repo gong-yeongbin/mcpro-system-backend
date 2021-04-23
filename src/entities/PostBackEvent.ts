@@ -13,13 +13,13 @@ export class PostBackEvent {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
   idx: number;
 
-  @Column({ type: 'nvarchar', name: 'trackerPostback', length: 45 })
+  @Column({ type: 'nvarchar', name: 'trackerPostback' })
   trackerPostback: string;
 
-  @Column({ type: 'nvarchar', name: 'adminPostback', length: 45 })
+  @Column({ type: 'nvarchar', name: 'adminPostback' })
   adminPostback: string;
 
-  @Column({ type: 'nvarchar', name: 'mediaPostback', length: 45 })
+  @Column({ type: 'nvarchar', name: 'mediaPostback' })
   mediaPostback: string;
 
   @Column({ type: 'boolean', name: 'sendPostback', default: true })

@@ -8,6 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Advertising } from '../entities/Advertising';
+import { SubMedia } from '../entities/SubMedia';
 import { PostBackLog } from '../entities/PostBackLog';
 
 @Entity('mcp_tracker')
@@ -16,16 +17,16 @@ export class Tracker {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
   idx: number;
 
-  @Column({ type: 'nvarchar', name: 'tk_code', length: 20 })
+  @Column({ type: 'nvarchar', name: 'tk_code' })
   tkCode: string;
 
-  @Column({ type: 'nvarchar', name: 'tk_name', length: 45 })
+  @Column({ type: 'nvarchar', name: 'tk_name' })
   tkName: string;
 
   @Column({
     type: 'nvarchar',
     name: 'type',
-    length: 10,
+
     default: 'tracker',
   })
   type: string;
@@ -33,20 +34,18 @@ export class Tracker {
   @Column({ type: 'boolean', name: 'tk_status', default: true })
   tkStatus: boolean;
 
-  @Column({ type: 'nvarchar', name: 'trackerTrackingUrlTemplate', length: 200 })
+  @Column({ type: 'nvarchar', name: 'trackerTrackingUrlTemplate' })
   trackerTrackingUrlTemplate: string;
 
   @Column({
     type: 'nvarchar',
     name: 'mecrossPostbackInstallUrlTemplate',
-    length: 200,
   })
   mecrossPostbackInstallUrlTemplate: string;
 
   @Column({
     type: 'nvarchar',
     name: 'mecrossPostbackEventUrlTemplate',
-    length: 200,
   })
   mecrossPostbackEventUrlTemplate: string;
 

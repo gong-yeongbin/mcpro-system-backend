@@ -17,10 +17,10 @@ export class Media {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
   idx: number;
 
-  @Column({ type: 'nvarchar', name: 'md_code', length: 20 })
+  @Column({ type: 'nvarchar', name: 'md_code' })
   mdCode: string;
 
-  @Column({ type: 'nvarchar', name: 'md_name', length: 45 })
+  @Column({ type: 'nvarchar', name: 'md_name' })
   mdName: string;
 
   @Column({
@@ -33,14 +33,12 @@ export class Media {
   @Column({
     type: 'nvarchar',
     name: 'mediaPostbackInstallUrlTemplate',
-    length: 200,
   })
   mediaPostbackInstallUrlTemplate: string;
 
   @Column({
     type: 'nvarchar',
     name: 'mediaPostbackEventUrlTemplate',
-    length: 200,
   })
   mediaPostbackEventUrlTemplate: string;
 

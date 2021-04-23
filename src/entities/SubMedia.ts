@@ -2,7 +2,7 @@ import { Advertising } from '../entities/Advertising';
 import { Campaign } from '../entities/Campaign';
 import { PostBackLog } from '../entities/PostBackLog';
 import { Media } from '../entities/Media';
-
+import { Tracker } from '../entities/Tracker';
 import {
   Column,
   CreateDateColumn,
@@ -21,16 +21,16 @@ export class SubMedia {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
   idx: string;
 
-  @Column({ type: 'nvarchar', name: 'cp_token', length: 45 })
+  @Column({ type: 'nvarchar', name: 'cp_token' })
   cpToken: string;
 
-  @Column({ type: 'nvarchar', name: 'pub_id', length: 45 })
+  @Column({ type: 'nvarchar', name: 'pub_id' })
   pubId: string;
 
-  @Column({ type: 'nvarchar', name: 'sub_id', length: 45, nullable: true })
+  @Column({ type: 'nvarchar', name: 'sub_id', nullable: true })
   subId: string;
 
-  @Column({ type: 'nvarchar', name: 'view_code', length: 45 })
+  @Column({ type: 'nvarchar', name: 'view_code' })
   viewCode: string;
 
   @CreateDateColumn({ name: 'created_at' })

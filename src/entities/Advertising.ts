@@ -21,20 +21,19 @@ export class Advertising {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
   idx: number;
 
-  @Column({ type: 'nvarchar', name: 'ad_code', length: 20 })
+  @Column({ type: 'nvarchar', name: 'ad_code' })
   adCode: string;
 
-  @Column({ type: 'nvarchar', name: 'ad_name', length: 45 })
+  @Column({ type: 'nvarchar', name: 'ad_name' })
   adName: string;
 
-  @Column({ type: 'nvarchar', name: 'ad_platform', length: 10 })
+  @Column({ type: 'nvarchar', name: 'ad_platform' })
   adPlatform: string;
 
   @Column({
     type: 'nvarchar',
     name: 'ad_image_url',
     nullable: true,
-    length: 100,
   })
   adImageUrl: string;
 

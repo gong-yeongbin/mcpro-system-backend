@@ -15,19 +15,19 @@ export class Reservation {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
   idx: number;
 
-  @Column({ type: 'nvarchar', name: 'reserve_code', length: 45 })
+  @Column({ type: 'nvarchar', name: 'reserve_code' })
   reserveCode: string;
 
-  @Column({ type: 'nvarchar', name: 'oldCampaignName', length: 45 })
+  @Column({ type: 'nvarchar', name: 'oldCampaignName' })
   oldCampaignName: string;
 
-  @Column({ type: 'nvarchar', name: 'newCampaignName', length: 45 })
+  @Column({ type: 'nvarchar', name: 'newCampaignName' })
   newCampaignName: string;
 
-  @Column({ type: 'nvarchar', name: 'oldTrackerTrackingUrl', length: 200 })
+  @Column({ type: 'nvarchar', name: 'oldTrackerTrackingUrl' })
   oldTrackerTrackingUrl: string;
 
-  @Column({ type: 'nvarchar', name: 'newTrackerTrackingUrl', length: 200 })
+  @Column({ type: 'nvarchar', name: 'newTrackerTrackingUrl' })
   newTrackerTrackingUrl: string;
 
   @Column({ type: 'boolean', name: 'status', default: false })

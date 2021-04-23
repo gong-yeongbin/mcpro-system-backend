@@ -15,10 +15,10 @@ export class Advertiser {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
   idx: number;
 
-  @Column({ type: 'nvarchar', name: 'ar_code', length: 20 })
+  @Column({ type: 'nvarchar', name: 'ar_code' })
   arCode: string;
 
-  @Column({ type: 'nvarchar', name: 'ar_name', length: 45 })
+  @Column({ type: 'nvarchar', name: 'ar_name' })
   arName: string;
 
   @CreateDateColumn({ name: 'created_at' })
