@@ -30,7 +30,7 @@ export class SubMedia {
   @Column({ type: 'nvarchar', name: 'sub_id', length: 45, nullable: true })
   subId: string;
 
-  @Column({ type: 'nvarchar', name: 'view_code', length: 30 })
+  @Column({ type: 'nvarchar', name: 'view_code', length: 45 })
   viewCode: string;
 
   @CreateDateColumn({ name: 'created_at' })
