@@ -1,4 +1,6 @@
+import { PostbackInstallDto } from 'src/postback/dto/postback-install.dto';
 import { TrackingDto } from 'src/tracking/dto/tracking.dto';
+import * as moment from 'moment-timezone';
 
 /**
  * 4.메크로스Pro 트래킹 URL 를 트래커 트래킹 URL 변환
@@ -209,4 +211,93 @@ export function convertTrackerTrackingUrl(
   }
 
   return convertedTrackerTrackingUrl;
+}
+
+interface postBackInstallData {
+  tkCode?: string;
+  viewCode?: string;
+  clickId?: string;
+  deviceId?: string;
+  deviceIosId?: string;
+  deviceAndroidId?: string;
+  deviceCarrier?: string;
+  deviceCountry?: string;
+  deviceLanguage?: string;
+  deviceIp?: string;
+  appkey?: string;
+  clickDatetime?: string;
+  installDatetime?: string;
+  eventName?: string;
+  eventDatetime?: string;
+  productId?: string;
+  price?: number;
+  currency?: string;
+}
+
+export function postBackInstall(req: PostbackInstallDto) {
+  const returnData: postBackInstallData = {};
+
+  if (!req.cb_param3 && !req.cb_param4) {
+    //애드브릭스
+    returnData.tkCode = 'adbrix';
+  }
+  if (!req.cb_2 && !req.cb_3) {
+    //애드브릭스-리마스터
+    returnData.tkCode = 'adbrix_remaster';
+  }
+  if (!req.af_siteid && !req.clickid) {
+    //앱스플라이어
+    returnData.tkCode = 'appsflyer';
+  }
+
+  switch (returnData.tkCode) {
+    case 'adbrix':
+      returnData.viewCode = req.cb_param4;
+      returnData.clickId = req.cb_param3;
+      returnData.deviceId = !req.ifa ? req.gaid : req.ifa;
+      returnData.deviceCarrier = req.carrier;
+      returnData.deviceCountry = req.country;
+      returnData.deviceLanguage = req.language;
+      returnData.deviceIp = req.click_ip;
+      returnData.appkey = req.appkey;
+      // returnData.clickDatetime = req.session_dt_kst //20201220105052211
+      //   ? convertTimeToFormat(req.session_dt_kst)
+      //   : '1970-01-01 00:00:00';
+      // returnData.installDatetime = req.install_dt_kst //20201220105116000
+      //   ? convertTimeToFormat(req.install_dt_kst)
+      //   : '1970-01-01 00:00:00';
+      break;
+
+    case 'adbrix_remaster':
+      returnData.viewCode = req.cb_2;
+      returnData.clickId = req.cb_3;
+      returnData.deviceId = req.adid; //공통
+      returnData.deviceCarrier = req.device_carrier;
+      returnData.deviceCountry = req.device_country;
+      returnData.deviceLanguage = req.device_language;
+      returnData.appkey = req.appkey;
+      returnData.deviceIp = req.a_ip;
+      // returnData.clickDatetime = clickDatetime2.format('YYYY-MM-DD HH:mm:ss');
+      // returnData.installDatetime = installDatetime2.format(
+      //   'YYYY-MM-DD HH:mm:ss',
+      // );
+      break;
+
+    case 'appsflyer':
+      returnData.viewCode = req.af_siteid; //노출용코드
+      returnData.clickId = req.clickid; //클릭id
+      returnData.deviceId = !req.idfa ? req.advertising_id : req.idfa;
+      returnData.deviceCarrier = req.device_carrier;
+      returnData.deviceCountry = req.country_code;
+      returnData.deviceLanguage = req.language;
+      returnData.deviceIp = '';
+      returnData.appkey = '';
+      // returnData.clickDatetime = clickDatetime2.format('YYYY-MM-DD HH:mm:ss');
+      // returnData.installDatetime = installDatetime2.format(
+      //   'YYYY-MM-DD HH:mm:ss',
+      // );
+      break;
+  }
+
+  return;
 }

@@ -33,7 +33,6 @@ export class PostBackEvent {
 
   @ManyToOne(() => Campaign, (campaign) => campaign.postBackEvent, {
     onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
   })
   campaign: Campaign;
 }

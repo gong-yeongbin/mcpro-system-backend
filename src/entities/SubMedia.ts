@@ -2,7 +2,7 @@ import { Advertising } from '../entities/Advertising';
 import { Campaign } from '../entities/Campaign';
 import { PostBackLog } from '../entities/PostBackLog';
 import { Media } from '../entities/Media';
-import { Tracker } from '../entities/Tracker';
+
 import {
   Column,
   CreateDateColumn,
@@ -14,6 +14,7 @@ import {
   Unique,
   UpdateDateColumn,
 } from 'typeorm';
+import { CampaignDaily } from './CampaignDaily';
 
 @Entity('mcp_submedia')
 @Unique(['viewCode'])
@@ -53,4 +54,7 @@ export class SubMedia {
 
   @OneToMany(() => PostBackLog, (postBackLog) => postBackLog.subMedia)
   postBackLog: PostBackLog;
+
+  @OneToMany(() => CampaignDaily, (campaignDaily) => campaignDaily.subMedia)
+  campaignDaily: CampaignDaily;
 }

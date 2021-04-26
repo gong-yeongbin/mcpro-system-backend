@@ -44,14 +44,12 @@ export class Reservation {
 
   @ManyToOne(() => Advertising, (advertising) => advertising.reservation, {
     onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
   })
   @JoinColumn({ name: 'advertising' })
   advertising: Advertising;
 
   @ManyToOne(() => Campaign, (campaign) => campaign.reservation, {
     onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
   })
   @JoinColumn({ name: 'campaign' })
   campaign: Campaign;

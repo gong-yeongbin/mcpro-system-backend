@@ -9,7 +9,7 @@ import { ConfigModule } from '@nestjs/config';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: ['.env.dev', '.env.staging', '.env.prod'],
+      envFilePath: ['.env.dev', '.env.prod'],
       isGlobal: true,
     }),
     TypeOrmModule.forRoot({

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, Logger } from '@nestjs/common';
+import { Injectable, NotFoundException, Logger, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Campaign } from 'src/entities/Campaign';
 import { SubMedia } from 'src/entities/SubMedia';
@@ -6,6 +6,8 @@ import { Repository } from 'typeorm';
 import { v4 } from 'uuid';
 import { TrackingDto } from './dto/tracking.dto';
 import { convertTrackerTrackingUrl } from '../common/util';
+import { CampaignDaily } from 'src/entities/CampaignDaily';
+import * as moment from 'moment';
 
 @Injectable()
 export class TrackingService {
@@ -14,6 +16,8 @@ export class TrackingService {
     private readonly campaignRepository: Repository<Campaign>,
     @InjectRepository(SubMedia)
     private readonly submediaRepository: Repository<SubMedia>,
+    @InjectRepository(CampaignDaily)
+    private readonly campaignDailyRepository: Repository<CampaignDaily>,
   ) {}
 
   async tracking(requestQuery: TrackingDto): Promise<string> {
@@ -76,35 +80,44 @@ export class TrackingService {
 
     //5. 트래커 트래킹 URL를 실행
     if (convertedTrackingUrl !== null) {
+      const submediaEntity: SubMedia = await this.submediaRepository.findOne({
+        where: {
+          pubId: pubId,
+          subId: subId,
+        },
+      });
+
+      const campaignDailyEntity: CampaignDaily = await this.campaignDailyRepository.findOne(
+        {
+          where: {
+            campaign: campaignEntity,
+            subMedia: submediaEntity,
+            createdAt: moment().format('YYYY-MM-DD'),
+          },
+        },
+      );
+
+      if (!campaignDailyEntity) {
+        const campaignDaily: CampaignDaily = new CampaignDaily();
+
+        campaignDaily.viewCode = viewCode;
+        campaignDaily.click = 1;
+        campaignDaily.tracker = campaignEntity.advertising.tracker;
+        campaignDaily.media = campaignEntity.media;
+        campaignDaily.advertising = campaignEntity.advertising;
+        campaignDaily.campaign = campaignEntity;
+        campaignDaily.subMedia = submediaEntity;
+        campaignDaily.createdAt = new Date();
+        campaignDaily.updatedAt = new Date();
+
+        await this.campaignDailyRepository.save(campaignDaily);
+      } else {
+        campaignDailyEntity.click = Number(campaignDailyEntity.click) + 1;
+
+        await this.campaignDailyRepository.save(campaignDailyEntity);
+      }
+
       return convertedTrackingUrl;
     }
-
-    //6. 트래킹 로그 확인
-    //6-1) 메크로스 트래킹 로그 확인
-
-    //7. 클릭 데이터 취합
-    // try {
-    //   await query.dailyCollection(
-    //     'click',
-    //     advertisingCode,
-    //     campaignCode,
-    //     req.query.token,
-    //     trackerCode,
-    //     mediaCode,
-    //     submediaCode,
-    //     viewCode,
-    //   );
-    // } catch (err) {
-    //   console.log('클릭 데이터 취합 error : ' + err);
-    // }
-
-    // let exist = await sequelize.query(
-    //   `select * from ${tableNameForCampaignSubmedia} where campaignCode = '${campaignCode}' and submediaCode = '${submediaCode}' and registeredAt = '${currentDay}' limit 1;`,
-    //   {
-    //     type: QueryTypes.SELECT,
-    //   },
-    // );
-
-    return;
   }
 }

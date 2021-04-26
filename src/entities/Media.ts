@@ -10,6 +10,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Campaign } from './Campaign';
+import { CampaignDaily } from './CampaignDaily';
 
 @Entity('mcp_media')
 @Unique(['mdCode'])
@@ -56,4 +57,7 @@ export class Media {
 
   @OneToMany(() => PostBackLog, (postBackLog) => postBackLog.media)
   postBackLog: PostBackLog;
+
+  @OneToMany(() => CampaignDaily, (campaignDaily) => campaignDaily.media)
+  campaignDaily: CampaignDaily;
 }

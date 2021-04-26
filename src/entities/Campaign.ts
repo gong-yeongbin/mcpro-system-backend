@@ -14,6 +14,7 @@ import { PostBackEvent } from './PostBackEvent';
 import { Reservation } from './Reservation';
 import { SubMedia } from '../entities/SubMedia';
 import { PostBackLog } from 'src/entities/PostBackLog';
+import { CampaignDaily } from './CampaignDaily';
 
 @Entity('mcp_campaign')
 @Unique(['cpCode', 'cpToken'])
@@ -30,6 +31,7 @@ export class Campaign {
   @Column({
     type: 'nvarchar',
     name: 'cp_code',
+    nullable: true,
   })
   cpCode: string;
 
@@ -74,13 +76,11 @@ export class Campaign {
 
   @ManyToOne(() => Advertising, (advertising) => advertising.campaign, {
     onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
   })
   advertising: Advertising;
 
   @ManyToOne(() => Media, (media) => media.campaign, {
     onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
   })
   media: Media;
 
@@ -95,4 +95,7 @@ export class Campaign {
 
   @OneToMany(() => PostBackLog, (postBackLog) => postBackLog.campaign)
   postBackLog: PostBackLog;
+
+  @OneToMany(() => CampaignDaily, (campaignDaily) => campaignDaily.campaign)
+  campaignDaily: CampaignDaily;
 }
