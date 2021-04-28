@@ -91,43 +91,48 @@ export class PostBackLog {
   @Column({ type: 'nvarchar', name: 'clickId', nullable: true })
   clickId: string;
 
-  @Column('datetime', { name: 'clickDatetime', nullable: true })
+  @Column({ type: 'datetime', name: 'clickDatetime', nullable: true })
   clickDatetime: Date;
 
-  @Column('datetime', { name: 'installDatetime', nullable: true })
+  @Column({ type: 'datetime', name: 'installDatetime', nullable: true })
   installDatetime: Date;
 
-  @Column('datetime', { name: 'eventDatetime', nullable: true })
+  @Column({ type: 'datetime', name: 'eventDatetime', nullable: true })
   eventDatetime: Date;
 
-  @Column('datetime', { name: 'mediaSendDatetime', nullable: true })
+  @Column({ type: 'datetime', name: 'mediaSendDatetime', nullable: true })
   mediaSendDatetime: Date;
 
-  @Column('varchar', { name: 'eventName', nullable: true })
+  @Column({ type: 'nvarchar', name: 'eventName', nullable: true })
   eventName: string;
 
-  @Column('varchar', { name: 'mediaSendUrl', nullable: true })
+  @Column({ type: 'nvarchar', name: 'mediaSendUrl', nullable: true })
   mediaSendUrl: string;
 
-  @Column('varchar', { name: 'product', nullable: true })
+  @Column({ type: 'nvarchar', name: 'product', nullable: true })
   product: string;
 
-  @Column('varchar', { name: 'productId', nullable: true })
+  @Column({ type: 'nvarchar', name: 'productId', nullable: true })
   productId: string;
 
-  @Column('varchar', { name: 'price', nullable: true })
+  @Column({ type: 'nvarchar', name: 'price', nullable: true })
   price: string;
 
-  @Column('varchar', { name: 'currency', nullable: true })
+  @Column({ type: 'nvarchar', name: 'currency', nullable: true })
   currency: string;
 
-  @Column('varchar', { name: 'firstPurchase', nullable: true })
+  @Column({ type: 'nvarchar', name: 'firstPurchase', nullable: true })
   firstPurchase: string;
 
-  @Column('text', { name: 'originalUrl', nullable: true })
+  @Column({
+    type: 'nvarchar',
+    name: 'originalUrl',
+    nullable: true,
+    length: 2000,
+  })
   originalUrl: string;
 
-  @Column('datetime', { name: 'registeredAt', nullable: true })
+  @Column({ type: 'datetime', name: 'registeredAt', nullable: true })
   registeredAt: Date;
 
   @CreateDateColumn({ name: 'created_at' })

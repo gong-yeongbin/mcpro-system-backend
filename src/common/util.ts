@@ -237,15 +237,15 @@ interface postBackInstallData {
 export function postBackInstall(req: PostbackInstallDto) {
   const returnData: postBackInstallData = {};
 
-  if (!req.cb_param3 && !req.cb_param4) {
+  if (req.cb_param3 && req.cb_param4) {
     //애드브릭스
     returnData.tkCode = 'adbrix';
   }
-  if (!req.cb_2 && !req.cb_3) {
+  if (req.cb_2 && req.cb_3) {
     //애드브릭스-리마스터
     returnData.tkCode = 'adbrix_remaster';
   }
-  if (!req.af_siteid && !req.clickid) {
+  if (req.af_siteid && req.clickid) {
     //앱스플라이어
     returnData.tkCode = 'appsflyer';
   }
@@ -260,15 +260,29 @@ export function postBackInstall(req: PostbackInstallDto) {
       returnData.deviceLanguage = req.language;
       returnData.deviceIp = req.click_ip;
       returnData.appkey = req.appkey;
-      // returnData.clickDatetime = req.session_dt_kst //20201220105052211
-      //   ? convertTimeToFormat(req.session_dt_kst)
-      //   : '1970-01-01 00:00:00';
-      // returnData.installDatetime = req.install_dt_kst //20201220105116000
-      //   ? convertTimeToFormat(req.install_dt_kst)
-      //   : '1970-01-01 00:00:00';
+      returnData.clickDatetime = req.session_dt_kst //20201220105052211
+        ? convertTimeToFormat(req.session_dt_kst)
+        : '1970-01-01 00:00:00';
+      returnData.installDatetime = req.install_dt_kst //20201220105116000
+        ? convertTimeToFormat(req.install_dt_kst)
+        : '1970-01-01 00:00:00';
       break;
 
     case 'adbrix_remaster':
+      const installDatetime2 = req.event_datetime
+        ? moment(req.event_datetime.replace('+', ' ').split('.')[0]).add(
+            9,
+            'hours',
+          )
+        : moment('1970-01-01 00:00:00');
+      //event_datetime=2020-12-28+01:41:10.422
+
+      const clickDatetime2 = req.event_datetime
+        ? moment(req.event_datetime.replace('+', ' ').split('.')[0])
+            .add(9, 'hours')
+            .subtract(req.seconds_gap, 'seconds')
+        : moment('1970-01-01 00:00:00');
+
       returnData.viewCode = req.cb_2;
       returnData.clickId = req.cb_3;
       returnData.deviceId = req.adid; //공통
@@ -277,13 +291,21 @@ export function postBackInstall(req: PostbackInstallDto) {
       returnData.deviceLanguage = req.device_language;
       returnData.appkey = req.appkey;
       returnData.deviceIp = req.a_ip;
-      // returnData.clickDatetime = clickDatetime2.format('YYYY-MM-DD HH:mm:ss');
-      // returnData.installDatetime = installDatetime2.format(
-      //   'YYYY-MM-DD HH:mm:ss',
-      // );
+      returnData.clickDatetime = clickDatetime2.format('YYYY-MM-DD HH:mm:ss');
+      returnData.installDatetime = installDatetime2.format(
+        'YYYY-MM-DD HH:mm:ss',
+      );
       break;
 
     case 'appsflyer':
+      const clickDatetime3 = req.click_time
+        ? moment(decodeURIComponent(req.click_time)).add(9, 'hours')
+        : moment('1970-01-01 00:00:00'); //click_datetime=2021-02-03%2006%3A11%3A06.725
+
+      const installDatetime4 = req.install_time
+        ? moment(decodeURIComponent(req.install_time)).add(9, 'hours')
+        : moment('1970-01-01 00:00:00'); //install_datetime=2021-02-03%2006%3A11%3A17.223
+
       returnData.viewCode = req.af_siteid; //노출용코드
       returnData.clickId = req.clickid; //클릭id
       returnData.deviceId = !req.idfa ? req.advertising_id : req.idfa;
@@ -292,12 +314,29 @@ export function postBackInstall(req: PostbackInstallDto) {
       returnData.deviceLanguage = req.language;
       returnData.deviceIp = '';
       returnData.appkey = '';
-      // returnData.clickDatetime = clickDatetime2.format('YYYY-MM-DD HH:mm:ss');
-      // returnData.installDatetime = installDatetime2.format(
-      //   'YYYY-MM-DD HH:mm:ss',
-      // );
+      returnData.clickDatetime = clickDatetime3.format('YYYY-MM-DD HH:mm:ss');
+      returnData.installDatetime = installDatetime4.format(
+        'YYYY-MM-DD HH:mm:ss',
+      );
       break;
   }
 
-  return;
+  return returnData;
+}
+
+export function convertTimeToFormat(datetime) {
+  const datetimeFormat =
+    datetime.substring(0, 4) +
+    '-' +
+    datetime.substring(4, 6) +
+    '-' +
+    datetime.substring(6, 8) +
+    ' ' +
+    datetime.substring(8, 10) +
+    ':' +
+    datetime.substring(10, 12) +
+    ':' +
+    datetime.substring(12, 14);
+
+  return moment(datetimeFormat).format('YYYY-MM-DD HH:mm:ss');
 }

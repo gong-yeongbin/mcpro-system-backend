@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, Logger, Inject } from '@nestjs/common';
+import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Campaign } from 'src/entities/Campaign';
 import { SubMedia } from 'src/entities/SubMedia';
@@ -96,11 +96,10 @@ export class TrackingService {
           },
         },
       );
-
       if (!campaignDailyEntity) {
         const campaignDaily: CampaignDaily = new CampaignDaily();
 
-        campaignDaily.viewCode = viewCode;
+        campaignDaily.viewCode = submediaEntity.viewCode;
         campaignDaily.click = 1;
         campaignDaily.tracker = campaignEntity.advertising.tracker;
         campaignDaily.media = campaignEntity.media;

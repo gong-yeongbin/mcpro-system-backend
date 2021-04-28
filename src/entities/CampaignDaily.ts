@@ -1,9 +1,7 @@
 import {
   Column,
-  CreateDateColumn,
   Entity,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
@@ -18,12 +16,13 @@ export class CampaignDaily {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
   idx: string;
 
-  @Column({ type: 'nvarchar', name: 'viewCode' })
+  @Column({ type: 'nvarchar', name: 'viewCode', nullable: true })
   viewCode: string;
 
   @Column({
     type: 'bigint',
     name: 'click',
+    nullable: true,
     default: 0,
   })
   click: number;
@@ -31,6 +30,7 @@ export class CampaignDaily {
   @Column({
     type: 'bigint',
     name: 'install',
+    nullable: true,
     default: 0,
   })
   install: number;
@@ -38,6 +38,7 @@ export class CampaignDaily {
   @Column({
     type: 'bigint',
     name: 'signup',
+    nullable: true,
     default: 0,
   })
   signup: number;
@@ -45,16 +46,18 @@ export class CampaignDaily {
   @Column({
     type: 'bigint',
     name: 'retention',
+    nullable: true,
     default: 0,
   })
   retention: number;
 
-  @Column({ type: 'bigint', name: 'buy', default: 0 })
+  @Column({ type: 'bigint', name: 'buy', nullable: true, default: 0 })
   buy: number;
 
   @Column({
     type: 'bigint',
     name: 'price',
+    nullable: true,
     default: 0,
   })
   price: number;
@@ -62,6 +65,7 @@ export class CampaignDaily {
   @Column({
     type: 'bigint',
     name: 'etc1',
+    nullable: true,
     default: 0,
   })
   etc1: number;
@@ -69,6 +73,7 @@ export class CampaignDaily {
   @Column({
     type: 'bigint',
     name: 'etc2',
+    nullable: true,
     default: 0,
   })
   etc2: number;
@@ -76,6 +81,7 @@ export class CampaignDaily {
   @Column({
     type: 'bigint',
     name: 'etc3',
+    nullable: true,
     default: 0,
   })
   etc3: number;
@@ -83,6 +89,7 @@ export class CampaignDaily {
   @Column({
     type: 'bigint',
     name: 'etc4',
+    nullable: true,
     default: 0,
   })
   etc4: number;
@@ -90,6 +97,7 @@ export class CampaignDaily {
   @Column({
     type: 'bigint',
     name: 'etc5',
+    nullable: true,
     default: 0,
   })
   etc5: number;
