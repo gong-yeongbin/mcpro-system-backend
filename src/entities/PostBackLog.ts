@@ -109,20 +109,14 @@ export class PostBackLog {
   @Column({ type: 'nvarchar', name: 'mediaSendUrl', nullable: true })
   mediaSendUrl: string;
 
-  @Column({ type: 'nvarchar', name: 'product', nullable: true })
-  product: string;
-
   @Column({ type: 'nvarchar', name: 'productId', nullable: true })
   productId: string;
 
-  @Column({ type: 'nvarchar', name: 'price', nullable: true })
-  price: string;
+  @Column({ type: 'integer', name: 'price', nullable: true })
+  price: number;
 
   @Column({ type: 'nvarchar', name: 'currency', nullable: true })
   currency: string;
-
-  @Column({ type: 'nvarchar', name: 'firstPurchase', nullable: true })
-  firstPurchase: string;
 
   @Column({
     type: 'nvarchar',
@@ -132,7 +126,7 @@ export class PostBackLog {
   })
   originalUrl: string;
 
-  @Column({ type: 'datetime', name: 'registeredAt', nullable: true })
+  @Column({ type: 'date', name: 'registeredAt', nullable: true })
   registeredAt: Date;
 
   @CreateDateColumn({ name: 'created_at' })
