@@ -1,19 +1,26 @@
 import { Controller, Get, Query, Req } from '@nestjs/common';
+import { AdbrixRemasterPostbackInstallDto } from './dto/adbrix-remaster-postback-install.dto';
+import { AdbrixRemasterPostbackEventDto } from './dto/adbrix-remaster-postback-event.dto';
 import { PostbackEventDto } from './dto/postback-event.dto';
-import { PostbackInstallDto } from './dto/postback-install.dto';
 import { PostbackService } from './postback.service';
 
 @Controller()
 export class PostbackController {
   constructor(private readonly postBackService: PostbackService) {}
 
-  @Get('/postback-install')
-  postBackInstall(@Req() req: any, @Query() query: PostbackInstallDto) {
-    return this.postBackService.postBackInstall(req, query);
+  @Get('/adbrix-remaster/install')
+  postBackInstallAdbrixRemaster(
+    @Req() req: any,
+    @Query() query: AdbrixRemasterPostbackInstallDto,
+  ) {
+    return this.postBackService.postBackInstallAdbrixRemaster(req, query);
   }
 
-  @Get('/postback-event')
-  postBackEvent(@Req() req: any, @Query() query: PostbackEventDto) {
-    return this.postBackService.postBackEvent(req, query);
+  @Get('/adbrix-remaster/event')
+  postBackEventAdbrixRemaster(
+    @Req() req: any,
+    @Query() query: AdbrixRemasterPostbackEventDto,
+  ) {
+    return this.postBackService.postBackEventAdbrixRemaster(req, query);
   }
 }

@@ -1,6 +1,5 @@
 import { Advertising } from '../entities/Advertising';
 import { Campaign } from '../entities/Campaign';
-import { PostBackLog } from '../entities/PostBackLog';
 import { Media } from '../entities/Media';
 
 import {
@@ -34,6 +33,89 @@ export class SubMedia {
   @Column({ type: 'nvarchar', name: 'view_code' })
   viewCode: string;
 
+  @Column({
+    type: 'bigint',
+    name: 'click',
+    nullable: true,
+    default: 0,
+  })
+  click: number;
+
+  @Column({
+    type: 'bigint',
+    name: 'install',
+    nullable: true,
+    default: 0,
+  })
+  install: number;
+
+  @Column({
+    type: 'bigint',
+    name: 'signup',
+    nullable: true,
+    default: 0,
+  })
+  signup: number;
+
+  @Column({
+    type: 'bigint',
+    name: 'retention',
+    nullable: true,
+    default: 0,
+  })
+  retention: number;
+
+  @Column({ type: 'bigint', name: 'buy', nullable: true, default: 0 })
+  buy: number;
+
+  @Column({
+    type: 'bigint',
+    name: 'price',
+    nullable: true,
+    default: 0,
+  })
+  price: number;
+
+  @Column({
+    type: 'bigint',
+    name: 'etc1',
+    nullable: true,
+    default: 0,
+  })
+  etc1: number;
+
+  @Column({
+    type: 'bigint',
+    name: 'etc2',
+    nullable: true,
+    default: 0,
+  })
+  etc2: number;
+
+  @Column({
+    type: 'bigint',
+    name: 'etc3',
+    nullable: true,
+    default: 0,
+  })
+  etc3: number;
+
+  @Column({
+    type: 'bigint',
+    name: 'etc4',
+    nullable: true,
+    default: 0,
+  })
+  etc4: number;
+
+  @Column({
+    type: 'bigint',
+    name: 'etc5',
+    nullable: true,
+    default: 0,
+  })
+  etc5: number;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
@@ -51,9 +133,6 @@ export class SubMedia {
   @ManyToOne(() => Media, (media) => media.subMedia)
   @JoinColumn({ name: 'media' })
   media: Media;
-
-  @OneToMany(() => PostBackLog, (postBackLog) => postBackLog.subMedia)
-  postBackLog: PostBackLog;
 
   @OneToMany(() => CampaignDaily, (campaignDaily) => campaignDaily.subMedia)
   campaignDaily: CampaignDaily;

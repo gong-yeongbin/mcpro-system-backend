@@ -1,4 +1,3 @@
-import { PostBackLog } from '../entities/PostBackLog';
 import { SubMedia } from '../entities/SubMedia';
 import {
   Column,
@@ -54,9 +53,6 @@ export class Media {
 
   @OneToMany(() => SubMedia, (subMedia) => subMedia.media)
   subMedia: SubMedia;
-
-  @OneToMany(() => PostBackLog, (postBackLog) => postBackLog.media)
-  postBackLog: PostBackLog;
 
   @OneToMany(() => CampaignDaily, (campaignDaily) => campaignDaily.media)
   campaignDaily: CampaignDaily;

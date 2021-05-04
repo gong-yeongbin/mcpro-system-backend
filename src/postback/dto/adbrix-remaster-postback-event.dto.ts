@@ -1,6 +1,6 @@
 import { IsNumberString, IsOptional, IsString } from 'class-validator';
 
-export class AdbrixRemasterPostbackEvent {
+export class AdbrixRemasterPostbackEventDto {
   @IsString()
   @IsOptional()
   a_key: string;
@@ -157,16 +157,16 @@ export class AdbrixRemasterPostbackEvent {
   @IsOptional()
   param_json: string;
 
+  //캠페인 토큰
   @IsString()
-  @IsOptional()
   cb_1: string;
 
+  //노출코드
   @IsString()
-  @IsOptional()
   cb_2: string;
 
+  //click id
   @IsString()
-  @IsOptional()
   cb_3: string;
 
   @IsString()

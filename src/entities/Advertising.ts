@@ -13,7 +13,6 @@ import { Tracker } from './Tracker';
 import { Campaign } from './Campaign';
 import { Reservation } from './Reservation';
 import { SubMedia } from '../entities/SubMedia';
-import { PostBackLog } from 'src/entities/PostBackLog';
 import { CampaignDaily } from './CampaignDaily';
 
 @Entity('mcp_advertising')
@@ -69,9 +68,6 @@ export class Advertising {
 
   @OneToMany(() => SubMedia, (subMedia) => subMedia.advertising)
   subMedia: SubMedia;
-
-  @OneToMany(() => PostBackLog, (postBackLog) => postBackLog.advertising)
-  postBackLog: PostBackLog;
 
   @OneToMany(() => CampaignDaily, (campaignDaily) => campaignDaily.advertising)
   campaignDaily: CampaignDaily;

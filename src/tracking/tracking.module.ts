@@ -7,7 +7,7 @@ import { TrackingController } from './tracking.controller';
 import { TrackingService } from './tracking.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Campaign, SubMedia, CampaignDaily])],
+  imports: [TypeOrmModule.forFeature([Campaign, SubMedia])],
   controllers: [TrackingController],
   providers: [TrackingService],
 })

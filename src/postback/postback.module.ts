@@ -1,8 +1,8 @@
 import { HttpModule, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { CampaignDaily } from 'src/entities/CampaignDaily';
 import { PostBackEvent } from 'src/entities/PostBackEvent';
-import { PostBackLog } from 'src/entities/PostBackLog';
+import { PostBackEventAdbrixRemaster } from 'src/entities/PostBackEventAdbrixRemaster';
+import { PostBackInstallAdbrixRemaster } from 'src/entities/PostBackInstallAdbrixRemaster';
 import { SubMedia } from 'src/entities/SubMedia';
 import { PostbackController } from './postback.controller';
 import { PostbackService } from './postback.service';
@@ -11,9 +11,9 @@ import { PostbackService } from './postback.service';
   imports: [
     TypeOrmModule.forFeature([
       SubMedia,
-      PostBackLog,
       PostBackEvent,
-      CampaignDaily,
+      PostBackInstallAdbrixRemaster,
+      PostBackEventAdbrixRemaster,
     ]),
     HttpModule.register({
       timeout: 5000,

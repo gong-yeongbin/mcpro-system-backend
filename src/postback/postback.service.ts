@@ -1,20 +1,13 @@
-import {
-  HttpService,
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { HttpService, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SubMedia } from 'src/entities/SubMedia';
-import { Connection, getConnection, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import * as moment from 'moment';
-import { PostbackInstallDto } from './dto/postback-install.dto';
-import { postBackEvent, postBackInstall } from 'src/common/util';
-import { PostBackLog } from 'src/entities/PostBackLog';
-import { CampaignDaily } from 'src/entities/CampaignDaily';
-import { PostbackEventDto } from './dto/postback-event.dto';
 import { PostBackEvent } from 'src/entities/PostBackEvent';
-import { Campaign } from 'src/entities/Campaign';
+import { AdbrixRemasterPostbackInstallDto } from './dto/adbrix-remaster-postback-install.dto';
+import { AdbrixRemasterPostbackEventDto } from './dto/adbrix-remaster-postback-event.dto';
+import { PostBackInstallAdbrixRemaster } from 'src/entities/PostBackInstallAdbrixRemaster';
+import { PostBackEventAdbrixRemaster } from 'src/entities/PostBackEventAdbrixRemaster';
 
 @Injectable()
 export class PostbackService {
@@ -22,49 +15,69 @@ export class PostbackService {
     private httpService: HttpService,
     @InjectRepository(SubMedia)
     private readonly subMediaRepository: Repository<SubMedia>,
-    @InjectRepository(PostBackLog)
-    private readonly postBackLogRepository: Repository<PostBackLog>,
     @InjectRepository(PostBackEvent)
     private readonly postBackEventRepository: Repository<PostBackEvent>,
-    @InjectRepository(CampaignDaily)
-    private readonly campaignDailyRepository: Repository<CampaignDaily>,
+    @InjectRepository(PostBackInstallAdbrixRemaster)
+    private readonly postBackInstallAdbrixRemasterRepository: Repository<PostBackInstallAdbrixRemaster>,
+    @InjectRepository(PostBackEventAdbrixRemaster)
+    private readonly postBackEventAdbrixRemasterRepository: Repository<PostBackEventAdbrixRemaster>,
   ) {}
 
-  async postBackInstall(req: any, query: PostbackInstallDto) {
+  async postBackInstallAdbrixRemaster(
+    req: any,
+    query: AdbrixRemasterPostbackInstallDto,
+  ) {
     const originalUrl: string = `${req.protocol}://${req.get('host')}${
       req.originalUrl
     }` as string;
-    //1. 로그서버로 트래픽 전송
-    //2. 트래커 별 포스트백 공통 (viewCode, adid, clickid ...)
 
     const {
-      tkCode,
-      viewCode,
-      clickId,
-      deviceId,
-      deviceAndroidId,
-      deviceIosId,
-      deviceCarrier,
-      deviceCountry,
-      deviceLanguage,
-      deviceIp,
+      a_key,
+      a_cookie,
+      a_ip,
+      a_fp,
+      a_country,
+      a_city,
+      a_region,
+      a_appkey,
+      m_publisher,
+      m_sub_publisher,
+      adid,
+      idfv,
+      ad_id_opt_out,
+      device_os_version,
+      device_model,
+      device_vendor,
+      device_resolution,
+      device_portrait,
+      device_platform,
+      device_network,
+      device_wifi,
+      device_carrier,
+      device_language,
+      device_country,
+      device_build_id,
+      package_name,
       appkey,
-      clickDatetime,
-      installDatetime,
-    } = postBackInstall(query);
+      sdk_version,
+      installer,
+      app_version,
+      attr_type,
+      event_name,
+      event_datetime,
+      deeplink_path,
+      market_install_btn_clicked,
+      app_install_start,
+      app_install_completed,
+      app_first_open,
+      seconds_gap,
+      cb_1, //캠페인 토큰
+      cb_2, //노출코드
+      cb_3, //click id
+      cb_4,
+      cb_5,
+    } = query;
 
-    //3. 노출용코드(viewCode)로 캠페인토큰, 광고앱코드, 캠페인코드, 매체코드, 서브매체코드 가져오기
-    //viewCode는 모든 트래커가 공통으로 내려주는 컬럼 (campaignToken 은 공통 x)
-    if (!viewCode) {
-      throw new InternalServerErrorException();
-    }
-
-    //4. 캠페인(Campaign) 관련 정보 가져오기
-    //4-1) 포스트백 별 매체 전송 여부 (Postback)
-    //4-2) 매체 별 포스트백 URL 템플릿 (Media)
-    //4-3) 광고앱 차단 여부 (Advertising)
-    //* 광고앱이 off 인 경우 포스트백을 받지 않는다.
-    //캐시 메모리 처리(v1)
     const subMediaEntity: SubMedia = await this.subMediaRepository
       .createQueryBuilder('subMedia')
       .leftJoinAndSelect('subMedia.advertising', 'advertising')
@@ -72,7 +85,11 @@ export class PostbackService {
       .leftJoinAndSelect('subMedia.media', 'media')
       .leftJoinAndSelect('advertising.tracker', 'tracker')
       .leftJoinAndSelect('campaign.postBackEvent', 'postBackEvent')
-      .where('postBackEvent.trackerPostBack =:trackerPostBack', {
+      .where('subMedia.viewCode =:viewCode', {
+        viewCode: cb_2,
+      })
+      .andWhere('subMedia.cpToken =:cpToken', { cpToken: cb_1 })
+      .andWhere('postBackEvent.trackerPostBack =:trackerPostBack', {
         trackerPostBack: 'install',
       })
       .andWhere('advertising.adStatus =:adStatus', { adStatus: true })
@@ -82,130 +99,153 @@ export class PostbackService {
       throw new NotFoundException();
     }
 
-    //캐시 메모리 처리(v2)
-    const { advertising, campaign, media } = subMediaEntity;
+    const { campaign, media } = subMediaEntity;
 
-    //5. 트래커의 인스톨 포스트백 DB 저장
-    const postBackLog: PostBackLog = new PostBackLog();
-    postBackLog.campaignToken = subMediaEntity.cpToken;
-    postBackLog.viewCode = viewCode;
-    postBackLog.type = campaign.type;
-    postBackLog.platform = advertising.adPlatform;
-    postBackLog.appkey = appkey;
-    postBackLog.deviceCountry = deviceCountry;
-    postBackLog.deviceLanguage = deviceLanguage;
-    postBackLog.deviceCarrier = deviceCarrier;
-    postBackLog.deviceIp = deviceIp;
-    postBackLog.deviceId = deviceId;
-    postBackLog.clickId = clickId;
-    postBackLog.deviceAndroidId = deviceAndroidId;
-    postBackLog.deviceIosId = deviceIosId;
-    postBackLog.clickDatetime = new Date(clickDatetime);
-    postBackLog.installDatetime = new Date(installDatetime);
-    postBackLog.eventName = 'install';
-    postBackLog.media = media;
-    postBackLog.advertising = advertising;
-    postBackLog.campaign = campaign;
-    postBackLog.subMedia = subMediaEntity;
-    postBackLog.originalUrl = originalUrl;
-    postBackLog.tracker = advertising.tracker;
-    postBackLog.registeredAt = new Date();
+    const postBackInstallAdbrixRemaster: PostBackInstallAdbrixRemaster = new PostBackInstallAdbrixRemaster();
+    postBackInstallAdbrixRemaster.cpToken = cb_1;
+    postBackInstallAdbrixRemaster.aKey = a_key;
+    postBackInstallAdbrixRemaster.aCookie = a_cookie;
+    postBackInstallAdbrixRemaster.aIp = a_ip;
+    postBackInstallAdbrixRemaster.aFp = a_fp;
+    postBackInstallAdbrixRemaster.aCountry = a_country;
+    postBackInstallAdbrixRemaster.aCity = a_city;
+    postBackInstallAdbrixRemaster.aRegion = a_region;
+    postBackInstallAdbrixRemaster.aAppkey = a_appkey;
+    postBackInstallAdbrixRemaster.mPublisher = m_publisher;
+    postBackInstallAdbrixRemaster.mSubPublisher = m_sub_publisher;
+    postBackInstallAdbrixRemaster.adid = adid;
+    postBackInstallAdbrixRemaster.idfv = idfv;
+    postBackInstallAdbrixRemaster.adIdOptOut = ad_id_opt_out;
+    postBackInstallAdbrixRemaster.deviceOsVersion = device_os_version;
+    postBackInstallAdbrixRemaster.deviceModel = device_model;
+    postBackInstallAdbrixRemaster.deviceVendor = device_vendor;
+    postBackInstallAdbrixRemaster.deviceResolution = device_resolution;
+    postBackInstallAdbrixRemaster.devicePortrait = device_portrait;
+    postBackInstallAdbrixRemaster.devicePlatform = device_platform;
+    postBackInstallAdbrixRemaster.deviceNetwork = device_network;
+    postBackInstallAdbrixRemaster.deviceWifi = device_wifi;
+    postBackInstallAdbrixRemaster.deviceCarrier = device_carrier;
+    postBackInstallAdbrixRemaster.deviceLanguage = device_language;
+    postBackInstallAdbrixRemaster.deviceCountry = device_country;
+    postBackInstallAdbrixRemaster.deviceBuildId = device_build_id;
+    postBackInstallAdbrixRemaster.packageName = package_name;
+    postBackInstallAdbrixRemaster.appkey = appkey;
+    postBackInstallAdbrixRemaster.sdkVersion = sdk_version;
+    postBackInstallAdbrixRemaster.installer = installer;
+    postBackInstallAdbrixRemaster.appVersion = app_version;
+    postBackInstallAdbrixRemaster.attrType = attr_type;
+    postBackInstallAdbrixRemaster.eventName = event_name;
+    postBackInstallAdbrixRemaster.eventDatetime = event_datetime;
+    postBackInstallAdbrixRemaster.deeplinkPath = deeplink_path;
+    postBackInstallAdbrixRemaster.marketInstallBtnClicked = market_install_btn_clicked;
+    postBackInstallAdbrixRemaster.appInstallStart = app_install_start;
+    postBackInstallAdbrixRemaster.appInstallCompleted = app_install_completed;
+    postBackInstallAdbrixRemaster.appFirstOpen = app_first_open;
+    postBackInstallAdbrixRemaster.secondsGap = seconds_gap;
+    postBackInstallAdbrixRemaster.cb1 = cb_1;
+    postBackInstallAdbrixRemaster.cb2 = cb_2;
+    postBackInstallAdbrixRemaster.cb3 = cb_3;
+    postBackInstallAdbrixRemaster.cb4 = cb_4;
+    postBackInstallAdbrixRemaster.cb5 = cb_5;
+    postBackInstallAdbrixRemaster.pbUrl = originalUrl;
 
-    const postBackLogEntity: PostBackLog = await this.postBackLogRepository.save(
-      postBackLog,
+    const postBackInstallAdbrixRemasterEntity: PostBackInstallAdbrixRemaster = await this.postBackInstallAdbrixRemasterRepository.save(
+      postBackInstallAdbrixRemaster,
     );
 
-    //6. 매체 전송 인 경우 매체 전송 후 포스트백 테이블에 기록
-    //6-1) 포스트백 별 매체 전송 여부 (Postback)
-    //6-2) 매체 별 포스트백 URL 템플릿 (Media)
-    //media 테이블의 postback_install_url_template 컬럼에서 가져오기
-    /**
-     * 애드마일 install 포스트백 : http://admile.offerstrack.net/advBack.php?click_id={click_id}&adv_id=641
-     * 패들웨이버 install 포스트백 : http://postback.paddlewaver.com/?adv=1000137&clickid={click_id}&payout={payout}
-     * 아바주 install 포스트백 : http://postback.apx.avazutracking.net/postback.php?advid=24571&subid={click_id}&install_timestamp={install_timestamp}&adid={device_id}&siteid=
-     * 애드타이밍 install 포스트백 : http://api.adtiming.com/callback/active?n=701&c={click_id}&idfa={ios_device_id}&gaid={android_device_id}
-     */
-    //캠페인 off 인 경우 매체 전송하지 않는다.
     if (campaign.cpStatus) {
       const convertedPostbackInstallUrlTemplate = media.mediaPostbackInstallUrlTemplate
-        .replace('{click_id}', clickId)
-        .replace('{device_id}', deviceId)
-        .replace('{android_device_id}', deviceAndroidId)
-        .replace('{ios_device_id}', deviceIosId)
-        .replace('{install_timestamp}', installDatetime);
+        .replace('{click_id}', cb_3)
+        .replace('{device_id}', query.adid)
+        .replace(
+          '{android_device_id}',
+          Number(device_platform) == 1 ? device_platform : '',
+        )
+        .replace(
+          '{ios_device_id}',
+          Number(device_platform) != 1 ? device_platform : '',
+        )
+        .replace('{install_timestamp}', event_datetime);
       if (
         campaign &&
         campaign.postBackEvent &&
         campaign.postBackEvent[0].sendPostback === true
       ) {
-        postBackLogEntity.mediaSendUrl = convertedPostbackInstallUrlTemplate;
-
         await this.httpService
-          .get('http://naver1.com')
+          .get(convertedPostbackInstallUrlTemplate)
           .toPromise()
           .then(() => {
-            postBackLogEntity.mediaSendDatetime = new Date();
+            postBackInstallAdbrixRemasterEntity.isSendDate = new Date();
           })
           .catch();
 
-        await this.postBackLogRepository.save(postBackLogEntity);
+        await this.postBackInstallAdbrixRemasterRepository.save(
+          postBackInstallAdbrixRemasterEntity,
+        );
       }
     }
 
-    const campaignDailyEntity: CampaignDaily = await this.campaignDailyRepository.findOne(
-      {
-        where: { createdAt: moment().format('YYYY-MM-DD') },
-        relations: ['campaign', 'subMedia'],
-      },
-    );
-
-    if (!campaignDailyEntity) {
-      throw new NotFoundException();
-    }
-
-    campaignDailyEntity.install = Number(campaignDailyEntity.install) + 1;
-    await this.campaignDailyRepository.save(campaignDailyEntity);
+    subMediaEntity.install = Number(subMediaEntity.install) + 1;
+    await this.subMediaRepository.save(subMediaEntity);
 
     return;
   }
 
-  async postBackEvent(req: any, query: PostbackEventDto) {
+  async postBackEventAdbrixRemaster(
+    req: any,
+    query: AdbrixRemasterPostbackEventDto,
+  ) {
     const originalUrl: string = `${req.protocol}://${req.get('host')}${
       req.originalUrl
     }` as string;
 
     const {
-      tkCode,
-      viewCode,
-      clickId,
-      deviceId,
-      deviceAndroidId,
-      deviceIosId,
-      deviceCarrier,
-      deviceCountry,
-      deviceLanguage,
-      deviceIp,
+      a_key,
+      a_cookie,
+      a_ip,
+      a_fp,
+      a_country,
+      a_city,
+      a_region,
+      a_appkey,
+      m_publisher,
+      m_sub_publisher,
+      attr_adid,
+      attr_event_datetime,
+      attr_event_timestamp,
+      attr_seconds_gap,
+      adid,
+      idfv,
+      ad_id_opt_out,
+      device_os_version,
+      device_model,
+      device_vendor,
+      device_resolution,
+      device_portrait,
+      device_platform,
+      device_network,
+      device_wifi,
+      device_carrier,
+      device_language,
+      device_country,
+      device_build_id,
+      package_name,
       appkey,
-      clickDatetime,
-      installDatetime,
-      eventDatetime,
-      eventName,
-      productId,
-      price,
-      currency,
-    } = postBackEvent(query);
+      sdk_version,
+      installer,
+      app_version,
+      event_name,
+      event_datetime,
+      event_timestamp,
+      event_timestamp_d,
+      param_json,
+      cb_1,
+      cb_2,
+      cb_3,
+      cb_4,
+      cb_5,
+    } = query;
 
-    //3. 노출용코드(viewCode)로 캠페인토큰, 광고앱코드, 캠페인코드, 매체코드, 서브매체코드 가져오기
-    //viewCode는 모든 트래커가 공통으로 내려주는 컬럼 (campaignToken 은 공통 x)
-    if (!viewCode) {
-      throw new InternalServerErrorException();
-    }
-
-    // //4. 캠페인(Campaign) 관련 정보 가져오기
-    // //4-1) 포스트백 별 매체 전송 여부 (Postback)
-    // //4-2) 매체 별 포스트백 URL 템플릿 (Media)
-    // //4-3) 광고앱 차단 여부 (Advertising)
-    // //* 광고앱이 off 인 경우 포스트백을 받지 않는다.
     const subMediaEntity: SubMedia = await this.subMediaRepository
       .createQueryBuilder('subMedia')
       .leftJoinAndSelect('subMedia.advertising', 'advertising')
@@ -213,153 +253,155 @@ export class PostbackService {
       .leftJoinAndSelect('subMedia.media', 'media')
       .leftJoinAndSelect('advertising.tracker', 'tracker')
       .leftJoinAndSelect('campaign.postBackEvent', 'postBackEvent')
-      .where('postBackEvent.trackerPostBack =:trackerPostBack', {
-        trackerPostBack: 'install',
+      .where('subMedia.viewCode =:viewCode', {
+        viewCode: cb_2,
+      })
+      .andWhere('subMedia.cpToken =:cpToken', { cpToken: cb_1 })
+      .andWhere('postBackEvent.trackerPostBack =:trackerPostBack', {
+        trackerPostBack: event_name,
       })
       .andWhere('advertising.adStatus =:adStatus', { adStatus: true })
       .getOne();
 
-    //4-3) 광고앱 차단 여부
     if (!subMediaEntity) {
       throw new NotFoundException();
     }
-    //캐시 메모리 처리(v2)
-    const { advertising, campaign, media } = subMediaEntity;
+    const { campaign, media } = subMediaEntity;
+    const postBackEventAdbrixRemaster: PostBackEventAdbrixRemaster = new PostBackEventAdbrixRemaster();
+    postBackEventAdbrixRemaster.cpToken = cb_1;
+    postBackEventAdbrixRemaster.aKey = a_key;
+    postBackEventAdbrixRemaster.aCookie = a_cookie;
+    postBackEventAdbrixRemaster.aIp = a_ip;
+    postBackEventAdbrixRemaster.aFp = a_fp;
+    postBackEventAdbrixRemaster.aCountry = a_country;
+    postBackEventAdbrixRemaster.aCity = a_city;
+    postBackEventAdbrixRemaster.aRegion = a_region;
+    postBackEventAdbrixRemaster.aAppkey = a_appkey;
+    postBackEventAdbrixRemaster.mPublisher = m_publisher;
+    postBackEventAdbrixRemaster.mSubPublisher = m_sub_publisher;
+    postBackEventAdbrixRemaster.attrAdid = attr_adid;
+    postBackEventAdbrixRemaster.attrEventDatetime = attr_event_datetime;
+    postBackEventAdbrixRemaster.attrEventTimestamp = attr_event_timestamp;
+    postBackEventAdbrixRemaster.attrSecondsGap = attr_seconds_gap;
+    postBackEventAdbrixRemaster.adid = adid;
+    postBackEventAdbrixRemaster.idfv = idfv;
+    postBackEventAdbrixRemaster.adIdOptOut = ad_id_opt_out;
+    postBackEventAdbrixRemaster.deviceOsVersion = device_os_version;
+    postBackEventAdbrixRemaster.deviceModel = device_model;
+    postBackEventAdbrixRemaster.deviceVendor = device_vendor;
+    postBackEventAdbrixRemaster.deviceResolution = device_resolution;
+    postBackEventAdbrixRemaster.devicePortrait = device_portrait;
+    postBackEventAdbrixRemaster.devicePlatform = device_platform;
+    postBackEventAdbrixRemaster.deviceNetwork = device_network;
+    postBackEventAdbrixRemaster.deviceWifi = device_wifi;
+    postBackEventAdbrixRemaster.deviceCarrier = device_carrier;
+    postBackEventAdbrixRemaster.deviceLanguage = device_language;
+    postBackEventAdbrixRemaster.deviceCountry = device_country;
+    postBackEventAdbrixRemaster.deviceBuildId = device_build_id;
+    postBackEventAdbrixRemaster.packageName = package_name;
+    postBackEventAdbrixRemaster.appkey = appkey;
+    postBackEventAdbrixRemaster.sdkVersion = sdk_version;
+    postBackEventAdbrixRemaster.installer = installer;
+    postBackEventAdbrixRemaster.appVersion = app_version;
+    postBackEventAdbrixRemaster.eventName = event_name;
+    postBackEventAdbrixRemaster.eventDatetime = event_datetime;
+    postBackEventAdbrixRemaster.eventTimestamp = event_timestamp;
+    postBackEventAdbrixRemaster.eventTimestampD = event_timestamp_d;
+    postBackEventAdbrixRemaster.paramJson = param_json;
+    postBackEventAdbrixRemaster.cb1 = cb_1;
+    postBackEventAdbrixRemaster.cb2 = cb_2;
+    postBackEventAdbrixRemaster.cb3 = cb_3;
+    postBackEventAdbrixRemaster.cb4 = cb_4;
+    postBackEventAdbrixRemaster.cb5 = cb_5;
+    postBackEventAdbrixRemaster.pbUrl = originalUrl;
 
-    //5. 트래커의 인스톨 포스트백 DB 저장
-    const postBackLog: PostBackLog = new PostBackLog();
-    postBackLog.campaignToken = subMediaEntity.cpToken;
-    postBackLog.viewCode = viewCode;
-    postBackLog.type = campaign.type;
-    postBackLog.platform = advertising.adPlatform;
-    postBackLog.appkey = appkey;
-    postBackLog.deviceCountry = deviceCountry;
-    postBackLog.deviceLanguage = deviceLanguage;
-    postBackLog.deviceCarrier = deviceCarrier;
-    postBackLog.deviceIp = deviceIp;
-    postBackLog.deviceId = deviceId;
-    postBackLog.clickId = clickId;
-    postBackLog.deviceAndroidId = deviceAndroidId;
-    postBackLog.deviceIosId = deviceIosId;
-    postBackLog.clickDatetime = new Date(clickDatetime);
-    postBackLog.installDatetime = new Date(installDatetime);
-    postBackLog.eventDatetime = new Date(eventDatetime);
-    postBackLog.eventName = 'event';
-    postBackLog.media = media;
-    postBackLog.advertising = advertising;
-    postBackLog.campaign = campaign;
-    postBackLog.subMedia = subMediaEntity;
-    postBackLog.originalUrl = originalUrl;
-    postBackLog.tracker = advertising.tracker;
-    postBackLog.productId = productId;
-    postBackLog.price = price;
-    postBackLog.currency = currency;
-    postBackLog.registeredAt = new Date();
-
-    const postBackLogEntity: PostBackLog = await this.postBackLogRepository.save(
-      postBackLog,
+    const postBackEventAdbrixRemasterEntity: PostBackEventAdbrixRemaster = await this.postBackEventAdbrixRemasterRepository.save(
+      postBackEventAdbrixRemaster,
     );
-
-    //6. 매체 전송 인 경우 매체 전송 후 포스트백 테이블에 기록
-    //6-1) 포스트백 별 매체 전송 여부 (Postback)
-    //미등록 이벤트는 매체 전송 및 데이터 취합을 하지 않는다.
-    //6-2) 매체 별 포스트백 URL 템플릿 (Media)
-    //media 테이블의 postback_install_url_template 컬럼에서 가져오기
-    /**
-     * 애드마일 event 포스트백 : http://admile.offerstrack.net/advBack.php?click_id={click_id}&adv_id=641&event_token={event_name}
-     * 패들웨이버 event 포스트백 : http://postback.paddlewaver.com/event?adv=1000137&event_name={event_name}&clickid={click_id}
-     * 아바주 event 포스트백 : http://postback.apx.avazutracking.net/postback.php?advid=24571&subid={click_id}&eventname={event_name}&eventvalue={event_value}&install_timestamp={install_timestamp}&adid={device_id}&siteid=
-     * 애드타이밍 event 포스트백 : http://api.adtiming.com/eventcallback/active?n=701&c={click_id}&idfa={ios_device_id}&gaid={android_device_id}&eventname={event_name}&eventvalue={event_value}
-     */
-
-    //캠페인 off 인 경우 매체 전송하지 않는다.
     if (campaign.cpStatus === true) {
+      const paramJsonData: any = JSON.parse(param_json);
+
+      let event_value: number;
+      if (paramJsonData['abx:item.abx:sales']) {
+        event_value = paramJsonData['abx:item.abx:sales'];
+      } else if (paramJsonData['abx:items']) {
+        for (const item of paramJsonData['abx:items']) {
+          event_value += item['abx:sales'];
+        }
+      }
       const convertedPostbackEventUrlTemplate = media.mediaPostbackEventUrlTemplate
-        .replace('{click_id}', clickId)
-        .replace('{event_name}', eventName)
-        .replace('{event_value}', price.toString())
-        .replace('{device_id}', deviceId)
-        .replace('{android_device_id}', deviceAndroidId)
-        .replace('{ios_device_id}', deviceIosId)
-        .replace('{install_timestamp}', installDatetime)
-        .replace('{event_timestamp}', eventDatetime);
+        .replace('{click_id}', cb_3)
+        .replace('{event_name}', event_name)
+        .replace('{event_value}', event_value.toString())
+        .replace('{device_id}', adid)
+        .replace(
+          '{android_device_id}',
+          Number(device_platform) == 1 ? device_platform : '',
+        )
+        .replace(
+          '{ios_device_id}',
+          Number(device_platform) != 1 ? device_platform : '',
+        )
+        .replace('{install_timestamp}', '')
+        .replace('{event_timestamp}', event_datetime);
 
       if (
         campaign &&
         campaign.postBackEvent &&
         campaign.postBackEvent[0].sendPostback === true
       ) {
-        postBackLogEntity.mediaSendUrl = convertedPostbackEventUrlTemplate;
-
         await this.httpService
-          .get('http://naver1.com')
+          .get(convertedPostbackEventUrlTemplate)
           .toPromise()
           .then(() => {
-            postBackLogEntity.mediaSendDatetime = new Date();
+            postBackEventAdbrixRemasterEntity.isSendDate = new Date();
           })
           .catch();
-
-        await this.postBackLogRepository.save(postBackLogEntity);
+        await this.postBackEventAdbrixRemasterRepository.save(
+          postBackEventAdbrixRemasterEntity,
+        );
       }
     }
 
-    // //7. 이벤트 데이터 취합
-    // //트래커 이벤트 명을 어드민 이벤트 명으로 변환 (postbacks 테이블)
-    // const adminPostbackName = await Postback.findOne({
-    //   where: { campaignId: campaign.id, trackerPostback: eventName },
-    // });
     const postBackEventEntity: PostBackEvent = await this.postBackEventRepository.findOne(
       {
-        where: { campaign: campaign, trackerPostback: eventName },
+        where: { campaign: campaign, trackerPostback: event_name },
       },
     );
 
     if (postBackEventEntity) {
-      const campaignDailyEntity: CampaignDaily = await this.campaignDailyRepository.findOne(
-        {
-          where: { createdAt: moment().format('YYYY-MM-DD') },
-          relations: ['campaign', 'subMedia'],
-        },
-      );
-
-      if (!campaignDailyEntity) {
-        throw new NotFoundException();
-      }
-
       switch (postBackEventEntity.adminPostback) {
         case 'install':
-          campaignDailyEntity.install = Number(campaignDailyEntity.install) + 1;
+          subMediaEntity.install = Number(subMediaEntity.install) + 1;
           break;
         case 'signup':
-          campaignDailyEntity.signup = Number(campaignDailyEntity.signup) + 1;
+          subMediaEntity.signup = Number(subMediaEntity.signup) + 1;
           break;
         case 'retention':
-          campaignDailyEntity.retention =
-            Number(campaignDailyEntity.retention) + 1;
+          subMediaEntity.retention = Number(subMediaEntity.retention) + 1;
           break;
         case 'buy':
-          campaignDailyEntity.buy = Number(campaignDailyEntity.buy) + 1;
+          subMediaEntity.buy = Number(subMediaEntity.buy) + 1;
           break;
         case 'etc1':
-          campaignDailyEntity.etc1 = Number(campaignDailyEntity.etc1) + 1;
+          subMediaEntity.etc1 = Number(subMediaEntity.etc1) + 1;
           break;
         case 'etc2':
-          campaignDailyEntity.etc2 = Number(campaignDailyEntity.etc2) + 1;
+          subMediaEntity.etc2 = Number(subMediaEntity.etc2) + 1;
           break;
         case 'etc3':
-          campaignDailyEntity.etc3 = Number(campaignDailyEntity.etc3) + 1;
+          subMediaEntity.etc3 = Number(subMediaEntity.etc3) + 1;
           break;
         case 'etc4':
-          campaignDailyEntity.etc4 = Number(campaignDailyEntity.etc4) + 1;
+          subMediaEntity.etc4 = Number(subMediaEntity.etc4) + 1;
           break;
         case 'etc5':
-          campaignDailyEntity.etc5 = Number(campaignDailyEntity.etc5) + 1;
+          subMediaEntity.etc5 = Number(subMediaEntity.etc5) + 1;
           break;
       }
 
-      await this.campaignDailyRepository.save(campaignDailyEntity);
+      await this.subMediaRepository.save(subMediaEntity);
     }
-
     return;
   }
 }

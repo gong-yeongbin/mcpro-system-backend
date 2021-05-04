@@ -157,8 +157,8 @@ export class AdbrixRemasterPostbackInstallDto {
   @IsOptional()
   seconds_gap: string;
 
+  //캠페인 토큰
   @IsString()
-  @IsOptional()
   cb_1: string;
 
   //노출코드
