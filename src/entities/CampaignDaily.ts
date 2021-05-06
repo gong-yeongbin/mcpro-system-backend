@@ -1,10 +1,4 @@
-import {
-  Column,
-  Entity,
-  PrimaryGeneratedColumn,
-  ManyToOne,
-  JoinColumn,
-} from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
 import { Advertising } from './Advertising';
 import { Campaign } from './Campaign';
 import { Media } from './Media';
@@ -109,22 +103,17 @@ export class CampaignDaily {
   updatedAt: Date;
 
   @ManyToOne(() => Tracker, (tracker) => tracker.campaignDaily)
-  @JoinColumn({ name: 'tracker' })
   tracker: Tracker;
 
   @ManyToOne(() => Media, (media) => media.campaignDaily)
-  @JoinColumn({ name: 'media' })
   media: Media;
 
   @ManyToOne(() => Advertising, (advertising) => advertising.campaignDaily)
-  @JoinColumn({ name: 'advertising' })
   advertising: Advertising;
 
   @ManyToOne(() => Campaign, (campaign) => campaign.campaignDaily)
-  @JoinColumn({ name: 'campaign' })
   campaign: Campaign;
 
   @ManyToOne(() => SubMedia, (subMedia) => subMedia.campaignDaily)
-  @JoinColumn({ name: 'subMedia' })
   subMedia: SubMedia;
 }
