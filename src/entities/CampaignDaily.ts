@@ -1,5 +1,4 @@
 import { Column, Entity, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
-import { Advertising } from './Advertising';
 import { Campaign } from './Campaign';
 import { Media } from './Media';
 import { SubMedia } from './SubMedia';
@@ -107,9 +106,6 @@ export class CampaignDaily {
 
   @ManyToOne(() => Media, (media) => media.campaignDaily)
   media: Media;
-
-  @ManyToOne(() => Advertising, (advertising) => advertising.campaignDaily)
-  advertising: Advertising;
 
   @ManyToOne(() => Campaign, (campaign) => campaign.campaignDaily)
   campaign: Campaign;
