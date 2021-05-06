@@ -1,4 +1,10 @@
-import { Column, Entity, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 import { Campaign } from './Campaign';
 import { Media } from './Media';
 import { SubMedia } from './SubMedia';
@@ -8,9 +14,6 @@ import { Tracker } from './Tracker';
 export class CampaignDaily {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
   idx: string;
-
-  @Column({ type: 'nvarchar', name: 'viewCode', nullable: true })
-  viewCode: string;
 
   @Column({
     type: 'bigint',
@@ -108,6 +111,7 @@ export class CampaignDaily {
   media: Media;
 
   @ManyToOne(() => Campaign, (campaign) => campaign.campaignDaily)
+  @JoinColumn({ name: 'campagin' })
   campaign: Campaign;
 
   @ManyToOne(() => SubMedia, (subMedia) => subMedia.campaignDaily)
