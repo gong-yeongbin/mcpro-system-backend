@@ -48,10 +48,9 @@ export class TrackingService {
       .leftJoinAndSelect('submedia.advertising', 'advertising')
       .leftJoinAndSelect('submedia.media', 'media')
       .leftJoinAndSelect('advertising.tracker', 'tracker')
-      .where('submedia.pubId =:pubId and submedia.subId', {
-        pubId: pubId,
-        subId: subId,
-      })
+      .where('submedia.pubId =:pubId', { pubId: pubId })
+      .andWhere('submedia.subId =:subId', { subId: subId })
+      .andWhere('submedia.cpToken =:cpToken', { cpToken: cpToken })
       .andWhere('Date(submedia.createdAt) =:date ', {
         date: moment().format('YYYY-MM-DD'),
       })
@@ -75,7 +74,7 @@ export class TrackingService {
 
       await this.submediaRepository.save(submedia);
     } else {
-      viewCode = submediaEntity.viewCode;
+      // viewCode = submediaEntity.viewCode;
     }
 
     //4. 메크로스Pro 트래킹 URL 를 트래커 트래킹 URL 변환
@@ -89,15 +88,13 @@ export class TrackingService {
     if (convertedTrackingUrl !== null) {
       const submediaEntity: SubMedia = await this.submediaRepository
         .createQueryBuilder('submedia')
-        .where('submedia.pubId =:pubId and submedia.subId', {
-          pubId: pubId,
-          subId: subId,
-        })
+        .where('submedia.pubId =:pubId', { pubId: pubId })
+        .andWhere('submedia.subId =:subId', { subId: subId })
+        .andWhere('submedia.cpToken =:cpToken', { cpToken: cpToken })
         .andWhere('Date(submedia.createdAt) =:date ', {
           date: moment().format('YYYY-MM-DD'),
         })
         .getOne();
-
       submediaEntity.click = Number(submediaEntity.click) + 1;
       await this.submediaRepository.save(submediaEntity);
 
