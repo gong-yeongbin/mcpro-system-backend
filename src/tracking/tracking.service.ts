@@ -43,14 +43,19 @@ export class TrackingService {
       throw new NotFoundException();
     }
 
-    const submediaEntity: SubMedia = await this.submediaRepository.findOne({
-      where: {
-        cpToken: cpToken,
+    const submediaEntity: SubMedia = await this.submediaRepository
+      .createQueryBuilder('submedia')
+      .leftJoinAndSelect('submedia.advertising', 'advertising')
+      .leftJoinAndSelect('submedia.media', 'media')
+      .leftJoinAndSelect('advertising.tracker', 'tracker')
+      .where('submedia.pubId =:pubId and submedia.subId', {
         pubId: pubId,
         subId: subId,
-      },
-      relations: ['advertising', 'media', 'advertising.tracker'],
-    });
+      })
+      .andWhere('Date(submedia.createdAt) =:date ', {
+        date: moment().format('YYYY-MM-DD'),
+      })
+      .getOne();
 
     //새로운 노출용코드 생성
     let viewCode: string = null;
@@ -80,7 +85,6 @@ export class TrackingService {
       requestQuery,
       viewCode,
     );
-
     //5. 트래커 트래킹 URL를 실행
     if (convertedTrackingUrl !== null) {
       const submediaEntity: SubMedia = await this.submediaRepository

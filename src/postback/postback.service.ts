@@ -266,6 +266,7 @@ export class PostbackService {
     if (!subMediaEntity) {
       throw new NotFoundException();
     }
+
     const { campaign, media } = subMediaEntity;
     const postBackEventAdbrixRemaster: PostBackEventAdbrixRemaster = new PostBackEventAdbrixRemaster();
     postBackEventAdbrixRemaster.cpToken = cb_1;
@@ -318,6 +319,7 @@ export class PostbackService {
     const postBackEventAdbrixRemasterEntity: PostBackEventAdbrixRemaster = await this.postBackEventAdbrixRemasterRepository.save(
       postBackEventAdbrixRemaster,
     );
+
     if (campaign.cpStatus === true) {
       const paramJsonData: any = JSON.parse(param_json);
 
@@ -357,6 +359,7 @@ export class PostbackService {
             postBackEventAdbrixRemasterEntity.isSendDate = new Date();
           })
           .catch();
+
         await this.postBackEventAdbrixRemasterRepository.save(
           postBackEventAdbrixRemasterEntity,
         );
