@@ -93,8 +93,10 @@ export class PostbackService {
         trackerPostBack: 'install',
       })
       .andWhere('advertising.adStatus =:adStatus', { adStatus: true })
+      .andWhere('Date(submedia.createdAt) =:date ', {
+        date: moment().format('YYYY-MM-DD'),
+      })
       .getOne();
-
     if (!subMediaEntity) {
       throw new NotFoundException();
     }
@@ -319,7 +321,6 @@ export class PostbackService {
     const postBackEventAdbrixRemasterEntity: PostBackEventAdbrixRemaster = await this.postBackEventAdbrixRemasterRepository.save(
       postBackEventAdbrixRemaster,
     );
-
     if (campaign.cpStatus === true) {
       const paramJsonData: any = JSON.parse(param_json);
 

@@ -1,7 +1,6 @@
 import { Controller, Get, Query, Req } from '@nestjs/common';
 import { AdbrixRemasterPostbackInstallDto } from './dto/adbrix-remaster-postback-install.dto';
 import { AdbrixRemasterPostbackEventDto } from './dto/adbrix-remaster-postback-event.dto';
-import { PostbackEventDto } from './dto/postback-event.dto';
 import { PostbackService } from './postback.service';
 
 @Controller()
