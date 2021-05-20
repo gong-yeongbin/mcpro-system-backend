@@ -8,7 +8,6 @@ import { TrackingDto } from './dto/tracking.dto';
 import { convertTrackerTrackingUrl } from '../common/util';
 import * as moment from 'moment';
 import { RedisService } from 'nestjs-redis';
-import * as JSONCache from 'redis-json';
 
 @Injectable()
 export class TrackingService {
@@ -90,8 +89,6 @@ export class TrackingService {
 
     //5. 트래커 트래킹 URL를 실행
     if (convertedTrackingUrl !== null) {
-      await this.submediaRepository.save(submediaEntity);
-
       const isExists: number = await this.redisService
         .getClient()
         .setnx(`${cpToken}/${viewCode}/${pubId}/${subId}`, 1);
