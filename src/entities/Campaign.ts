@@ -13,7 +13,7 @@ import { Media } from './Media';
 import { PostBackEvent } from './PostBackEvent';
 import { Reservation } from './Reservation';
 import { SubMedia } from '../entities/SubMedia';
-import { CampaignDaily } from './CampaignDaily';
+import { PostBackUnregisteredEvent } from './PostBackUnregisteredEvent';
 
 @Entity('mcp_campaign')
 @Unique(['cpCode', 'cpToken'])
@@ -78,20 +78,21 @@ export class Campaign {
   })
   advertising: Advertising;
 
-  @ManyToOne(() => Media, (media) => media.campaign, {
-    onDelete: 'CASCADE',
-  })
+  @ManyToOne(() => Media, (media) => media.campaign)
   media: Media;
 
   @OneToMany(() => PostBackEvent, (postBackEvent) => postBackEvent.campaign)
   postBackEvent: PostBackEvent[];
 
-  @OneToMany(() => Reservation, (reservation) => reservation.campaign)
+  @OneToMany(
+    () => PostBackUnregisteredEvent,
+    (postBackUnregisteredEvent) => postBackUnregisteredEvent.campaign,
+  )
+  postBackUnregisteredEvent: PostBackUnregisteredEvent[];
+
+  @ManyToOne(() => Reservation, (reservation) => reservation.campaign)
   reservation: Reservation[];
 
   @OneToMany(() => SubMedia, (subMedia) => subMedia.campaign)
   subMedia: SubMedia;
-
-  @OneToMany(() => CampaignDaily, (campaignDaily) => campaignDaily.campaign)
-  campaignDaily: CampaignDaily;
 }

@@ -7,9 +7,10 @@ import {
   Unique,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
+  OneToOne,
 } from 'typeorm';
 import { Campaign } from './Campaign';
-import { CampaignDaily } from './CampaignDaily';
 
 @Entity('mcp_media')
 @Unique(['mdCode'])
@@ -48,12 +49,9 @@ export class Media {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
-  @OneToMany(() => Campaign, (campaign) => campaign.media)
-  campaign: Campaign[];
-
   @OneToMany(() => SubMedia, (subMedia) => subMedia.media)
   subMedia: SubMedia;
 
-  @OneToMany(() => CampaignDaily, (campaignDaily) => campaignDaily.media)
-  campaignDaily: CampaignDaily;
+  @OneToMany(() => Campaign, (campaign) => campaign.media)
+  campaign: Campaign;
 }

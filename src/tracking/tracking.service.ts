@@ -7,6 +7,8 @@ import { v4 } from 'uuid';
 import { TrackingDto } from './dto/tracking.dto';
 import { convertTrackerTrackingUrl } from '../common/util';
 import * as moment from 'moment';
+import { RedisService } from 'nestjs-redis';
+import * as JSONCache from 'redis-json';
 
 @Injectable()
 export class TrackingService {
@@ -15,6 +17,7 @@ export class TrackingService {
     private readonly campaignRepository: Repository<Campaign>,
     @InjectRepository(SubMedia)
     private readonly submediaRepository: Repository<SubMedia>,
+    private readonly redisService: RedisService,
   ) {}
 
   async tracking(requestQuery: TrackingDto): Promise<string> {
@@ -74,7 +77,7 @@ export class TrackingService {
 
       await this.submediaRepository.save(submedia);
     } else {
-      // viewCode = submediaEntity.viewCode;
+      viewCode = submediaEntity.viewCode;
     }
 
     //4. 메크로스Pro 트래킹 URL 를 트래커 트래킹 URL 변환
@@ -84,19 +87,20 @@ export class TrackingService {
       requestQuery,
       viewCode,
     );
+
     //5. 트래커 트래킹 URL를 실행
     if (convertedTrackingUrl !== null) {
-      const submediaEntity: SubMedia = await this.submediaRepository
-        .createQueryBuilder('submedia')
-        .where('submedia.pubId =:pubId', { pubId: pubId })
-        .andWhere('submedia.subId =:subId', { subId: subId })
-        .andWhere('submedia.cpToken =:cpToken', { cpToken: cpToken })
-        .andWhere('Date(submedia.createdAt) =:date ', {
-          date: moment().format('YYYY-MM-DD'),
-        })
-        .getOne();
-      submediaEntity.click = Number(submediaEntity.click) + 1;
       await this.submediaRepository.save(submediaEntity);
+
+      const isExists: number = await this.redisService
+        .getClient()
+        .setnx(`${cpToken}/${viewCode}/${pubId}/${subId}`, 1);
+
+      if (!isExists) {
+        await this.redisService
+          .getClient()
+          .incr(`${cpToken}/${viewCode}/${pubId}/${subId}`);
+      }
 
       return convertedTrackingUrl;
     }

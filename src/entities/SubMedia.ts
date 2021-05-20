@@ -8,12 +8,10 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
   Unique,
   UpdateDateColumn,
 } from 'typeorm';
-import { CampaignDaily } from './CampaignDaily';
 
 @Entity('mcp_submedia')
 @Unique(['viewCode'])
@@ -133,7 +131,4 @@ export class SubMedia {
   @ManyToOne(() => Media, (media) => media.subMedia)
   @JoinColumn({ name: 'media' })
   media: Media;
-
-  @OneToMany(() => CampaignDaily, (campaignDaily) => campaignDaily.subMedia)
-  campaignDaily: CampaignDaily;
 }

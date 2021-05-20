@@ -97,12 +97,12 @@ export class PostbackService {
         date: moment().format('YYYY-MM-DD'),
       })
       .getOne();
+
     if (!subMediaEntity) {
       throw new NotFoundException();
     }
 
     const { campaign, media } = subMediaEntity;
-
     const postBackInstallAdbrixRemaster: PostBackInstallAdbrixRemaster = new PostBackInstallAdbrixRemaster();
     postBackInstallAdbrixRemaster.cpToken = cb_1;
     postBackInstallAdbrixRemaster.aKey = a_key;

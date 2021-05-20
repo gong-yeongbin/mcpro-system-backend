@@ -8,7 +8,6 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Advertising } from '../entities/Advertising';
-import { CampaignDaily } from './CampaignDaily';
 
 @Entity('mcp_tracker')
 @Unique(['tkCode'])
@@ -56,7 +55,4 @@ export class Tracker {
 
   @OneToMany(() => Advertising, (advertising) => advertising.tracker)
   advertising: Advertising[];
-
-  @OneToMany(() => CampaignDaily, (campaignDaily) => campaignDaily.tracker)
-  campaignDaily: CampaignDaily;
 }
