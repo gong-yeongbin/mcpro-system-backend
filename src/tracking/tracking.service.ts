@@ -8,6 +8,7 @@ import { TrackingDto } from './dto/tracking.dto';
 import { convertTrackerTrackingUrl } from '../common/util';
 import * as moment from 'moment';
 import { RedisService } from 'nestjs-redis';
+import { RedisLockService } from 'nestjs-simple-redis-lock';
 
 @Injectable()
 export class TrackingService {
@@ -17,6 +18,7 @@ export class TrackingService {
     @InjectRepository(SubMedia)
     private readonly submediaRepository: Repository<SubMedia>,
     private readonly redisService: RedisService,
+    private readonly lockService: RedisLockService,
   ) {}
 
   async tracking(requestQuery: TrackingDto): Promise<string> {
@@ -89,14 +91,19 @@ export class TrackingService {
 
     //5. 트래커 트래킹 URL를 실행
     if (convertedTrackingUrl !== null) {
-      const isExists: number = await this.redisService
-        .getClient()
-        .setnx(`${cpToken}/${viewCode}/${pubId}/${subId}`, 1);
-
-      if (!isExists) {
-        await this.redisService
+      try {
+        await this.lockService.lock('click', 2 * 60 * 1000, 50, 50);
+        const isExists: number = await this.redisService
           .getClient()
-          .incr(`${cpToken}/${viewCode}/${pubId}/${subId}`);
+          .setnx(`${cpToken}/${viewCode}/${pubId}/${subId}`, 1);
+
+        if (!isExists) {
+          await this.redisService
+            .getClient()
+            .incr(`${cpToken}/${viewCode}/${pubId}/${subId}`);
+        }
+      } finally {
+        this.lockService.unlock('click');
       }
 
       return convertedTrackingUrl;

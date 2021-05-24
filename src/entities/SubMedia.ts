@@ -32,7 +32,7 @@ export class SubMedia {
   viewCode: string;
 
   @Column({
-    type: 'bigint',
+    type: 'int',
     name: 'click',
     nullable: true,
     default: 0,
@@ -40,7 +40,7 @@ export class SubMedia {
   click: number;
 
   @Column({
-    type: 'bigint',
+    type: 'int',
     name: 'install',
     nullable: true,
     default: 0,
@@ -48,7 +48,7 @@ export class SubMedia {
   install: number;
 
   @Column({
-    type: 'bigint',
+    type: 'int',
     name: 'signup',
     nullable: true,
     default: 0,
@@ -56,18 +56,18 @@ export class SubMedia {
   signup: number;
 
   @Column({
-    type: 'bigint',
+    type: 'int',
     name: 'retention',
     nullable: true,
     default: 0,
   })
   retention: number;
 
-  @Column({ type: 'bigint', name: 'buy', nullable: true, default: 0 })
+  @Column({ type: 'int', name: 'buy', nullable: true, default: 0 })
   buy: number;
 
   @Column({
-    type: 'bigint',
+    type: 'int',
     name: 'price',
     nullable: true,
     default: 0,
@@ -75,7 +75,7 @@ export class SubMedia {
   price: number;
 
   @Column({
-    type: 'bigint',
+    type: 'int',
     name: 'etc1',
     nullable: true,
     default: 0,
@@ -83,7 +83,7 @@ export class SubMedia {
   etc1: number;
 
   @Column({
-    type: 'bigint',
+    type: 'int',
     name: 'etc2',
     nullable: true,
     default: 0,
@@ -91,7 +91,7 @@ export class SubMedia {
   etc2: number;
 
   @Column({
-    type: 'bigint',
+    type: 'int',
     name: 'etc3',
     nullable: true,
     default: 0,
@@ -99,7 +99,7 @@ export class SubMedia {
   etc3: number;
 
   @Column({
-    type: 'bigint',
+    type: 'int',
     name: 'etc4',
     nullable: true,
     default: 0,
@@ -107,7 +107,7 @@ export class SubMedia {
   etc4: number;
 
   @Column({
-    type: 'bigint',
+    type: 'int',
     name: 'etc5',
     nullable: true,
     default: 0,

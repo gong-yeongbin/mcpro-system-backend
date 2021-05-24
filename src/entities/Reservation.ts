@@ -15,9 +15,6 @@ export class Reservation {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
   idx: number;
 
-  @Column({ type: 'nvarchar', name: 'reserve_code' })
-  reserveCode: string;
-
   @Column({ type: 'nvarchar', name: 'oldCampaignName' })
   oldCampaignName: string;
 
@@ -45,12 +42,10 @@ export class Reservation {
   @ManyToOne(() => Advertising, (advertising) => advertising.reservation, {
     onDelete: 'CASCADE',
   })
-  @JoinColumn({ name: 'advertising' })
   advertising: Advertising;
 
   @ManyToOne(() => Campaign, (campaign) => campaign.reservation, {
     onDelete: 'CASCADE',
   })
-  @JoinColumn({ name: 'campaign' })
   campaign: Campaign;
 }
