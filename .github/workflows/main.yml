@@ -2,25 +2,24 @@ name: Nest.js CI # 이 workflow의 이름
 
 on:
   push:
-    branches: [ master ]
+    branches: [main]
   pull_request:
-    branches: [ master ]  # master branch에 push, pullrequest가 생길때 발동
+    branches: [main] # master branch에 push, pullrequest가 생길때 발동
 
 jobs:
-  build:                  # build라는 job을 정의
-
-    runs-on: ubuntu-latest     # 이 workflow가 수행될 OS 환경 ubuntu-laster
+  build: # build라는 job을 정의
+    runs-on: ubuntu-latest # 이 workflow가 수행될 OS 환경 ubuntu-laster
 
     strategy:
       matrix:
-        node-version: [12.x]   # 이 workflow 내에서의 변수
+        node-version: [12.x] # 이 workflow 내에서의 변수
 
     steps:
-    - uses: actions/checkout@v2            # github repo내의 코드를 workflow instance로 가져오는 action 실행
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1          # nodejs 버전에 따라 workflow를 수행하도록 해주는 action 실행
-      with:
-        node-version: ${{ matrix.node-version }}
-    - run: npm ci
-    - run: npm run build --if-present
-    - run: npm test                        # build, test가 이루어짐
+      - uses: actions/checkout@v2 # github repo내의 코드를 workflow instance로 가져오는 action 실행
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1 # nodejs 버전에 따라 workflow를 수행하도록 해주는 action 실행
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm ci
+      - run: npm run build --if-present
+      - run: npm test # build, test가 이루어짐
