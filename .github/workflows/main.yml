@@ -29,8 +29,8 @@ jobs:
 
       - name: Generate deployment package
         run: |
-          mkdir -p deploy
-          cp dist/* deploy/
+          cp Procfile dist/
+          cp package.json dist/
           cd dist && zip deploy.zip -r * .[^.]*
 
       - name: Deploy to EB
