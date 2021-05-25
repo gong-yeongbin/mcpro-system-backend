@@ -31,6 +31,7 @@ jobs:
         run: cd dist
 
       - name: ${{ secrets.AWS_EB_ACCESS_KEY_ID }}
+
       - name: ${{ secrets.AWS_EB_SECRET_ACCESS_KEY }}
 
       - name: Deploy to EB
