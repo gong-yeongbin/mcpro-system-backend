@@ -33,11 +33,11 @@ jobs:
       - name: Deploy to EB
         uses: einaregilsson/beanstalk-deploy@v16
         with:
-          aws_access_key: AKIAW64RXWMKU6AQ6U6W
-          aws_secret_key: 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
+          aws_access_key: ${{ secrets.AWS_EB_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_EB_SECRET_ACCESS_KEY }}
           application_name: mecrosspro-system
-          environment_name: mecrosspro
-          version_label: ${{github.run_number}}
-          use_existing_version_if_available: true
-          region: ap-northeast-2
-          deployment_package: dist/deploy.zip
+          # environment_name: mecrosspro
+          # version_label: ${{github.run_number}}
+          # use_existing_version_if_available: true
+          # region: ap-northeast-2
+          # deployment_package: dist/deploy.zip
