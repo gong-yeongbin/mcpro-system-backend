@@ -30,8 +30,8 @@ jobs:
       - name: Generate deployment package
         run: cd dist
 
-      - name: test
-      - run: ${{ secrets.AWS_EB_ACCESS_KEY_ID }}
+      - run: |
+          ${{ secrets.AWS_EB_ACCESS_KEY_ID }}
 
       - name: Deploy to EB
         uses: einaregilsson/beanstalk-deploy@v16
