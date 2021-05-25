@@ -1,1 +1,1 @@
-web: node src/main.js
+web: npm i -g @ nestjs/cli
