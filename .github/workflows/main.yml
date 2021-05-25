@@ -20,5 +20,9 @@ jobs:
         uses: actions/setup-node@v1 # nodejs 버전에 따라 workflow를 수행하도록 해주는 action 실행
         with:
           node-version: ${{ matrix.node-version }}
-      - run: npm ci
-      - run: npm run build --if-present
+
+      - name: Install Packages
+        run: npm ci
+
+      - name: Gnerate Bundle File
+        run: npm run build --if-present
