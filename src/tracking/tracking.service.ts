@@ -48,14 +48,15 @@ export class TrackingService {
     }
 
     const submediaEntity: SubMedia = await this.submediaRepository
-      .createQueryBuilder('submedia')
-      .leftJoinAndSelect('submedia.advertising', 'advertising')
-      .leftJoinAndSelect('submedia.media', 'media')
+      .createQueryBuilder('subMedia')
+      .leftJoinAndSelect('subMedia.advertising', 'advertising')
+      .leftJoinAndSelect('subMedia.media', 'media')
       .leftJoinAndSelect('advertising.tracker', 'tracker')
-      .where('submedia.pubId =:pubId', { pubId: pubId })
-      .andWhere('submedia.subId =:subId', { subId: subId })
-      .andWhere('submedia.cpToken =:cpToken', { cpToken: cpToken })
-      .andWhere('Date(submedia.createdAt) =:date ', {
+      .where('subMedia.pubId =:pubId', { pubId: pubId })
+      .andWhere('subMedia.subId =:subId', { subId: subId })
+      .andWhere('media.idx =:mediaIdx', { mediaIdx: campaignEntity.media.idx })
+      .andWhere('subMedia.cpToken =:cpToken', { cpToken: cpToken })
+      .andWhere('Date(subMedia.createdAt) =:date ', {
         date: moment().format('YYYY-MM-DD'),
       })
       .getOne();
