@@ -13,11 +13,12 @@ import { RedisModule } from 'nestjs-redis';
       envFilePath: ['.env.dev', '.env.prod'],
       isGlobal: true,
     }),
-    // RedisModule.register({
-    //   host: process.env.REDIS_HOST,
-    //   port: parseInt(process.env.REDIS_PORT),
-    //   password: process.env.REDIS_PASSWORD,
-    // }),
+    RedisModule.register({
+      host: process.env.REDIS_HOST,
+      // port: parseInt(process.env.REDIS_PORT),
+      port: 6379,
+      password: process.env.REDIS_PASSWORD,
+    }),
     TypeOrmModule.forRoot({
       type: process.env.MYSQL_TYPE as 'mysql',
       host: process.env.MYSQL_HOST,
