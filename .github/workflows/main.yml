@@ -17,20 +17,29 @@ jobs:
       - name: Install Packages
         run: npm install
 
-      - name: Gnerate Bundle File
+      - name: Generate Bundle File
         run: npm run build --if-present
 
       - name: Create env file
         run: |
-          touch .env
-          cat << EOF >> .env
+          touch .env.prod
+          cat << EOF >> .env.prod
           ${{ secrets.PROD }}
-      # - name: Generate deployment package
-      #   run: |
-      #     cp Procfile dist/
-      #     cp package.json dist/
-      #     cp -r .ebextensions dist/
-      #     cd dist && zip deploy.zip -r * .[^.]*
+
+      - name: Generate deployment package
+        run: |
+          cp package.json dist/
+          cd dist && zip deploy.zip -r * .[^.]*
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
+      # cp Procfile dist/
+      # cp -r .ebextensions dist/
 
       # - name: Deploy to EB
       #   uses: einaregilsson/beanstalk-deploy@v16
