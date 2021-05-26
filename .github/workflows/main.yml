@@ -31,7 +31,6 @@ jobs:
           cp package.json dist/
           cp -r .ebextensions dist/
           cd dist && zip deploy.zip -r * .[^.]*
-
       - name: Deploy to EB
         uses: einaregilsson/beanstalk-deploy@v16
         with:
