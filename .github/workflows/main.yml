@@ -30,7 +30,6 @@ jobs:
           touch .env.prod
           cat << EOF >> .env.prod
           ${{ secrets.PROD }}
-
       # - name: Generate deployment package
       #   run: |
       #     cp Procfile dist/
