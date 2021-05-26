@@ -27,8 +27,8 @@ jobs:
 
       - name: Create env file
         run: |
-          touch .env.prod
-          cat << EOF >> .env.prod
+          touch .env
+          cat << EOF >> .env
           ${{ secrets.PROD }}
       # - name: Generate deployment package
       #   run: |
