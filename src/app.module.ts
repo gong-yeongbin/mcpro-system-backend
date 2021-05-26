@@ -15,8 +15,7 @@ import { RedisModule } from 'nestjs-redis';
     }),
     RedisModule.register({
       host: process.env.REDIS_HOST,
-      port: 6379,
-      // port: parseInt(process.env.REDIS_PORT),
+      port: parseInt(process.env.REDIS_PORT),
       password: process.env.REDIS_PASSWORD,
     }),
     TypeOrmModule.forRoot({
