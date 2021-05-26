@@ -17,9 +17,9 @@ export class TrackingService {
     private readonly campaignRepository: Repository<Campaign>,
     @InjectRepository(SubMedia)
     private readonly submediaRepository: Repository<SubMedia>,
-    private readonly redisService: RedisService,
-    private readonly lockService: RedisLockService,
   ) {}
+  // private readonly redisService: RedisService,
+  // private readonly lockService: RedisLockService,
 
   async tracking(requestQuery: TrackingDto): Promise<string> {
     Logger.log(`[media -> mecrosspro] : ${JSON.stringify(requestQuery)}`);
@@ -92,20 +92,20 @@ export class TrackingService {
 
     //5. 트래커 트래킹 URL를 실행
     if (convertedTrackingUrl !== null) {
-      try {
-        await this.lockService.lock('click', 2 * 60 * 1000, 50, 50);
-        const isExists: number = await this.redisService
-          .getClient()
-          .setnx(`${cpToken}/${viewCode}/${pubId}/${subId}`, 1);
+      // try {
+      //   await this.lockService.lock('click', 2 * 60 * 1000, 50, 50);
+      //   const isExists: number = await this.redisService
+      //     .getClient()
+      //     .setnx(`${cpToken}/${viewCode}/${pubId}/${subId}`, 1);
 
-        if (!isExists) {
-          await this.redisService
-            .getClient()
-            .incr(`${cpToken}/${viewCode}/${pubId}/${subId}`);
-        }
-      } finally {
-        this.lockService.unlock('click');
-      }
+      //   if (!isExists) {
+      //     await this.redisService
+      //       .getClient()
+      //       .incr(`${cpToken}/${viewCode}/${pubId}/${subId}`);
+      //   }
+      // } finally {
+      //   this.lockService.unlock('click');
+      // }
 
       return convertedTrackingUrl;
     }
