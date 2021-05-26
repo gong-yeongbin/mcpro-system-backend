@@ -32,7 +32,6 @@ jobs:
           cp Procfile dist/
           cp package.json dist/
           cp .ebextensions/* dist/
-          cp .npmrc dist/
           cd dist && zip deploy.zip -r * .[^.]*
 
       - name: Deploy to EB
