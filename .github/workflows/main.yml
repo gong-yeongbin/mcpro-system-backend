@@ -6,11 +6,11 @@ on:
 
 jobs:
   build: # build라는 job을 정의
-    runs-on: ubuntu-latest # 이 workflow가 수행될 OS 환경 ubuntu-laster
+    runs-on: ubuntu-18.04 # 이 workflow가 수행될 OS 환경 ubuntu-laster
 
     strategy:
       matrix:
-        node-version: [12.x] # 이 workflow 내에서의 변수
+        node-version: 12.x # 이 workflow 내에서의 변수
 
     steps:
       - uses: actions/checkout@v2 # github repo내의 코드를 workflow instance로 가져오는 action 실행
@@ -25,21 +25,28 @@ jobs:
       - name: Gnerate Bundle File
         run: npm run build --if-present
 
-      - name: Generate deployment package
+       - name: Create env file
         run: |
-          cp Procfile dist/
-          cp package.json dist/
-          cp -r .ebextensions dist/
-          cd dist && zip deploy.zip -r * .[^.]*
-      - name: Deploy to EB
-        uses: einaregilsson/beanstalk-deploy@v16
+          touch .env.prod
+          cat << EOF >> .env.prod
+          ${{ secrets.PROD }}
 
-        with:
-          aws_access_key: ${{ secrets.AWS_EB_ACCESS_KEY_ID }}
-          aws_secret_key: ${{ secrets.AWS_EB_SECRET_ACCESS_KEY }}
-          application_name: mecrosspro-system
-          environment_name: mecrosspro-system-env
-          version_label: ${{github.run_number}}
-          use_existing_version_if_available: true
-          region: ap-northeast-2
-          deployment_package: dist/deploy.zip
+      # - name: Generate deployment package
+      #   run: |
+      #     cp Procfile dist/
+      #     cp package.json dist/
+      #     cp -r .ebextensions dist/
+      #     cd dist && zip deploy.zip -r * .[^.]*
+
+      # - name: Deploy to EB
+      #   uses: einaregilsson/beanstalk-deploy@v16
+
+      #   with:
+      #     aws_access_key: ${{ secrets.AWS_EB_ACCESS_KEY_ID }}
+      #     aws_secret_key: ${{ secrets.AWS_EB_SECRET_ACCESS_KEY }}
+      #     application_name: mecrosspro-system
+      #     environment_name: mecrosspro-system-env
+      #     version_label: ${{github.run_number}}
+      #     use_existing_version_if_available: true
+      #     region: ap-northeast-2
+      #     deployment_package: dist/deploy.zip
