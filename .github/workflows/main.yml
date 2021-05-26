@@ -40,9 +40,7 @@ jobs:
 
       - name: Upload to S3
         run: |
-          aws s3 cp \
-            --region ap-northeast-2 \
-            .\dist/deploy.zip s3:mcpro-system-s3-bucket/testtest/deploy.zip
+          aws s3 cp --region ap-northeast-2 dist/deploy.zip s3:mcpro-system-s3-bucket/testtest/deploy.zip
       # cp Procfile dist/
       # cp -r .ebextensions dist/
 
