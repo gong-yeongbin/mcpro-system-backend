@@ -9,7 +9,7 @@ import { RedisLockModule } from 'nestjs-simple-redis-lock';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Campaign, SubMedia]),
-    RedisLockModule.register({}),
+    // RedisLockModule.register({}),
   ],
   controllers: [TrackingController],
   providers: [TrackingService],
