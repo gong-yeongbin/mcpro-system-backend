@@ -11,7 +11,7 @@ const ENV = process.env.NODE_ENV;
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: !ENV ? `.env.${ENV}` : '.env.dev',
+      envFilePath: !ENV ? '.env.dev' : `.env.${ENV}`,
       isGlobal: true,
     }),
     RedisModule.register({
