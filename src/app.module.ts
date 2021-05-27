@@ -27,6 +27,7 @@ const ENV = process.env.NODE_ENV;
       database: process.env.MYSQL_DATABASE,
       synchronize: Boolean(process.env.MYSQL_SYNCHRONIZE),
       entities: [__dirname + '/**/*{.ts,.js}'],
+      connectTimeout: 10000,
     }),
     TrackingModule,
     PostbackModule,
