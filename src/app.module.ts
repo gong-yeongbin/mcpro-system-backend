@@ -10,7 +10,7 @@ import { RedisModule } from 'nestjs-redis';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: ['.env.development', '.env.production'],
+      envFilePath: ['.env.dev', '.env.prod'],
       isGlobal: true,
     }),
     RedisModule.register({
