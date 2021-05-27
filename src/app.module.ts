@@ -15,7 +15,7 @@ import { RedisModule } from 'nestjs-redis';
     }),
     RedisModule.register({
       host: process.env.REDIS_HOST,
-      port: parseInt(process.env.REDIS_PORT),
+      port: Number(process.env.REDIS_PORT),
     }),
     TypeOrmModule.forRoot({
       type: process.env.MYSQL_TYPE as 'mysql',
