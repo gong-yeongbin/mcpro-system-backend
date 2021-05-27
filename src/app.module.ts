@@ -10,12 +10,12 @@ import { RedisModule } from 'nestjs-redis';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: process.env.NODE_ENV === 'dev' ? '.env.dev' : 'env.prod',
+      envFilePath: process.env.NODE_ENV === 'prod' ? '.env.prod' : 'env.dev',
       isGlobal: true,
     }),
     RedisModule.register({
       host: process.env.REDIS_HOST,
-      port: 6379,
+      port: Number(process.env.REDIS_PORT),
     }),
     TypeOrmModule.forRoot({
       type: process.env.MYSQL_TYPE as 'mysql',
