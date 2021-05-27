@@ -6,6 +6,7 @@ import { PostbackModule } from './postback/postback.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { RedisModule } from 'nestjs-redis';
+import { RedisLockModule } from 'nestjs-simple-redis-lock';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { RedisModule } from 'nestjs-redis';
       host: process.env.REDIS_HOST,
       port: parseInt(process.env.REDIS_PORT),
     }),
+    RedisLockModule.register({}),
     TypeOrmModule.forRoot({
       type: process.env.MYSQL_TYPE as 'mysql',
       host: process.env.MYSQL_HOST,
