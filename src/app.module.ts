@@ -17,6 +17,7 @@ const ENV = process.env.NODE_ENV;
     RedisModule.register({
       host: process.env.REDIS_HOST,
       port: Number(process.env.REDIS_PORT),
+      connectTimeout: 10000,
     }),
     TypeOrmModule.forRoot({
       type: process.env.MYSQL_TYPE as 'mysql',
