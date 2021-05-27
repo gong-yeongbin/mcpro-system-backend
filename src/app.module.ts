@@ -34,5 +34,6 @@ const ENV = process.env.NODE_ENV;
   ],
   controllers: [AppController],
   providers: [AppService],
+  exports: [ConfigModule],
 })
 export class AppModule {}
