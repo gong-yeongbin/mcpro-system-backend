@@ -7,8 +7,8 @@ import { v4 } from 'uuid';
 import { TrackingDto } from './dto/tracking.dto';
 import { convertTrackerTrackingUrl } from '../common/util';
 import * as moment from 'moment';
-// import { RedisService } from 'nestjs-redis';
-// import { RedisLockService } from 'nestjs-simple-redis-lock';
+import { RedisService } from 'nestjs-redis';
+import { RedisLockService } from 'nestjs-simple-redis-lock';
 
 @Injectable()
 export class TrackingService {
@@ -17,10 +17,10 @@ export class TrackingService {
     private readonly campaignRepository: Repository<Campaign>,
     @InjectRepository(SubMedia)
     private readonly submediaRepository: Repository<SubMedia>,
+    private readonly redisService: RedisService,
+    private readonly lockService: RedisLockService,
   ) {}
 
-  // private readonly redisService: RedisService,
-  // private readonly lockService: RedisLockService,
   async tracking(requestQuery: TrackingDto): Promise<string> {
     Logger.log(`[media -> mecrosspro] : ${JSON.stringify(requestQuery)}`);
 
