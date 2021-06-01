@@ -43,6 +43,5 @@ jobs:
 
       - name: Upload to S3
         run: aws s3 cp --region ap-northeast-2 ./dist.zip s3://mecrosspro-deploy/system/dist.zip
-
       # - name: Code Deploy
       #   run: aws deploy create-deployment --application-name mecrosspro-system-app --file-exists-behavior OVERWRITE --deployment-config-name CodeDeployDefault.OneAtATime --deployment-group-name mecrosspro-system-deploy-group --s3-location bucket=mecrosspro-deploy,bundleType=zip,key=system/dist.zip
