@@ -1,24 +1,27 @@
-name: Nest.js CI # 이 workflow의 이름
+name: mecrosspro-system
 
 on:
   push:
     branches: [main]
 
+  workflow_dispatch:
+
 jobs:
-  build: # build라는 job을 정의
-    runs-on: ubuntu-18.04 # 이 workflow가 수행될 OS 환경 ubuntu-laster
+  build:
+    runs-on: ubuntu-18.04
+
     steps:
-      - uses: actions/checkout@v2 # github repo내의 코드를 workflow instance로 가져오는 action 실행
+      - uses: actions/checkout@v2
       - name: Use Node.js
-        uses: actions/setup-node@v1 # nodejs 버전에 따라 workflow를 수행하도록 해주는 action 실행
+        uses: actions/setup-node@v1
         with:
           node-version: '12.x'
 
-      - name: Install Packages
+      - name: Install Dependencies
         run: npm install
 
-      - name: Generate Bundle File
-        run: npm run build --if-present
+      - name: Build
+        run: npm run build
 
       - name: Create env file
         run: |
@@ -26,33 +29,20 @@ jobs:
           cat << EOF >> .env.prod
           ${{ secrets.PROD }}
 
-      - name: Generate deployment package
+      - name: Make zip file
         run: |
-          cp package.json dist/
-          cd dist && zip dist.zip -r * .[^.]*
+          zip -r dist.zip ./
 
+      # cp .env.prod package.json appspec.yml before_deploy.sh after_deploy.sh dist/
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.AWS_CODEDEPLOY_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_CODEDEPLOY_ACCESS_KEY_ID }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-2
 
       - name: Upload to S3
-        run: |
-          aws s3 cp --region ap-northeast-2 dist/dist.zip s3://mcpro-system-s3-bucket/dist.zip
-      # cp Procfile dist/
-      # cp -r .ebextensions dist/
+        run: aws s3 cp --region ap-northeast-2 ./dist.zip s3://mecrosspro-deploy/system/dist.zip
 
-      # - name: Deploy to EB
-      #   uses: einaregilsson/beanstalk-deploy@v16
-
-      #   with:
-      #     aws_access_key: ${{ secrets.AWS_EB_ACCESS_KEY_ID }}
-      #     aws_secret_key: ${{ secrets.AWS_EB_SECRET_ACCESS_KEY }}
-      #     application_name: mecrosspro-system
-      #     environment_name: mecrosspro-system-env
-      #     version_label: ${{github.run_number}}
-      #     use_existing_version_if_available: true
-      #     region: ap-northeast-2
-      #     deployment_package: dist/deploy.zip
+      # - name: Code Deploy
+      #   run: aws deploy create-deployment --application-name mecrosspro-system-app --file-exists-behavior OVERWRITE --deployment-config-name CodeDeployDefault.OneAtATime --deployment-group-name mecrosspro-system-deploy-group --s3-location bucket=mecrosspro-deploy,bundleType=zip,key=system/dist.zip
