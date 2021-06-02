@@ -23,7 +23,9 @@ export class TrackingService {
   ) {}
 
   async tracking(requestQuery: TrackingDto): Promise<string> {
-    this.logger.log(`[media -> mecrosspro] : ${JSON.stringify(requestQuery)}`);
+    this.logger.log(
+      `\n [media -> mecrosspro] : ${JSON.stringify(requestQuery)}`,
+    );
 
     //3. 노출용코드 관련
     const cpToken: string = requestQuery.token;
@@ -45,6 +47,7 @@ export class TrackingService {
     });
 
     if (!campaignEntity) {
+      this.logger.log(`Not Found ${requestQuery.token}`);
       throw new NotFoundException();
     }
 
