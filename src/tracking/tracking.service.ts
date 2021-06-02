@@ -25,7 +25,6 @@ export class TrackingService {
     console.log(
       `[ media ---> mecrosspro ] token:${requestQuery.token}, click_id:${requestQuery.click_id}, pub_id:${requestQuery.click_id}, sub_id:${requestQuery.sub_id}, adid:${requestQuery.adid} `,
     );
-
     //3. 노출용코드 관련
     const cpToken: string = requestQuery.token;
     const pubId: string = requestQuery.pub_id;
