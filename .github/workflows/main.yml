@@ -44,5 +44,5 @@ jobs:
           application_name: 'mecrosspro-system'
           environment_name: 'Mecrossprosystem-env'
           region: ap-northeast-2
-          version_label: 'mecrosspro-system-${{ github.run_number} }}'
+          version_label: 'mecrosspro-system-${{ github.run_number }}'
           deployment_package: dist.zip
