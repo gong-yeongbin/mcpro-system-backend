@@ -32,8 +32,7 @@ jobs:
       - name: Make zip file
         run: |
           mkdir deploy 
-          cd deploy
-          cp package.json dist/
+          cp package.json deploy/
           zip -r dist.zip ./deploy
 
       - name: Beanstalk Deploy for app
