@@ -1,13 +1,10 @@
-import { Controller, Get, Query, Redirect, Logger } from '@nestjs/common';
+import { Controller, Get, Query, Redirect } from '@nestjs/common';
 import { TrackingDto } from './dto/tracking.dto';
 import { TrackingService } from './tracking.service';
 
 @Controller('tracking')
 export class TrackingController {
-  constructor(
-    private readonly trackingService: TrackingService,
-    private readonly logger = new Logger(TrackingController.name),
-  ) {}
+  constructor(private readonly trackingService: TrackingService) {}
 
   @Get()
   @Redirect()
