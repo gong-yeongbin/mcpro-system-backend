@@ -19,10 +19,11 @@ export class TrackingService {
     private readonly submediaRepository: Repository<SubMedia>,
     private readonly redisService: RedisService,
     private readonly lockService: RedisLockService,
+    private readonly logger = new Logger(TrackingService.name),
   ) {}
 
   async tracking(requestQuery: TrackingDto): Promise<string> {
-    Logger.log(`[media -> mecrosspro] : ${JSON.stringify(requestQuery)}`);
+    this.logger.log(`[media -> mecrosspro] : ${JSON.stringify(requestQuery)}`);
 
     //3. 노출용코드 관련
     const cpToken: string = requestQuery.token;

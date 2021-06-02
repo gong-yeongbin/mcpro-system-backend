@@ -4,7 +4,10 @@ import { TrackingService } from './tracking.service';
 
 @Controller('tracking')
 export class TrackingController {
-  constructor(private readonly trackingService: TrackingService) {}
+  constructor(
+    private readonly trackingService: TrackingService,
+    private readonly logger = new Logger(TrackingController.name),
+  ) {}
 
   @Get()
   @Redirect()
@@ -12,7 +15,7 @@ export class TrackingController {
     const redirectUrl: string = await this.trackingService.tracking(
       requestQuery,
     );
-    Logger.log(`[mecrosspro -> tracker] : ${redirectUrl}`);
+    this.logger.log(`[mecrosspro -> tracker] : ${redirectUrl}`);
     return { url: redirectUrl, status: 302 };
   }
 }
