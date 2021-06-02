@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, Logger } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Campaign } from 'src/entities/Campaign';
 import { SubMedia } from 'src/entities/SubMedia';
@@ -19,11 +19,12 @@ export class TrackingService {
     private readonly submediaRepository: Repository<SubMedia>,
     private readonly redisService: RedisService,
     private readonly lockService: RedisLockService,
-    private readonly logger = new Logger(TrackingService.name),
   ) {}
 
   async tracking(requestQuery: TrackingDto): Promise<string> {
-    console.log(`\n [media -> mecrosspro] : ${JSON.stringify(requestQuery)}`);
+    console.log(
+      `[ media ---> mecrosspro ] token:${requestQuery.token}, click_id:${requestQuery.click_id}, pub_id:${requestQuery.click_id}, sub_id:${requestQuery.sub_id}, adid:${requestQuery.adid} `,
+    );
 
     //3. 노출용코드 관련
     const cpToken: string = requestQuery.token;

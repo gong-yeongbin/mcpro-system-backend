@@ -15,7 +15,7 @@ export class TrackingController {
     const redirectUrl: string = await this.trackingService.tracking(
       requestQuery,
     );
-    this.logger.log(`\n [mecrosspro -> tracker] : ${redirectUrl}`);
+    console.log(`[ mecrosspro ---> tracker ] redirectUrl:${redirectUrl}`);
     return { url: redirectUrl, status: 302 };
   }
 }

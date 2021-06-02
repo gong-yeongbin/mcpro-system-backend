@@ -77,7 +77,9 @@ export class PostbackService {
       cb_4,
       cb_5,
     } = query;
-
+    console.log(
+      `[ tracker ---> mecrosspro ] tracker:adbrix-remaster, type:install, token:${cb_1}, viewCode:${cb_2}, click_id:${cb_3}`,
+    );
     const subMediaEntity: SubMedia = await this.subMediaRepository
       .createQueryBuilder('subMedia')
       .leftJoinAndSelect('subMedia.advertising', 'advertising')
@@ -103,7 +105,8 @@ export class PostbackService {
     }
 
     const { campaign, media } = subMediaEntity;
-    const postBackInstallAdbrixRemaster: PostBackInstallAdbrixRemaster = new PostBackInstallAdbrixRemaster();
+    const postBackInstallAdbrixRemaster: PostBackInstallAdbrixRemaster =
+      new PostBackInstallAdbrixRemaster();
     postBackInstallAdbrixRemaster.cpToken = cb_1;
     postBackInstallAdbrixRemaster.aKey = a_key;
     postBackInstallAdbrixRemaster.aCookie = a_cookie;
@@ -139,7 +142,8 @@ export class PostbackService {
     postBackInstallAdbrixRemaster.eventName = event_name;
     postBackInstallAdbrixRemaster.eventDatetime = event_datetime;
     postBackInstallAdbrixRemaster.deeplinkPath = deeplink_path;
-    postBackInstallAdbrixRemaster.marketInstallBtnClicked = market_install_btn_clicked;
+    postBackInstallAdbrixRemaster.marketInstallBtnClicked =
+      market_install_btn_clicked;
     postBackInstallAdbrixRemaster.appInstallStart = app_install_start;
     postBackInstallAdbrixRemaster.appInstallCompleted = app_install_completed;
     postBackInstallAdbrixRemaster.appFirstOpen = app_first_open;
@@ -151,23 +155,25 @@ export class PostbackService {
     postBackInstallAdbrixRemaster.cb5 = cb_5;
     postBackInstallAdbrixRemaster.pbUrl = originalUrl;
 
-    const postBackInstallAdbrixRemasterEntity: PostBackInstallAdbrixRemaster = await this.postBackInstallAdbrixRemasterRepository.save(
-      postBackInstallAdbrixRemaster,
-    );
+    const postBackInstallAdbrixRemasterEntity: PostBackInstallAdbrixRemaster =
+      await this.postBackInstallAdbrixRemasterRepository.save(
+        postBackInstallAdbrixRemaster,
+      );
 
     if (campaign.cpStatus) {
-      const convertedPostbackInstallUrlTemplate = media.mediaPostbackInstallUrlTemplate
-        .replace('{click_id}', cb_3)
-        .replace('{device_id}', query.adid)
-        .replace(
-          '{android_device_id}',
-          Number(device_platform) == 1 ? device_platform : '',
-        )
-        .replace(
-          '{ios_device_id}',
-          Number(device_platform) != 1 ? device_platform : '',
-        )
-        .replace('{install_timestamp}', event_datetime);
+      const convertedPostbackInstallUrlTemplate =
+        media.mediaPostbackInstallUrlTemplate
+          .replace('{click_id}', cb_3)
+          .replace('{device_id}', query.adid)
+          .replace(
+            '{android_device_id}',
+            Number(device_platform) == 1 ? device_platform : '',
+          )
+          .replace(
+            '{ios_device_id}',
+            Number(device_platform) != 1 ? device_platform : '',
+          )
+          .replace('{install_timestamp}', event_datetime);
       if (
         campaign &&
         campaign.postBackEvent &&
@@ -247,7 +253,9 @@ export class PostbackService {
       cb_4,
       cb_5,
     } = query;
-
+    console.log(
+      `[ tracker ---> mecrosspro ] tracker:adbrix-remaster, type:event, token:${cb_1}, viewCode:${cb_2}, click_id:${cb_3}`,
+    );
     const subMediaEntity: SubMedia = await this.subMediaRepository
       .createQueryBuilder('subMedia')
       .leftJoinAndSelect('subMedia.advertising', 'advertising')
@@ -270,7 +278,8 @@ export class PostbackService {
     }
 
     const { campaign, media } = subMediaEntity;
-    const postBackEventAdbrixRemaster: PostBackEventAdbrixRemaster = new PostBackEventAdbrixRemaster();
+    const postBackEventAdbrixRemaster: PostBackEventAdbrixRemaster =
+      new PostBackEventAdbrixRemaster();
     postBackEventAdbrixRemaster.cpToken = cb_1;
     postBackEventAdbrixRemaster.aKey = a_key;
     postBackEventAdbrixRemaster.aCookie = a_cookie;
@@ -318,9 +327,10 @@ export class PostbackService {
     postBackEventAdbrixRemaster.cb5 = cb_5;
     postBackEventAdbrixRemaster.pbUrl = originalUrl;
 
-    const postBackEventAdbrixRemasterEntity: PostBackEventAdbrixRemaster = await this.postBackEventAdbrixRemasterRepository.save(
-      postBackEventAdbrixRemaster,
-    );
+    const postBackEventAdbrixRemasterEntity: PostBackEventAdbrixRemaster =
+      await this.postBackEventAdbrixRemasterRepository.save(
+        postBackEventAdbrixRemaster,
+      );
     if (campaign.cpStatus === true) {
       const paramJsonData: any = JSON.parse(param_json);
 
@@ -332,21 +342,22 @@ export class PostbackService {
           event_value += item['abx:sales'];
         }
       }
-      const convertedPostbackEventUrlTemplate = media.mediaPostbackEventUrlTemplate
-        .replace('{click_id}', cb_3)
-        .replace('{event_name}', event_name)
-        .replace('{event_value}', event_value.toString())
-        .replace('{device_id}', adid)
-        .replace(
-          '{android_device_id}',
-          Number(device_platform) == 1 ? device_platform : '',
-        )
-        .replace(
-          '{ios_device_id}',
-          Number(device_platform) != 1 ? device_platform : '',
-        )
-        .replace('{install_timestamp}', '')
-        .replace('{event_timestamp}', event_datetime);
+      const convertedPostbackEventUrlTemplate =
+        media.mediaPostbackEventUrlTemplate
+          .replace('{click_id}', cb_3)
+          .replace('{event_name}', event_name)
+          .replace('{event_value}', event_value.toString())
+          .replace('{device_id}', adid)
+          .replace(
+            '{android_device_id}',
+            Number(device_platform) == 1 ? device_platform : '',
+          )
+          .replace(
+            '{ios_device_id}',
+            Number(device_platform) != 1 ? device_platform : '',
+          )
+          .replace('{install_timestamp}', '')
+          .replace('{event_timestamp}', event_datetime);
 
       if (
         campaign &&
@@ -367,11 +378,10 @@ export class PostbackService {
       }
     }
 
-    const postBackEventEntity: PostBackEvent = await this.postBackEventRepository.findOne(
-      {
+    const postBackEventEntity: PostBackEvent =
+      await this.postBackEventRepository.findOne({
         where: { campaign: campaign, trackerPostback: event_name },
-      },
-    );
+      });
 
     if (postBackEventEntity) {
       switch (postBackEventEntity.adminPostback) {
