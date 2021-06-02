@@ -6,12 +6,11 @@ import { PostbackModule } from './postback/postback.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { RedisModule } from 'nestjs-redis';
-const ENV = process.env.NODE_ENV;
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: !ENV ? '.env.dev' : `.env.dev`,
+      envFilePath: ['.env.dev', '.env.prod'],
       isGlobal: true,
     }),
     RedisModule.register({

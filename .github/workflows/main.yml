@@ -23,25 +23,34 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Create env file
-        run: |
-          touch .env.prod
-          cat << EOF >> .env.prod
-          ${{ secrets.PROD }}
+      # - name: Create env file
+      #   run: |
+      #     touch .env.prod
+      #     cat << EOF >> .env.prod
+      #     ${{ secrets.PROD }}
 
       - name: Make zip file
         run: |
           zip -r dist.zip ./
 
       # cp .env.prod package.json appspec.yml before_deploy.sh after_deploy.sh dist/
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-northeast-2
+      # - name: Configure AWS credentials
+      #   uses: aws-actions/configure-aws-credentials@v1
+      #   with:
+      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     aws-region: ap-northeast-2
 
-      - name: Upload to S3
-        run: aws s3 cp --region ap-northeast-2 ./dist.zip s3://mecrosspro-deploy/system/dist.zip
-      # - name: Code Deploy
-      #   run: aws deploy create-deployment --application-name mecrosspro-system-app --file-exists-behavior OVERWRITE --deployment-config-name CodeDeployDefault.OneAtATime --deployment-group-name mecrosspro-system-deploy-group --s3-location bucket=mecrosspro-deploy,bundleType=zip,key=system/dist.zip
+      # - name: Upload to S3
+      #   run: aws s3 cp --region ap-northeast-2 ./dist.zip s3://mecrosspro-deploy/system/dist.zip
+      
+       - name: Beanstalk Deploy for app
+        uses: einaregilsson/beanstalk-deploy@v3
+        with:
+          aws_access_key: ${{secrets.AWS_ACCESS_KEY}}
+          aws_secret_key: ${{secrets.AWS_SECRET_KEY}}
+          application_name: mecrosspro-system
+          environment_name: Mecrossprosystem-env
+          region: ap-northeast-2
+          version_label: "my-app-${{ steps.format-time.outputs.replaced }}"
+          deployment_package: deploy.zip
