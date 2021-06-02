@@ -23,12 +23,6 @@ jobs:
       - name: Build
         run: npm run build
 
-      # - name: Create env file
-      #   run: |
-      #     touch .env.prod
-      #     cat << EOF >> .env.prod
-      #     ${{ secrets.PROD }}
-
       - name: Make zip file
         run: |
           mkdir deploy 
