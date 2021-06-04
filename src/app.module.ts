@@ -1,4 +1,4 @@
-import { HttpModule, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TrackingModule } from './tracking/tracking.module';
@@ -6,7 +6,6 @@ import { PostbackModule } from './postback/postback.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { RedisModule } from 'nestjs-redis';
-import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -29,8 +28,6 @@ import { ScheduleModule } from '@nestjs/schedule';
       entities: [__dirname + '/**/*{.ts,.js}'],
       connectTimeout: 10000,
     }),
-    ScheduleModule.forRoot(),
-    HttpModule,
     TrackingModule,
     PostbackModule,
   ],
