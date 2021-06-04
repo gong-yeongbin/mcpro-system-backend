@@ -22,4 +22,20 @@ export class PostbackController {
   ) {
     return this.postBackService.postBackEventAdbrixRemaster(req, query);
   }
+
+  // @Get('/appsflyer/install')
+  // postBackInstallAppsflyer(
+  //   @Req() req: any,
+  //   @Query() query: AdbrixRemasterPostbackInstallDto,
+  // ) {
+  //   return this.postBackService.postBackInstallAdbrixRemaster(req, query);
+  // }
+
+  // @Get('/appsflyer/event')
+  // postBackEventAppsflyer(
+  //   @Req() req: any,
+  //   @Query() query: AdbrixRemasterPostbackEventDto,
+  // ) {
+  //   return this.postBackService.postBackEventAdbrixRemaster(req, query);
+  // }
 }

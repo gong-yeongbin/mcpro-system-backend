@@ -32,17 +32,17 @@ export class Tracker {
   @Column({ type: 'boolean', name: 'tk_status', default: true })
   tkStatus: boolean;
 
-  @Column({ type: 'nvarchar', name: 'trackerTrackingUrlTemplate' })
+  @Column({ type: 'text', name: 'trackerTrackingUrlTemplate' })
   trackerTrackingUrlTemplate: string;
 
   @Column({
-    type: 'nvarchar',
+    type: 'text',
     name: 'mecrossPostbackInstallUrlTemplate',
   })
   mecrossPostbackInstallUrlTemplate: string;
 
   @Column({
-    type: 'nvarchar',
+    type: 'text',
     name: 'mecrossPostbackEventUrlTemplate',
   })
   mecrossPostbackEventUrlTemplate: string;

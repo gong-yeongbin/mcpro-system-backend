@@ -86,12 +86,10 @@ export class TrackingService {
     //4. 메크로스Pro 트래킹 URL 를 트래커 트래킹 URL 변환
     const convertedTrackingUrl: string = convertTrackerTrackingUrl(
       campaignEntity.advertising.tracker.tkCode,
-      // campaignEntity.trackerTrackingUrl,
-      'https://app.appsflyer.com/com.appsflyer.adNetworkTest?pid=mecrosspro_int&af_siteid={af_siteid}&af_c_id={af_c_id}&af_adset_id={af_adset_id}&af_ad_id={af_ad_id}&af_click_lookback=7d&clickid={clickid}&advertising_id={advertising_id}&idfa={idfa}&af_ip={af_ip}&af_ua={af_ua}&af_lang={af_lang}',
+      campaignEntity.trackerTrackingUrl,
       requestQuery,
       viewCode,
     );
-    console.log(convertedTrackingUrl);
     //5. 트래커 트래킹 URL를 실행
     if (convertedTrackingUrl !== null) {
       try {
