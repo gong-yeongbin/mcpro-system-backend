@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { PostBackEvent } from 'src/entities/PostBackEvent';
 import { PostBackEventAdbrixRemaster } from 'src/entities/PostBackEventAdbrixRemaster';
 import { PostBackInstallAdbrixRemaster } from 'src/entities/PostBackInstallAdbrixRemaster';
+import { PostBackInstallAppsflyer } from 'src/entities/PostBackInstallAppsflyer';
 import { SubMedia } from 'src/entities/SubMedia';
 import { PostbackController } from './postback.controller';
 import { PostbackService } from './postback.service';
@@ -14,6 +15,7 @@ import { PostbackService } from './postback.service';
       PostBackEvent,
       PostBackInstallAdbrixRemaster,
       PostBackEventAdbrixRemaster,
+      PostBackInstallAppsflyer,
     ]),
     HttpModule.register({
       timeout: 5000,
