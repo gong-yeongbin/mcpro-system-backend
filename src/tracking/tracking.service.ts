@@ -93,7 +93,12 @@ export class TrackingService {
     //5. 트래커 트래킹 URL를 실행
     if (convertedTrackingUrl !== null) {
       try {
-        await this.lockService.lock('click', 2 * 60 * 1000, 50, 50);
+        await this.lockService.lock(
+          moment().format('YYYYMMDD'),
+          2 * 60 * 1000,
+          50,
+          50,
+        );
         const isExists: number = await this.redisService
           .getClient()
           .hsetnx(
@@ -112,7 +117,7 @@ export class TrackingService {
             );
         }
       } finally {
-        this.lockService.unlock('click');
+        this.lockService.unlock(moment().format('YYYYMMDD'));
       }
 
       return convertedTrackingUrl;
