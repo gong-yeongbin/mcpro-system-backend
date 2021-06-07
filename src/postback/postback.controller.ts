@@ -1,8 +1,7 @@
 import { Controller, Get, Query, Req } from '@nestjs/common';
-import { AdbrixRemasterPostbackInstallDto } from './dto/adbrix-remaster-postback-install.dto';
-import { AdbrixRemasterPostbackEventDto } from './dto/adbrix-remaster-postback-event.dto';
 import { PostbackService } from './postback.service';
 import { AppsflyerPostbackInstallDto } from './dto/appsflyer-postback-install.dto';
+import { AppsflyerPostbackEventDto } from './dto/appsflyer-postback-event.dto';
 
 @Controller()
 export class PostbackController {
@@ -32,11 +31,11 @@ export class PostbackController {
     return this.postBackService.postBackInstallAppsflyer(req, query);
   }
 
-  // @Get('/appsflyer/event')
-  // postBackEventAppsflyer(
-  //   @Req() req: any,
-  //   @Query() query: AdbrixRemasterPostbackEventDto,
-  // ) {
-  //   return this.postBackService.postBackEventAdbrixRemaster(req, query);
-  // }
+  @Get('/appsflyer/event')
+  postBackEventAppsflyer(
+    @Req() req: any,
+    @Query() query: AppsflyerPostbackEventDto,
+  ) {
+    return this.postBackService.postBackEventAppsflyer(req, query);
+  }
 }

@@ -4,13 +4,11 @@ import { SubMedia } from 'src/entities/SubMedia';
 import { Repository } from 'typeorm';
 import * as moment from 'moment';
 import { PostBackEvent } from 'src/entities/PostBackEvent';
-import { AdbrixRemasterPostbackInstallDto } from './dto/adbrix-remaster-postback-install.dto';
-import { AdbrixRemasterPostbackEventDto } from './dto/adbrix-remaster-postback-event.dto';
-import { PostBackInstallAdbrixRemaster } from 'src/entities/PostBackInstallAdbrixRemaster';
-import { PostBackEventAdbrixRemaster } from 'src/entities/PostBackEventAdbrixRemaster';
+import { PostBackEventAppsflyer } from 'src/entities/PostBackEventAppsflyer';
 import { AppsflyerPostbackInstallDto } from './dto/appsflyer-postback-install.dto';
 import { Request } from 'express';
 import { PostBackInstallAppsflyer } from 'src/entities/PostBackInstallAppsflyer';
+import { AppsflyerPostbackEventDto } from './dto/appsflyer-postback-event.dto';
 
 @Injectable()
 export class PostbackService {
@@ -20,12 +18,10 @@ export class PostbackService {
     private readonly subMediaRepository: Repository<SubMedia>,
     @InjectRepository(PostBackEvent)
     private readonly postBackEventRepository: Repository<PostBackEvent>,
-    @InjectRepository(PostBackInstallAdbrixRemaster)
-    private readonly postBackInstallAdbrixRemasterRepository: Repository<PostBackInstallAdbrixRemaster>,
-    @InjectRepository(PostBackEventAdbrixRemaster)
-    private readonly postBackEventAdbrixRemasterRepository: Repository<PostBackEventAdbrixRemaster>,
     @InjectRepository(PostBackInstallAppsflyer)
     private readonly postBackInstallAppsflyerRepository: Repository<PostBackInstallAppsflyer>,
+    @InjectRepository(PostBackEventAppsflyer)
+    private readonly postbackEventAppsflyerRepository: Repository<PostBackEventAppsflyer>,
   ) {}
 
   // async postBackInstallAdbrixRemaster(
@@ -429,7 +425,7 @@ export class PostbackService {
     query: AppsflyerPostbackInstallDto,
   ) {
     console.log(
-      `[ appsflyer ---> mecrosspro ] ${req.protocol}://${req.headers.host}${req.url}`,
+      `[ appsflyer ---> mecrosspro ] install : ${req.protocol}://${req.headers.host}${req.url}`,
     );
     const originalUrl: string = `${req.protocol}://${req.get('host')}${
       req.originalUrl
@@ -445,11 +441,9 @@ export class PostbackService {
       install_time,
       country_code,
       language,
-      event_name,
-      event_revenue_currency,
-      event_revenue,
-      event_time,
+      click_time,
       device_carrier,
+      device_ip,
     } = query;
     console.log(
       `[ appsflyer ---> mecrosspro ] tracker:adbrix-remaster, type:install, cpToken:${af_c_id}, viewCode:${af_siteid}, click_id:${clickid}`,
@@ -474,9 +468,7 @@ export class PostbackService {
       })
       .getOne();
 
-    if (!subMediaEntity) {
-      throw new NotFoundException();
-    }
+    if (!subMediaEntity) throw new NotFoundException();
 
     const { campaign, media } = subMediaEntity;
     const postBackInstallAppsflyer: PostBackInstallAppsflyer =
@@ -492,11 +484,9 @@ export class PostbackService {
     postBackInstallAppsflyer.install_time = install_time;
     postBackInstallAppsflyer.country_code = country_code;
     postBackInstallAppsflyer.language = language;
-    postBackInstallAppsflyer.event_name = event_name;
-    postBackInstallAppsflyer.event_time = event_time;
-    postBackInstallAppsflyer.event_revenue_currency = event_revenue_currency;
-    postBackInstallAppsflyer.event_revenue = event_revenue;
+    postBackInstallAppsflyer.click_time = click_time;
     postBackInstallAppsflyer.device_carrier = device_carrier;
+    postBackInstallAppsflyer.device_ip = device_ip;
     postBackInstallAppsflyer.pbUrl = originalUrl;
 
     const postBackInstallAppsflyerEntity: PostBackInstallAppsflyer =
@@ -508,10 +498,10 @@ export class PostbackService {
       const convertedPostbackInstallUrlTemplate =
         media.mediaPostbackInstallUrlTemplate
           .replace('{click_id}', clickid)
-          .replace('{device_id}', !idfa ? advertising_id : idfa)
+          .replace('{device_id}', advertising_id ? advertising_id : idfa)
           .replace('{android_device_id}', advertising_id)
           .replace('{ios_device_id}', idfa)
-          .replace('{install_timestamp}', event_time);
+          .replace('{install_timestamp}', install_time);
       if (
         campaign &&
         campaign.postBackEvent &&
@@ -534,6 +524,148 @@ export class PostbackService {
     subMediaEntity.install = Number(subMediaEntity.install) + 1;
     await this.subMediaRepository.save(subMediaEntity);
 
+    return;
+  }
+
+  async postBackEventAppsflyer(req: any, query: AppsflyerPostbackEventDto) {
+    console.log(
+      `[ appsflyer ---> mecrosspro ] event : ${req.protocol}://${req.headers.host}${req.url}`,
+    );
+    const originalUrl: string = `${req.protocol}://${req.get('host')}${
+      req.originalUrl
+    }` as string;
+
+    const {
+      clickid,
+      af_siteid,
+      af_c_id,
+      advertising_id,
+      idfa,
+      idfv,
+      install_time,
+      country_code,
+      language,
+      event_name,
+      event_revenue_currency,
+      event_revenue,
+      event_time,
+      device_carrier,
+      device_ip,
+    } = query;
+    console.log(
+      `[ appsflyer ---> mecrosspro ] event : type:event, cpToken:${af_c_id}, viewCode:${af_siteid}, click_id:${clickid}`,
+    );
+    const subMediaEntity: SubMedia = await this.subMediaRepository
+      .createQueryBuilder('subMedia')
+      .leftJoinAndSelect('subMedia.advertising', 'advertising')
+      .leftJoinAndSelect('subMedia.campaign', 'campaign')
+      .leftJoinAndSelect('subMedia.media', 'media')
+      .leftJoinAndSelect('advertising.tracker', 'tracker')
+      .leftJoinAndSelect('campaign.postBackEvent', 'postBackEvent')
+      .where('subMedia.viewCode =:viewCode', {
+        viewCode: af_siteid,
+      })
+      .andWhere('subMedia.cpToken =:cpToken', { cpToken: af_c_id })
+      .andWhere('postBackEvent.trackerPostBack =:trackerPostBack', {
+        trackerPostBack: event_name,
+      })
+      .andWhere('advertising.adStatus =:adStatus', { adStatus: true })
+      .getOne();
+
+    if (!subMediaEntity) throw new NotFoundException();
+
+    const { campaign, media } = subMediaEntity;
+    const postBackEventAppsflyer: PostBackEventAppsflyer =
+      new PostBackEventAppsflyer();
+    postBackEventAppsflyer.cpToken = af_c_id;
+    postBackEventAppsflyer.clickid = clickid;
+    postBackEventAppsflyer.af_siteid = af_siteid;
+    postBackEventAppsflyer.af_c_id = af_c_id;
+    postBackEventAppsflyer.advertising_id = advertising_id;
+    postBackEventAppsflyer.idfa = idfa;
+    postBackEventAppsflyer.idfv = idfv;
+    postBackEventAppsflyer.install_time = install_time;
+    postBackEventAppsflyer.country_code = country_code;
+    postBackEventAppsflyer.language = language;
+    postBackEventAppsflyer.event_name = event_name;
+    postBackEventAppsflyer.event_revenue_currency = event_revenue_currency;
+    postBackEventAppsflyer.event_revenue = event_revenue;
+    postBackEventAppsflyer.event_time = event_time;
+    postBackEventAppsflyer.device_carrier = device_carrier;
+    postBackEventAppsflyer.device_ip = device_ip;
+    postBackEventAppsflyer.pbUrl = originalUrl;
+
+    const postbackEventApppsflyerEntity: PostBackEventAppsflyer =
+      await this.postbackEventAppsflyerRepository.save(postBackEventAppsflyer);
+
+    if (campaign.cpStatus === true) {
+      const convertedPostbackEventUrlTemplate =
+        media.mediaPostbackEventUrlTemplate
+          .replace('{click_id}', clickid)
+          .replace('{event_name}', event_name)
+          .replace('{event_value}', event_revenue)
+          .replace('{device_id}', advertising_id ? advertising_id : idfa)
+          .replace('{android_device_id}', advertising_id)
+          .replace('{ios_device_id}', idfa)
+          .replace('{install_timestamp}', install_time)
+          .replace('{event_timestamp}', event_time);
+
+      if (
+        campaign &&
+        campaign.postBackEvent &&
+        campaign.postBackEvent[0].sendPostback === true
+      ) {
+        await this.httpService
+          .get(convertedPostbackEventUrlTemplate)
+          .toPromise()
+          .then(() => {
+            postbackEventApppsflyerEntity.isSendDate = new Date();
+          })
+          .catch();
+
+        await this.postbackEventAppsflyerRepository.save(
+          postbackEventApppsflyerEntity,
+        );
+      }
+    }
+    const postBackEventEntity: PostBackEvent =
+      await this.postBackEventRepository.findOne({
+        where: { campaign: campaign, trackerPostback: event_name },
+      });
+
+    if (postBackEventEntity) {
+      switch (postBackEventEntity.adminPostback) {
+        case 'install':
+          subMediaEntity.install = Number(subMediaEntity.install) + 1;
+          break;
+        case 'signup':
+          subMediaEntity.signup = Number(subMediaEntity.signup) + 1;
+          break;
+        case 'retention':
+          subMediaEntity.retention = Number(subMediaEntity.retention) + 1;
+          break;
+        case 'buy':
+          subMediaEntity.buy = Number(subMediaEntity.buy) + 1;
+          break;
+        case 'etc1':
+          subMediaEntity.etc1 = Number(subMediaEntity.etc1) + 1;
+          break;
+        case 'etc2':
+          subMediaEntity.etc2 = Number(subMediaEntity.etc2) + 1;
+          break;
+        case 'etc3':
+          subMediaEntity.etc3 = Number(subMediaEntity.etc3) + 1;
+          break;
+        case 'etc4':
+          subMediaEntity.etc4 = Number(subMediaEntity.etc4) + 1;
+          break;
+        case 'etc5':
+          subMediaEntity.etc5 = Number(subMediaEntity.etc5) + 1;
+          break;
+      }
+
+      await this.subMediaRepository.save(subMediaEntity);
+    }
     return;
   }
 }

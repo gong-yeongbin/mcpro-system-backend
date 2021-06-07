@@ -36,21 +36,13 @@ export class AppsflyerPostbackInstallDto {
 
   @IsString()
   @IsOptional()
-  event_name: string;
-
-  @IsString()
-  @IsOptional()
-  event_revenue_currency: string;
-
-  @IsString()
-  @IsOptional()
-  event_revenue: string;
-
-  @IsString()
-  @IsOptional()
-  event_time: string;
+  click_time: string;
 
   @IsString()
   @IsOptional()
   device_carrier: string;
+
+  @IsString()
+  @IsOptional()
+  device_ip: string;
 }

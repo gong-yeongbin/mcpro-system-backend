@@ -1,16 +1,13 @@
-import { IsNumberString, IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 
 export class AppsflyerPostbackEventDto {
-  @IsString()
-  @IsOptional()
+  @IsString() //클릭id
   clickid: string;
 
-  @IsString()
-  @IsOptional()
+  @IsString() //노출용코드
   af_siteid: string;
 
-  @IsString()
-  @IsOptional()
+  @IsString() //캠페인토큰
   af_c_id: string;
 
   @IsString()
@@ -45,9 +42,9 @@ export class AppsflyerPostbackEventDto {
   @IsOptional()
   event_revenue_currency: string;
 
-  @IsNumberString()
+  @IsString()
   @IsOptional()
-  event_revenue: number;
+  event_revenue: string;
 
   @IsString()
   @IsOptional()
@@ -56,4 +53,8 @@ export class AppsflyerPostbackEventDto {
   @IsString()
   @IsOptional()
   device_carrier: string;
+
+  @IsString()
+  @IsOptional()
+  device_ip: string;
 }

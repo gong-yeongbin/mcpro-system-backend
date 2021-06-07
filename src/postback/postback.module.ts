@@ -1,8 +1,7 @@
 import { HttpModule, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PostBackEvent } from 'src/entities/PostBackEvent';
-import { PostBackEventAdbrixRemaster } from 'src/entities/PostBackEventAdbrixRemaster';
-import { PostBackInstallAdbrixRemaster } from 'src/entities/PostBackInstallAdbrixRemaster';
+import { PostBackEventAppsflyer } from 'src/entities/PostBackEventAppsflyer';
 import { PostBackInstallAppsflyer } from 'src/entities/PostBackInstallAppsflyer';
 import { SubMedia } from 'src/entities/SubMedia';
 import { PostbackController } from './postback.controller';
@@ -13,8 +12,7 @@ import { PostbackService } from './postback.service';
     TypeOrmModule.forFeature([
       SubMedia,
       PostBackEvent,
-      PostBackInstallAdbrixRemaster,
-      PostBackEventAdbrixRemaster,
+      PostBackEventAppsflyer,
       PostBackInstallAppsflyer,
     ]),
     HttpModule.register({
