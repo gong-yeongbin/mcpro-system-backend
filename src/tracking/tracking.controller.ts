@@ -1,4 +1,4 @@
-import { Controller, Get, Query, Redirect } from '@nestjs/common';
+import { Controller, Get, Query, Redirect, Req } from '@nestjs/common';
 import { TrackingDto } from './dto/tracking.dto';
 import { TrackingService } from './tracking.service';
 

@@ -96,12 +96,20 @@ export class TrackingService {
         await this.lockService.lock('click', 2 * 60 * 1000, 50, 50);
         const isExists: number = await this.redisService
           .getClient()
-          .setnx(`${cpToken}/${viewCode}/${pubId}/${subId}`, 1);
+          .hsetnx(
+            moment().format('YYYYMMDD'),
+            `${cpToken}/${viewCode}/${pubId}/${subId}`,
+            1,
+          );
 
         if (!isExists) {
           await this.redisService
             .getClient()
-            .incr(`${cpToken}/${viewCode}/${pubId}/${subId}`);
+            .hincrby(
+              moment().format('YYYYMMDD'),
+              `${cpToken}/${viewCode}/${pubId}/${subId}`,
+              1,
+            );
         }
       } finally {
         this.lockService.unlock('click');

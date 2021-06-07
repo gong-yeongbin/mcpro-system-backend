@@ -8,21 +8,21 @@ import { AppsflyerPostbackInstallDto } from './dto/appsflyer-postback-install.dt
 export class PostbackController {
   constructor(private readonly postBackService: PostbackService) {}
 
-  @Get('/adbrix-remaster/install')
-  postBackInstallAdbrixRemaster(
-    @Req() req: any,
-    @Query() query: AdbrixRemasterPostbackInstallDto,
-  ) {
-    return this.postBackService.postBackInstallAdbrixRemaster(req, query);
-  }
+  // @Get('/adbrix-remaster/install')
+  // postBackInstallAdbrixRemaster(
+  //   @Req() req: any,
+  //   @Query() query: AdbrixRemasterPostbackInstallDto,
+  // ) {
+  //   return this.postBackService.postBackInstallAdbrixRemaster(req, query);
+  // }
 
-  @Get('/adbrix-remaster/event')
-  postBackEventAdbrixRemaster(
-    @Req() req: any,
-    @Query() query: AdbrixRemasterPostbackEventDto,
-  ) {
-    return this.postBackService.postBackEventAdbrixRemaster(req, query);
-  }
+  // @Get('/adbrix-remaster/event')
+  // postBackEventAdbrixRemaster(
+  //   @Req() req: any,
+  //   @Query() query: AdbrixRemasterPostbackEventDto,
+  // ) {
+  //   return this.postBackService.postBackEventAdbrixRemaster(req, query);
+  // }
 
   @Get('/appsflyer/install')
   postBackInstallAppsflyer(
