@@ -1,7 +1,5 @@
-import { PostbackInstallDto } from 'src/postback/dto/postback-install.dto';
 import { TrackingDto } from 'src/tracking/dto/tracking.dto';
 import * as moment from 'moment-timezone';
-import { PostbackEventDto } from 'src/postback/dto/postback-event.dto';
 
 /**
  * 4.메크로스Pro 트래킹 URL 를 트래커 트래킹 URL 변환
@@ -235,218 +233,218 @@ interface postBackData {
   currency?: string;
 }
 
-export function postBackInstall(req: PostbackInstallDto) {
-  const returnData: postBackData = {};
+// export function postBackInstall(req: PostbackInstallDto) {
+//   const returnData: postBackData = {};
 
-  if (req.cb_param3 && req.cb_param4) {
-    //애드브릭스
-    returnData.tkCode = 'adbrix';
-  }
-  if (req.cb_2 && req.cb_3) {
-    //애드브릭스-리마스터
-    returnData.tkCode = 'adbrix_remaster';
-  }
-  if (req.af_siteid && req.clickid) {
-    //앱스플라이어
-    returnData.tkCode = 'appsflyer';
-  }
+//   if (req.cb_param3 && req.cb_param4) {
+//     //애드브릭스
+//     returnData.tkCode = 'adbrix';
+//   }
+//   if (req.cb_2 && req.cb_3) {
+//     //애드브릭스-리마스터
+//     returnData.tkCode = 'adbrix_remaster';
+//   }
+//   if (req.af_siteid && req.clickid) {
+//     //앱스플라이어
+//     returnData.tkCode = 'appsflyer';
+//   }
 
-  switch (returnData.tkCode) {
-    case 'adbrix':
-      returnData.viewCode = req.cb_param4;
-      returnData.clickId = req.cb_param3;
-      returnData.deviceId = !req.ifa ? req.gaid : req.ifa;
-      returnData.deviceCarrier = req.carrier;
-      returnData.deviceCountry = req.country;
-      returnData.deviceLanguage = req.language;
-      returnData.deviceIp = req.click_ip;
-      returnData.appkey = req.appkey;
-      returnData.clickDatetime = req.session_dt_kst //20201220105052211
-        ? convertTimeToFormat(req.session_dt_kst)
-        : '1970-01-01 00:00:00';
-      returnData.installDatetime = req.install_dt_kst //20201220105116000
-        ? convertTimeToFormat(req.install_dt_kst)
-        : '1970-01-01 00:00:00';
-      break;
+//   switch (returnData.tkCode) {
+//     case 'adbrix':
+//       returnData.viewCode = req.cb_param4;
+//       returnData.clickId = req.cb_param3;
+//       returnData.deviceId = !req.ifa ? req.gaid : req.ifa;
+//       returnData.deviceCarrier = req.carrier;
+//       returnData.deviceCountry = req.country;
+//       returnData.deviceLanguage = req.language;
+//       returnData.deviceIp = req.click_ip;
+//       returnData.appkey = req.appkey;
+//       returnData.clickDatetime = req.session_dt_kst //20201220105052211
+//         ? convertTimeToFormat(req.session_dt_kst)
+//         : '1970-01-01 00:00:00';
+//       returnData.installDatetime = req.install_dt_kst //20201220105116000
+//         ? convertTimeToFormat(req.install_dt_kst)
+//         : '1970-01-01 00:00:00';
+//       break;
 
-    case 'adbrix_remaster':
-      const installDatetime2 = req.event_datetime
-        ? moment(req.event_datetime.replace('+', ' ').split('.')[0]).add(
-            9,
-            'hours',
-          )
-        : moment('1970-01-01 00:00:00');
-      //event_datetime=2020-12-28+01:41:10.422
+//     case 'adbrix_remaster':
+//       const installDatetime2 = req.event_datetime
+//         ? moment(req.event_datetime.replace('+', ' ').split('.')[0]).add(
+//             9,
+//             'hours',
+//           )
+//         : moment('1970-01-01 00:00:00');
+//       //event_datetime=2020-12-28+01:41:10.422
 
-      const clickDatetime2 = req.event_datetime
-        ? moment(req.event_datetime.replace('+', ' ').split('.')[0])
-            .add(9, 'hours')
-            .subtract(req.seconds_gap, 'seconds')
-        : moment('1970-01-01 00:00:00');
+//       const clickDatetime2 = req.event_datetime
+//         ? moment(req.event_datetime.replace('+', ' ').split('.')[0])
+//             .add(9, 'hours')
+//             .subtract(req.seconds_gap, 'seconds')
+//         : moment('1970-01-01 00:00:00');
 
-      returnData.viewCode = req.cb_2;
-      returnData.clickId = req.cb_3;
-      returnData.deviceId = req.adid; //공통
-      returnData.deviceCarrier = req.device_carrier;
-      returnData.deviceCountry = req.device_country;
-      returnData.deviceLanguage = req.device_language;
-      returnData.appkey = req.appkey;
-      returnData.deviceIp = req.a_ip;
-      returnData.clickDatetime = clickDatetime2.format('YYYY-MM-DD HH:mm:ss');
-      returnData.installDatetime = installDatetime2.format(
-        'YYYY-MM-DD HH:mm:ss',
-      );
-      break;
+//       returnData.viewCode = req.cb_2;
+//       returnData.clickId = req.cb_3;
+//       returnData.deviceId = req.adid; //공통
+//       returnData.deviceCarrier = req.device_carrier;
+//       returnData.deviceCountry = req.device_country;
+//       returnData.deviceLanguage = req.device_language;
+//       returnData.appkey = req.appkey;
+//       returnData.deviceIp = req.a_ip;
+//       returnData.clickDatetime = clickDatetime2.format('YYYY-MM-DD HH:mm:ss');
+//       returnData.installDatetime = installDatetime2.format(
+//         'YYYY-MM-DD HH:mm:ss',
+//       );
+//       break;
 
-    case 'appsflyer':
-      const clickDatetime3 = req.click_time
-        ? moment(decodeURIComponent(req.click_time)).add(9, 'hours')
-        : moment('1970-01-01 00:00:00'); //click_datetime=2021-02-03%2006%3A11%3A06.725
+//     case 'appsflyer':
+//       const clickDatetime3 = req.click_time
+//         ? moment(decodeURIComponent(req.click_time)).add(9, 'hours')
+//         : moment('1970-01-01 00:00:00'); //click_datetime=2021-02-03%2006%3A11%3A06.725
 
-      const installDatetime4 = req.install_time
-        ? moment(decodeURIComponent(req.install_time)).add(9, 'hours')
-        : moment('1970-01-01 00:00:00'); //install_datetime=2021-02-03%2006%3A11%3A17.223
+//       const installDatetime4 = req.install_time
+//         ? moment(decodeURIComponent(req.install_time)).add(9, 'hours')
+//         : moment('1970-01-01 00:00:00'); //install_datetime=2021-02-03%2006%3A11%3A17.223
 
-      returnData.viewCode = req.af_siteid; //노출용코드
-      returnData.clickId = req.clickid; //클릭id
-      returnData.deviceId = !req.idfa ? req.advertising_id : req.idfa;
-      returnData.deviceCarrier = req.device_carrier;
-      returnData.deviceCountry = req.country_code;
-      returnData.deviceLanguage = req.language;
-      returnData.deviceIp = '';
-      returnData.appkey = '';
-      returnData.clickDatetime = clickDatetime3.format('YYYY-MM-DD HH:mm:ss');
-      returnData.installDatetime = installDatetime4.format(
-        'YYYY-MM-DD HH:mm:ss',
-      );
-      break;
-  }
+//       returnData.viewCode = req.af_siteid; //노출용코드
+//       returnData.clickId = req.clickid; //클릭id
+//       returnData.deviceId = !req.idfa ? req.advertising_id : req.idfa;
+//       returnData.deviceCarrier = req.device_carrier;
+//       returnData.deviceCountry = req.country_code;
+//       returnData.deviceLanguage = req.language;
+//       returnData.deviceIp = '';
+//       returnData.appkey = '';
+//       returnData.clickDatetime = clickDatetime3.format('YYYY-MM-DD HH:mm:ss');
+//       returnData.installDatetime = installDatetime4.format(
+//         'YYYY-MM-DD HH:mm:ss',
+//       );
+//       break;
+//   }
 
-  return returnData;
-}
+//   return returnData;
+// }
 
-export function postBackEvent(req: PostbackEventDto) {
-  const returnData: postBackData = {};
+// export function postBackEvent(req: PostbackEventDto) {
+//   const returnData: postBackData = {};
 
-  if (req.install_cb_param3 && req.install_cb_param4) {
-    //애드브릭스
-    returnData.tkCode = 'adbrix';
-  }
-  if (req.cb_2 && req.cb_3) {
-    //애드브릭스-리마스터
-    returnData.tkCode = 'adbrix_remaster';
-  }
-  if (req.af_siteid && req.clickid) {
-    //앱스플라이어
-    returnData.tkCode = 'appsflyer';
-  }
+//   if (req.install_cb_param3 && req.install_cb_param4) {
+//     //애드브릭스
+//     returnData.tkCode = 'adbrix';
+//   }
+//   if (req.cb_2 && req.cb_3) {
+//     //애드브릭스-리마스터
+//     returnData.tkCode = 'adbrix_remaster';
+//   }
+//   if (req.af_siteid && req.clickid) {
+//     //앱스플라이어
+//     returnData.tkCode = 'appsflyer';
+//   }
 
-  switch (returnData.tkCode) {
-    case 'adbrix':
-      returnData.viewCode = req.install_cb_param4;
-      returnData.clickId = req.install_cb_param3;
-      returnData.deviceIosId = req.ifa;
-      returnData.deviceAndroidId = req.gaid;
-      returnData.deviceId = returnData.deviceAndroidId
-        ? returnData.deviceAndroidId
-        : returnData.deviceIosId;
-      returnData.deviceCarrier = req.carrier;
-      returnData.deviceCountry = req.country;
-      returnData.deviceLanguage = req.language;
-      returnData.appkey = req.appkey;
-      returnData.installDatetime = req.install_dt_kst //20201220105116000
-        ? convertTimeToFormat(req.install_dt_kst)
-        : '1970-01-01 09:00:00';
-      returnData.eventName = req.activity;
-      returnData.eventDatetime = req.event_dt_kst //20201220105224000
-        ? convertTimeToFormat(req.event_dt_kst)
-        : '1970-01-01 09:00:00';
-      returnData.productId = req.product_id;
-      returnData.price = req.sales;
-      returnData.currency = req.currency;
-      break;
+//   switch (returnData.tkCode) {
+//     case 'adbrix':
+//       returnData.viewCode = req.install_cb_param4;
+//       returnData.clickId = req.install_cb_param3;
+//       returnData.deviceIosId = req.ifa;
+//       returnData.deviceAndroidId = req.gaid;
+//       returnData.deviceId = returnData.deviceAndroidId
+//         ? returnData.deviceAndroidId
+//         : returnData.deviceIosId;
+//       returnData.deviceCarrier = req.carrier;
+//       returnData.deviceCountry = req.country;
+//       returnData.deviceLanguage = req.language;
+//       returnData.appkey = req.appkey;
+//       returnData.installDatetime = req.install_dt_kst //20201220105116000
+//         ? convertTimeToFormat(req.install_dt_kst)
+//         : '1970-01-01 09:00:00';
+//       returnData.eventName = req.activity;
+//       returnData.eventDatetime = req.event_dt_kst //20201220105224000
+//         ? convertTimeToFormat(req.event_dt_kst)
+//         : '1970-01-01 09:00:00';
+//       returnData.productId = req.product_id;
+//       returnData.price = req.sales;
+//       returnData.currency = req.currency;
+//       break;
 
-    case 'adbrix_remaster':
-      const productArr = req.param_json ? JSON.parse(req.param_json) : null;
+//     case 'adbrix_remaster':
+//       const productArr = req.param_json ? JSON.parse(req.param_json) : null;
 
-      if (productArr['abx:item.abx:sales']) {
-        returnData.productId = productArr['abx:item.abx:product_id'];
-        returnData.price = productArr['abx:item.abx:sales'];
-        returnData.currency = productArr['abx:item.abx:currency'];
-      } else if (productArr['abx:items']) {
-        for (const item of productArr['abx:items']) {
-          returnData.price += item['abx:sales'];
-          returnData.productId = item['abx:product_id'];
-          returnData.currency = item['abx:currency'];
-        }
-      }
+//       if (productArr['abx:item.abx:sales']) {
+//         returnData.productId = productArr['abx:item.abx:product_id'];
+//         returnData.price = productArr['abx:item.abx:sales'];
+//         returnData.currency = productArr['abx:item.abx:currency'];
+//       } else if (productArr['abx:items']) {
+//         for (const item of productArr['abx:items']) {
+//           returnData.price += item['abx:sales'];
+//           returnData.productId = item['abx:product_id'];
+//           returnData.currency = item['abx:currency'];
+//         }
+//       }
 
-      returnData.viewCode = req.cb_2;
-      returnData.clickId = req.cb_3;
-      returnData.deviceId = req.adid; //공통
-      returnData.deviceCarrier = req.device_carrier;
-      returnData.deviceCountry = req.device_country;
-      returnData.deviceLanguage = req.device_language;
-      returnData.appkey = req.appkey;
-      returnData.installDatetime = req.attr_event_timestamp
-        ? moment
-            .unix(req.attr_event_timestamp) //attr_event_timestamp=1609286883
-            .format('YYYY-MM-DD HH:mm:ss')
-        : '1970-01-01 00:00:00';
-      returnData.eventName = req.event_name;
-      returnData.eventDatetime = req.event_timestamp
-        ? moment
-            .unix(req.event_timestamp) //event_timestamp=1609369877
-            .format('YYYY-MM-DD HH:mm:ss')
-        : '1970-01-01 00:00:00';
-      break;
+//       returnData.viewCode = req.cb_2;
+//       returnData.clickId = req.cb_3;
+//       returnData.deviceId = req.adid; //공통
+//       returnData.deviceCarrier = req.device_carrier;
+//       returnData.deviceCountry = req.device_country;
+//       returnData.deviceLanguage = req.device_language;
+//       returnData.appkey = req.appkey;
+//       returnData.installDatetime = req.attr_event_timestamp
+//         ? moment
+//             .unix(req.attr_event_timestamp) //attr_event_timestamp=1609286883
+//             .format('YYYY-MM-DD HH:mm:ss')
+//         : '1970-01-01 00:00:00';
+//       returnData.eventName = req.event_name;
+//       returnData.eventDatetime = req.event_timestamp
+//         ? moment
+//             .unix(req.event_timestamp) //event_timestamp=1609369877
+//             .format('YYYY-MM-DD HH:mm:ss')
+//         : '1970-01-01 00:00:00';
+//       break;
 
-    case 'appsflyer':
-      const installDatetime2 = req.install_time
-        ? moment(decodeURIComponent(req.install_time)).add(9, 'hours')
-        : moment('1970-01-01 00:00:00'); //install_datetime=2021-02-03%2006%3A11%3A17.223
+//     case 'appsflyer':
+//       const installDatetime2 = req.install_time
+//         ? moment(decodeURIComponent(req.install_time)).add(9, 'hours')
+//         : moment('1970-01-01 00:00:00'); //install_datetime=2021-02-03%2006%3A11%3A17.223
 
-      const eventDatetime2 = req.event_time
-        ? moment(decodeURIComponent(req.event_time)).add(9, 'hours')
-        : moment('1970-01-01 00:00:00'); //event_datetime=2021-02-03%2006%3A11%3A34.007
+//       const eventDatetime2 = req.event_time
+//         ? moment(decodeURIComponent(req.event_time)).add(9, 'hours')
+//         : moment('1970-01-01 00:00:00'); //event_datetime=2021-02-03%2006%3A11%3A34.007
 
-      returnData.viewCode = req.af_siteid;
-      returnData.clickId = req.clickid;
-      returnData.deviceIosId = req.idfa;
-      returnData.deviceAndroidId = req.advertising_id;
-      returnData.deviceId = returnData.deviceAndroidId
-        ? returnData.deviceAndroidId
-        : returnData.deviceIosId;
-      returnData.deviceCarrier = req.device_carrier;
-      returnData.deviceCountry = req.country_code;
-      returnData.deviceLanguage = req.language;
-      returnData.appkey = '';
-      returnData.installDatetime = installDatetime2.format(
-        'YYYY-MM-DD HH:mm:ss',
-      );
-      returnData.eventName = req.event_name;
-      returnData.eventDatetime = eventDatetime2.format('YYYY-MM-DD HH:mm:ss');
-      returnData.productId = '';
-      returnData.price = req.event_revenue;
-      returnData.currency = req.event_revenue_currency;
-      break;
-  }
-  return returnData;
-}
+//       returnData.viewCode = req.af_siteid;
+//       returnData.clickId = req.clickid;
+//       returnData.deviceIosId = req.idfa;
+//       returnData.deviceAndroidId = req.advertising_id;
+//       returnData.deviceId = returnData.deviceAndroidId
+//         ? returnData.deviceAndroidId
+//         : returnData.deviceIosId;
+//       returnData.deviceCarrier = req.device_carrier;
+//       returnData.deviceCountry = req.country_code;
+//       returnData.deviceLanguage = req.language;
+//       returnData.appkey = '';
+//       returnData.installDatetime = installDatetime2.format(
+//         'YYYY-MM-DD HH:mm:ss',
+//       );
+//       returnData.eventName = req.event_name;
+//       returnData.eventDatetime = eventDatetime2.format('YYYY-MM-DD HH:mm:ss');
+//       returnData.productId = '';
+//       returnData.price = req.event_revenue;
+//       returnData.currency = req.event_revenue_currency;
+//       break;
+//   }
+//   return returnData;
+// }
 
-export function convertTimeToFormat(datetime) {
-  const datetimeFormat =
-    datetime.substring(0, 4) +
-    '-' +
-    datetime.substring(4, 6) +
-    '-' +
-    datetime.substring(6, 8) +
-    ' ' +
-    datetime.substring(8, 10) +
-    ':' +
-    datetime.substring(10, 12) +
-    ':' +
-    datetime.substring(12, 14);
+// export function convertTimeToFormat(datetime) {
+//   const datetimeFormat =
+//     datetime.substring(0, 4) +
+//     '-' +
+//     datetime.substring(4, 6) +
+//     '-' +
+//     datetime.substring(6, 8) +
+//     ' ' +
+//     datetime.substring(8, 10) +
+//     ':' +
+//     datetime.substring(10, 12) +
+//     ':' +
+//     datetime.substring(12, 14);
 
-  return moment(datetimeFormat).format('YYYY-MM-DD HH:mm:ss');
-}
+//   return moment(datetimeFormat).format('YYYY-MM-DD HH:mm:ss');
+// }
