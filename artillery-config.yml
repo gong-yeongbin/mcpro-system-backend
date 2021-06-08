@@ -1,0 +1,15 @@
+config:
+  target: http://localhost:3000
+  tls:
+  rejectUnauthorized: false
+  phases:
+    - duration: 60
+      arrivalRate: 50
+scenarios:
+  - name: 'tracking test'
+    flow:
+      - get:
+          url: '/tracking?token=8139b786ce614c76830bd144228970cf&click_id=click_id_test&pub_id=pub_id_test&sub_id=sub_id_test&idfa=idfa_test'
+          capture:
+            json: '$.hashKey'
+            as: 'hashKey'

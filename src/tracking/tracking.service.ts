@@ -22,9 +22,6 @@ export class TrackingService {
   ) {}
 
   async tracking(requestQuery: TrackingDto): Promise<string> {
-    console.log(
-      `[ media ---> mecrosspro ] token:${requestQuery.token}, click_id:${requestQuery.click_id}, pub_id:${requestQuery.click_id}, sub_id:${requestQuery.sub_id}, adid:${requestQuery.adid}, idfa:${requestQuery.idfa} `,
-    );
     //3. 노출용코드 관련
     const cpToken: string = requestQuery.token;
     const pubId: string = requestQuery.pub_id;
@@ -35,6 +32,10 @@ export class TrackingService {
         ? ''
         : requestQuery.sub_id;
 
+    console.log(
+      `[ media ---> mecrosspro ] token:${requestQuery.token}, click_id:${requestQuery.click_id}, pub_id:${requestQuery.click_id}, sub_id:${requestQuery.sub_id}, adid:${requestQuery.adid}, idfa:${requestQuery.idfa} `,
+    );
+
     //2. 캠페인 토큰 검증 (캠페인 및 광고앱 차단 여부 확인)
     const campaignEntity: Campaign = await this.campaignRepository.findOne({
       where: {
@@ -44,9 +45,7 @@ export class TrackingService {
       relations: ['media', 'advertising', 'advertising.tracker'],
     });
 
-    if (!campaignEntity) {
-      throw new NotFoundException();
-    }
+    if (!campaignEntity) throw new NotFoundException();
 
     const submediaEntity: SubMedia = await this.submediaRepository
       .createQueryBuilder('subMedia')

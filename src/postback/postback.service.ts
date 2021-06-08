@@ -502,6 +502,7 @@ export class PostbackService {
           .replace('{android_device_id}', advertising_id)
           .replace('{ios_device_id}', idfa)
           .replace('{install_timestamp}', install_time);
+
       if (
         campaign &&
         campaign.postBackEvent &&
@@ -566,9 +567,6 @@ export class PostbackService {
         viewCode: af_siteid,
       })
       .andWhere('subMedia.cpToken =:cpToken', { cpToken: af_c_id })
-      .andWhere('postBackEvent.trackerPostBack =:trackerPostBack', {
-        trackerPostBack: event_name,
-      })
       .andWhere('advertising.adStatus =:adStatus', { adStatus: true })
       .getOne();
 
@@ -617,6 +615,7 @@ export class PostbackService {
       ) {
         await this.httpService
           .get(convertedPostbackEventUrlTemplate)
+          // .get('http://www.naver.com')
           .toPromise()
           .then(() => {
             postbackEventApppsflyerEntity.isSendDate = new Date();
