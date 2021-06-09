@@ -23,6 +23,7 @@ export class TrackingService {
 
   async tracking(requestQuery: TrackingDto): Promise<string> {
     //3. 노출용코드 관련
+
     const cp_token: string = requestQuery.token;
     const pub_id: string = requestQuery.pub_id;
     const click_id: string = requestQuery.click_id;
