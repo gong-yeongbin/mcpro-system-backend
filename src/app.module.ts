@@ -6,9 +6,7 @@ import { PostbackModule } from './postback/postback.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { RedisModule } from 'nestjs-redis';
-import { SubMedia } from './entities/SubMedia';
 import { RedisLockModule } from 'nestjs-simple-redis-lock';
-import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -32,8 +30,6 @@ import { ScheduleModule } from '@nestjs/schedule';
       entities: [__dirname + '/**/*{.ts,.js}'],
       connectTimeout: 10000,
     }),
-    TypeOrmModule.forFeature([SubMedia]),
-    ScheduleModule.forRoot(),
     TrackingModule,
     PostbackModule,
   ],
