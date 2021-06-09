@@ -23,10 +23,10 @@ export class User {
   type: string;
 
   @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date;
+  created_at: Date;
 
   @UpdateDateColumn({ name: 'updated_at' })
-  updatedAt: Date;
+  updated_at: Date;
 
   @OneToMany(() => UserLog, (userLog) => userLog.user)
   userLog: UserLog;

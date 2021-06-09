@@ -15,39 +15,39 @@ import { Reservation } from './Reservation';
 import { SubMedia } from '../entities/SubMedia';
 
 @Entity('mcp_advertising')
-@Unique(['adCode'])
+@Unique(['ad_code'])
 export class Advertising {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
   idx: number;
 
   @Column({ type: 'nvarchar', name: 'ad_code' })
-  adCode: string;
+  ad_code: string;
 
   @Column({ type: 'nvarchar', name: 'ad_name' })
-  adName: string;
+  ad_name: string;
 
   @Column({ type: 'nvarchar', name: 'ad_platform' })
-  adPlatform: string;
+  ad_platform: string;
 
   @Column({
     type: 'nvarchar',
     name: 'ad_image_url',
     nullable: true,
   })
-  adImageUrl: string;
+  ad_image_url: string;
 
   @Column({
     type: 'boolean',
     name: 'ad_status',
     default: true,
   })
-  adStatus: boolean;
+  ad_status: boolean;
 
   @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date;
+  created_at: Date;
 
   @UpdateDateColumn({ name: 'updated_at' })
-  updatedAt: Date;
+  updated_at: Date;
 
   @OneToMany(() => Campaign, (campaign) => campaign.advertising)
   campaign: Campaign[];

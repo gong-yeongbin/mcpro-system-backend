@@ -2,12 +2,15 @@ import { IsOptional, IsString } from 'class-validator';
 
 export class TrackingDto {
   @IsString()
+  @IsOptional()
   token: string;
 
   @IsString()
+  @IsOptional()
   click_id: string;
 
   @IsString()
+  @IsOptional()
   pub_id: string;
 
   @IsString()

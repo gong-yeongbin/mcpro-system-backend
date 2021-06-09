@@ -10,16 +10,16 @@ import {
 import { Advertising } from '../entities/Advertising';
 
 @Entity('mcp_tracker')
-@Unique(['tkCode'])
+@Unique(['tk_code'])
 export class Tracker {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
   idx: number;
 
   @Column({ type: 'nvarchar', name: 'tk_code' })
-  tkCode: string;
+  tk_code: string;
 
   @Column({ type: 'nvarchar', name: 'tk_name' })
-  tkName: string;
+  tk_name: string;
 
   @Column({
     type: 'nvarchar',
@@ -30,7 +30,7 @@ export class Tracker {
   type: string;
 
   @Column({ type: 'boolean', name: 'tk_status', default: true })
-  tkStatus: boolean;
+  tk_status: boolean;
 
   @Column({ type: 'text', name: 'trackerTrackingUrlTemplate' })
   trackerTrackingUrlTemplate: string;
@@ -48,10 +48,10 @@ export class Tracker {
   mecrossPostbackEventUrlTemplate: string;
 
   @CreateDateColumn({ name: 'created_At' })
-  createdAt: Date;
+  created_At: Date;
 
   @UpdateDateColumn({ name: 'updated_At' })
-  updatedAt: Date;
+  updated_At: Date;
 
   @OneToMany(() => Advertising, (advertising) => advertising.tracker)
   advertising: Advertising[];

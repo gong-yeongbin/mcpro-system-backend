@@ -5,13 +5,27 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
+export interface PostBackInstallAppsflyerMetaData {
+  clickid: string;
+  af_siteid: string;
+  af_c_id: string;
+  advertising_id: string;
+  idfa: string;
+  idfv: string;
+  install_time: string;
+  country_code: string;
+  language: string;
+  click_time: string;
+  device_carrier: string;
+  device_ip: string;
+  originalUrl: string;
+  isSendDate?: Date;
+}
+
 @Entity('mcp_postback_install_appsflyer')
 export class PostBackInstallAppsflyer {
   @PrimaryGeneratedColumn({ name: 'idx', type: 'bigint' })
   idx: number;
-
-  @Column({ name: 'cp_token', type: 'nvarchar' })
-  cpToken: string;
 
   @Column({ name: 'clickid', type: 'nvarchar' })
   clickid: string;
@@ -50,11 +64,11 @@ export class PostBackInstallAppsflyer {
   device_ip: string;
 
   @Column({ name: 'pbUrl', type: 'text', nullable: true })
-  pbUrl: string;
+  originalUrl: string;
 
-  @Column({ name: 'isSendDate', type: 'datetime', nullable: true })
+  @Column({ name: 'isSendDate', nullable: true })
   isSendDate: Date;
 
-  @CreateDateColumn({ name: 'created_at', type: 'datetime' })
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 }

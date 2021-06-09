@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Campaign } from 'src/entities/Campaign';
-import { SubMedia } from 'src/entities/SubMedia';
+import { SubMedia, SubMediaMetaData } from 'src/entities/SubMedia';
 import { Repository } from 'typeorm';
 import { v4 } from 'uuid';
 import { TrackingDto } from './dto/tracking.dto';
@@ -23,71 +23,81 @@ export class TrackingService {
 
   async tracking(requestQuery: TrackingDto): Promise<string> {
     //3. 노출용코드 관련
-    const cpToken: string = requestQuery.token;
-    const pubId: string = requestQuery.pub_id;
-    const subId: string =
-      requestQuery.sub_id == '' ||
-      requestQuery.sub_id == undefined ||
-      requestQuery.sub_id == '{sub_id}'
-        ? ''
-        : requestQuery.sub_id;
+    const cp_token: string = requestQuery.token;
+    const pub_id: string = requestQuery.pub_id;
+    const click_id: string = requestQuery.click_id;
+    const sub_id: string = ['', undefined, '{sub_id}'].includes(
+      requestQuery.sub_id,
+    )
+      ? ''
+      : requestQuery.sub_id;
+    const adid: string = ['', undefined, '{adid}'].includes(requestQuery.adid)
+      ? ''
+      : requestQuery.adid;
+    const idfa: string = ['', undefined, '{idfa}'].includes(requestQuery.idfa)
+      ? ''
+      : requestQuery.idfa;
 
     console.log(
-      `[ media ---> mecrosspro ] token:${requestQuery.token}, click_id:${requestQuery.click_id}, pub_id:${requestQuery.click_id}, sub_id:${requestQuery.sub_id}, adid:${requestQuery.adid}, idfa:${requestQuery.idfa} `,
+      `[ media ---> mecrosspro ] token:${cp_token}, click_id:${click_id}, pub_id:${pub_id}, sub_id:${sub_id}, adid:${adid}, idfa:${idfa} `,
     );
 
     //2. 캠페인 토큰 검증 (캠페인 및 광고앱 차단 여부 확인)
-    const campaignEntity: Campaign = await this.campaignRepository.findOne({
+    const campaign: Campaign = await this.campaignRepository.findOne({
       where: {
-        cpToken: cpToken,
-        cpStatus: true,
+        cp_token: cp_token,
+        cp_status: true,
       },
       relations: ['media', 'advertising', 'advertising.tracker'],
     });
 
-    if (!campaignEntity) throw new NotFoundException();
+    if (!campaign) throw new NotFoundException();
 
-    const submediaEntity: SubMedia = await this.submediaRepository
+    const { media, advertising } = campaign;
+    const { tracker } = advertising;
+
+    const subMedia: SubMedia = await this.submediaRepository
       .createQueryBuilder('subMedia')
       .leftJoinAndSelect('subMedia.advertising', 'advertising')
       .leftJoinAndSelect('subMedia.media', 'media')
       .leftJoinAndSelect('advertising.tracker', 'tracker')
-      .where('subMedia.pubId =:pubId', { pubId: pubId })
-      .andWhere('subMedia.subId =:subId', { subId: subId })
-      .andWhere('media.idx =:mediaIdx', { mediaIdx: campaignEntity.media.idx })
-      .andWhere('subMedia.cpToken =:cpToken', { cpToken: cpToken })
-      .andWhere('Date(subMedia.createdAt) =:date ', {
+      .where('subMedia.pub_id =:pubId', { pubId: pub_id })
+      .andWhere('subMedia.sub_id =:sub_id', { sub_id: sub_id })
+      .andWhere('media.idx =:mediaIdx', { mediaIdx: media.idx })
+      .andWhere('subMedia.cp_token =:cpToken', { cpToken: cp_token })
+      .andWhere('Date(subMedia.created_at) =:date ', {
         date: moment().format('YYYY-MM-DD'),
       })
       .getOne();
 
     //새로운 노출용코드 생성
-    let viewCode: string = null;
+    let view_code: string;
 
     //기존 노출용코드 반환
-    if (!submediaEntity) {
-      viewCode = v4().replace(/-/g, '');
+    if (!subMedia) {
+      view_code = v4().replace(/-/g, '');
 
-      const submedia: SubMedia = new SubMedia();
-      submedia.media = campaignEntity.media;
-      submedia.cpToken = requestQuery.token;
-      submedia.viewCode = viewCode;
-      submedia.pubId = pubId;
-      submedia.subId = subId;
-      submedia.campaign = campaignEntity;
-      submedia.advertising = campaignEntity.advertising;
+      const subMediaMetaData: SubMediaMetaData = {
+        media,
+        cp_token,
+        view_code,
+        pub_id,
+        sub_id,
+        campaign,
+        advertising,
+      };
 
-      await this.submediaRepository.save(submedia);
+      await this.submediaRepository.save(subMediaMetaData);
     } else {
-      viewCode = submediaEntity.viewCode;
+      view_code = subMedia.view_code;
     }
 
     //4. 메크로스Pro 트래킹 URL 를 트래커 트래킹 URL 변환
     const convertedTrackingUrl: string = convertTrackerTrackingUrl(
-      campaignEntity.advertising.tracker.tkCode,
-      campaignEntity.trackerTrackingUrl,
+      tracker.tk_code,
+      campaign.trackerTrackingUrl,
       requestQuery,
-      viewCode,
+      view_code,
     );
     //5. 트래커 트래킹 URL를 실행
     if (convertedTrackingUrl !== null) {
@@ -102,7 +112,7 @@ export class TrackingService {
           .getClient()
           .hsetnx(
             moment().format('YYYYMMDD'),
-            `${cpToken}/${viewCode}/${pubId}/${subId}`,
+            `${cp_token}/${view_code}/${pub_id}/${sub_id}`,
             1,
           );
 
@@ -111,14 +121,13 @@ export class TrackingService {
             .getClient()
             .hincrby(
               moment().format('YYYYMMDD'),
-              `${cpToken}/${viewCode}/${pubId}/${subId}`,
+              `${cp_token}/${view_code}/${pub_id}/${sub_id}`,
               1,
             );
         }
       } finally {
         this.lockService.unlock(moment().format('YYYYMMDD'));
       }
-
       return convertedTrackingUrl;
     }
   }

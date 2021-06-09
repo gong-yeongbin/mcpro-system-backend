@@ -1,7 +1,6 @@
 import {
   Column,
   Entity,
-  JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
   CreateDateColumn,
@@ -31,13 +30,13 @@ export class Reservation {
   status: boolean;
 
   @Column({ name: 'reserved_at' })
-  reservedAt: Date;
+  reserved_at: Date;
 
   @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date;
+  created_at: Date;
 
   @UpdateDateColumn({ name: 'updated_at' })
-  updatedAt: Date;
+  updated_at: Date;
 
   @ManyToOne(() => Advertising, (advertising) => advertising.reservation, {
     onDelete: 'CASCADE',

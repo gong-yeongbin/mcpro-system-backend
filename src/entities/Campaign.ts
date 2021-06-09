@@ -16,26 +16,26 @@ import { SubMedia } from '../entities/SubMedia';
 import { PostBackUnregisteredEvent } from './PostBackUnregisteredEvent';
 
 @Entity('mcp_campaign')
-@Unique(['cpCode', 'cpToken'])
+@Unique(['cp_code', 'cp_token'])
 export class Campaign {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
   idx: number;
 
   @Column({ type: 'nvarchar', name: 'cp_token' })
-  cpToken: string;
+  cp_token: string;
 
   @Column({ type: 'nvarchar', name: 'cp_appkey' })
-  cpAppkey: string;
+  cp_appkey: string;
 
   @Column({
     type: 'nvarchar',
     name: 'cp_code',
     nullable: true,
   })
-  cpCode: string;
+  cp_code: string;
 
   @Column({ type: 'nvarchar', name: 'cp_name' })
-  cpName: string;
+  cp_name: string;
 
   @Column({ type: 'nvarchar', name: 'type' })
   type: string;
@@ -65,7 +65,7 @@ export class Campaign {
     name: 'cp_status',
     default: true,
   })
-  cpStatus: boolean;
+  cp_status: boolean;
 
   @CreateDateColumn({ name: 'createdAt' })
   createdAt: Date;

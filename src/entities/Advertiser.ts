@@ -10,22 +10,22 @@ import {
 import { Advertising } from './Advertising';
 
 @Entity('mcp_advertiser')
-@Unique(['arCode', 'arName'])
+@Unique(['ar_code', 'ar_name'])
 export class Advertiser {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
   idx: number;
 
   @Column({ type: 'nvarchar', name: 'ar_code' })
-  arCode: string;
+  ar_code: string;
 
   @Column({ type: 'nvarchar', name: 'ar_name' })
-  arName: string;
+  ar_name: string;
 
   @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date;
+  created_at: Date;
 
   @UpdateDateColumn({ name: 'updated_at' })
-  updatedAt: Date;
+  updated_at: Date;
 
   @OneToMany(() => Advertising, (advertising) => advertising.advertiser, {
     onDelete: 'CASCADE',

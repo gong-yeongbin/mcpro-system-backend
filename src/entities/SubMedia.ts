@@ -13,23 +13,43 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+export interface SubMediaMetaData {
+  cp_token: string;
+  pub_id: string;
+  sub_id?: string;
+  view_code: string;
+  click?: number;
+  install?: number;
+  signup?: number;
+  retention?: number;
+  buy?: number;
+  price?: number;
+  etc1?: number;
+  etc2?: number;
+  etc3?: number;
+  etc4?: number;
+  etc5?: number;
+  advertising: Advertising;
+  campaign: Campaign;
+  media: Media;
+}
 @Entity('mcp_submedia')
-@Unique(['viewCode'])
+@Unique(['view_code'])
 export class SubMedia {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
   idx: string;
 
   @Column({ type: 'nvarchar', name: 'cp_token' })
-  cpToken: string;
+  cp_token: string;
 
   @Column({ type: 'nvarchar', name: 'pub_id' })
-  pubId: string;
+  pub_id: string;
 
   @Column({ type: 'nvarchar', name: 'sub_id', nullable: true })
-  subId: string;
+  sub_id: string;
 
   @Column({ type: 'nvarchar', name: 'view_code' })
-  viewCode: string;
+  view_code: string;
 
   @Column({
     type: 'int',
@@ -115,10 +135,10 @@ export class SubMedia {
   etc5: number;
 
   @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date;
+  created_at: Date;
 
   @UpdateDateColumn({ name: 'updated_at' })
-  updatedAt: Date;
+  updated_at: Date;
 
   @ManyToOne(() => Advertising, (advertising) => advertising.subMedia)
   @JoinColumn({ name: 'advertising' })

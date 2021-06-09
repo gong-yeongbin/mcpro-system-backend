@@ -2,12 +2,15 @@ import { IsOptional, IsString } from 'class-validator';
 
 export class AppsflyerPostbackEventDto {
   @IsString() //클릭id
+  @IsOptional()
   clickid: string;
 
   @IsString() //노출용코드
+  @IsOptional()
   af_siteid: string;
 
   @IsString() //캠페인토큰
+  @IsOptional()
   af_c_id: string;
 
   @IsString()
