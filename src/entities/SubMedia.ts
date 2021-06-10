@@ -11,7 +11,9 @@ import {
   PrimaryGeneratedColumn,
   Unique,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
+import { PostBackUnregisteredEvent } from './PostBackUnregisteredEvent';
 
 export interface SubMediaMetaData {
   cp_token: string;
@@ -151,4 +153,11 @@ export class SubMedia {
   @ManyToOne(() => Media, (media) => media.subMedia)
   @JoinColumn({ name: 'media' })
   media: Media;
+
+  @OneToMany(
+    () => PostBackUnregisteredEvent,
+    (postBackUnregisteredEvent) => postBackUnregisteredEvent.subMedia,
+    { nullable: true },
+  )
+  postBackUnregisteredEvent: PostBackUnregisteredEvent[];
 }

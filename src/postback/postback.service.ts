@@ -8,17 +8,15 @@ import {
   PostBackEventAppsflyer,
   PostBackEventAppsflyerMetaData,
 } from 'src/entities/PostBackEventAppsflyer';
-import { AppsflyerPostbackInstallDto } from './dto/appsflyer-postback-install.dto';
-import { Request } from 'express';
 import {
   PostBackInstallAppsflyer,
   PostBackInstallAppsflyerMetaData,
 } from 'src/entities/PostBackInstallAppsflyer';
-import { AppsflyerPostbackEventDto } from './dto/appsflyer-postback-event.dto';
 import {
   PostBackUnregisteredEvent,
   PostBackUnregisteredEventMetaData,
 } from 'src/entities/PostBackUnregisteredEvent';
+import { decodeUnicode } from 'src/common/util';
 
 @Injectable()
 export class PostbackService {
@@ -36,16 +34,12 @@ export class PostbackService {
     private readonly postbackEventAppsflyerRepository: Repository<PostBackEventAppsflyer>,
   ) {}
 
-  async postBackInstallAppsflyer(
-    req: Request,
-    query: AppsflyerPostbackInstallDto,
-  ) {
-    console.log(
-      `[ appsflyer ---> mecrosspro ] install : ${req.protocol}://${req.headers.host}${req.url}`,
+  async postBackInstallAppsflyer(req: any) {
+    const originalUrl: string = decodeUnicode(
+      `${req.protocol}://${req.get('host')}${req.originalUrl}`,
     );
-    const originalUrl: string = `${req.protocol}://${req.get('host')}${
-      req.originalUrl
-    }` as string;
+
+    console.log(`[ appsflyer ---> mecrosspro ] install : ${originalUrl}`);
 
     const {
       clickid,
@@ -60,35 +54,35 @@ export class PostbackService {
       click_time,
       device_carrier,
       device_ip,
-    } = query;
+    } = req.query;
 
     console.log(
-      `[ appsflyer ---> mecrosspro ] tracker:appsflyer, type:install, cpToken:${af_c_id}, viewCode:${af_siteid}, click_id:${clickid}`,
+      `[ appsflyer ---> mecrosspro ] cp_token:${af_c_id}, view_code:${af_siteid}, click_id:${clickid}`,
     );
 
-    const subMediaEntity: SubMedia = await this.subMediaRepository
+    const subMedia: SubMedia = await this.subMediaRepository
       .createQueryBuilder('subMedia')
       .leftJoinAndSelect('subMedia.advertising', 'advertising')
       .leftJoinAndSelect('subMedia.campaign', 'campaign')
       .leftJoinAndSelect('subMedia.media', 'media')
       .leftJoinAndSelect('advertising.tracker', 'tracker')
       .leftJoinAndSelect('campaign.postBackEvent', 'postBackEvent')
-      .where('subMedia.view_code =:viewCode', {
-        viewCode: af_siteid,
+      .where('subMedia.view_code =:view_code', {
+        view_code: af_siteid,
       })
-      .andWhere('subMedia.cp_token =:cpToken', { cpToken: af_c_id })
+      .andWhere('subMedia.cp_token =:cp_token', { cp_token: af_c_id })
       .andWhere('postBackEvent.trackerPostBack =:trackerPostBack', {
         trackerPostBack: 'install',
       })
-      .andWhere('advertising.ad_status =:adStatus', { adStatus: true })
+      .andWhere('advertising.ad_status =:ad_status', { ad_status: true })
       .andWhere('Date(subMedia.created_at) =:date ', {
         date: moment().format('YYYY-MM-DD'),
       })
       .getOne();
 
-    if (!subMediaEntity) throw new NotFoundException();
+    if (!subMedia) throw new NotFoundException();
 
-    const { campaign, media } = subMediaEntity;
+    const { campaign, media } = subMedia;
 
     const postBackInstallAppsflyer: PostBackInstallAppsflyerMetaData = {
       clickid,
@@ -115,11 +109,13 @@ export class PostbackService {
       const convertedPostbackInstallUrlTemplate =
         media.mediaPostbackInstallUrlTemplate
           .replace('{click_id}', clickid)
-          .replace('{device_id}', advertising_id ? advertising_id : idfa)
-          .replace('{android_device_id}', advertising_id)
-          .replace('{ios_device_id}', idfa)
+          .replace('{device_id}', idfa ? idfa : idfa)
+          .replace('{android_device_id}', idfa)
+          .replace('{ios_device_id}', idfv)
           .replace('{install_timestamp}', install_time);
-
+      console.log(
+        `[ mecrosspro ---> media ] install : ${convertedPostbackInstallUrlTemplate}`,
+      );
       if (
         campaign &&
         campaign.postBackEvent &&
@@ -139,19 +135,18 @@ export class PostbackService {
       }
     }
 
-    subMediaEntity.install = +subMediaEntity.install + 1;
-    await this.subMediaRepository.save(subMediaEntity);
+    subMedia.install = +subMedia.install + 1;
+    await this.subMediaRepository.save(subMedia);
 
     return;
   }
 
-  async postBackEventAppsflyer(req: Request, query: AppsflyerPostbackEventDto) {
-    console.log(
-      `[ appsflyer ---> mecrosspro ] event : ${req.protocol}://${req.headers.host}${req.url}`,
+  async postBackEventAppsflyer(req: any) {
+    const originalUrl: string = decodeUnicode(
+      `${req.protocol}://${req.get('host')}${req.originalUrl}`,
     );
-    const originalUrl: string = `${req.protocol}://${req.get('host')}${
-      req.originalUrl
-    }` as string;
+
+    console.log(`[ appsflyer ---> mecrosspro ] event : ${originalUrl}`);
 
     const {
       clickid,
@@ -169,29 +164,29 @@ export class PostbackService {
       event_time,
       device_carrier,
       device_ip,
-    } = query;
+    } = req.query;
 
     console.log(
-      `[ appsflyer ---> mecrosspro ] event : type:event, cpToken:${af_c_id}, viewCode:${af_siteid}, click_id:${clickid}`,
+      `[ appsflyer ---> mecrosspro ] cp_token:${af_c_id}, view_code:${af_siteid}, click_id:${clickid}`,
     );
 
-    const subMediaEntity: SubMedia = await this.subMediaRepository
+    const subMedia: SubMedia = await this.subMediaRepository
       .createQueryBuilder('subMedia')
       .leftJoinAndSelect('subMedia.advertising', 'advertising')
       .leftJoinAndSelect('subMedia.campaign', 'campaign')
       .leftJoinAndSelect('subMedia.media', 'media')
       .leftJoinAndSelect('advertising.tracker', 'tracker')
       .leftJoinAndSelect('campaign.postBackEvent', 'postBackEvent')
-      .where('subMedia.view_code =:viewCode', {
-        viewCode: af_siteid,
+      .where('subMedia.view_code =:view_code', {
+        view_code: af_siteid,
       })
-      .andWhere('subMedia.cp_token =:cpToken', { cpToken: af_c_id })
-      .andWhere('advertising.ad_status =:adStatus', { adStatus: true })
+      .andWhere('subMedia.cp_token =:cp_token', { cp_token: af_c_id })
+      .andWhere('advertising.ad_status =:ad_status', { ad_status: true })
       .getOne();
 
-    if (!subMediaEntity) throw new NotFoundException();
+    if (!subMedia) throw new NotFoundException();
 
-    const { campaign, media } = subMediaEntity;
+    const { campaign, media } = subMedia;
 
     const postBackEventAppsflyer: PostBackEventAppsflyerMetaData = {
       clickid,
@@ -221,11 +216,15 @@ export class PostbackService {
           .replace('{click_id}', clickid)
           .replace('{event_name}', event_name)
           .replace('{event_value}', event_revenue)
-          .replace('{device_id}', advertising_id ? advertising_id : idfa)
-          .replace('{android_device_id}', advertising_id)
-          .replace('{ios_device_id}', idfa)
+          .replace('{device_id}', idfa ? idfa : idfv)
+          .replace('{android_device_id}', idfa)
+          .replace('{ios_device_id}', idfv)
           .replace('{install_timestamp}', install_time)
           .replace('{event_timestamp}', event_time);
+
+      console.log(
+        `[ mecrosspro ---> media ] event : ${convertedPostbackEventUrlTemplate}`,
+      );
 
       if (
         campaign &&
@@ -254,50 +253,54 @@ export class PostbackService {
     if (postBackEventEntity) {
       switch (postBackEventEntity.adminPostback) {
         case 'install':
-          subMediaEntity.install = +subMediaEntity.install + 1;
+          subMedia.install = +subMedia.install + 1;
           break;
         case 'signup':
-          subMediaEntity.signup = +subMediaEntity.signup + 1;
+          subMedia.signup = +subMedia.signup + 1;
           break;
         case 'retention':
-          subMediaEntity.retention = +subMediaEntity.retention + 1;
+          subMedia.retention = +subMedia.retention + 1;
           break;
         case 'buy':
-          subMediaEntity.buy = +subMediaEntity.buy + 1;
+          subMedia.buy = +subMedia.buy + 1;
           break;
         case 'etc1':
-          subMediaEntity.etc1 = +subMediaEntity.etc1 + 1;
+          subMedia.etc1 = +subMedia.etc1 + 1;
           break;
         case 'etc2':
-          subMediaEntity.etc2 = +subMediaEntity.etc2 + 1;
+          subMedia.etc2 = +subMedia.etc2 + 1;
           break;
         case 'etc3':
-          subMediaEntity.etc3 = +subMediaEntity.etc3 + 1;
+          subMedia.etc3 = +subMedia.etc3 + 1;
           break;
         case 'etc4':
-          subMediaEntity.etc4 = +subMediaEntity.etc4 + 1;
+          subMedia.etc4 = +subMedia.etc4 + 1;
           break;
         case 'etc5':
-          subMediaEntity.etc5 = +subMediaEntity.etc5 + 1;
+          subMedia.etc5 = +subMedia.etc5 + 1;
           break;
       }
 
-      await this.subMediaRepository.save(subMediaEntity);
+      await this.subMediaRepository.save(subMedia);
     } else {
       const postBackUnregisteredEventEntity: PostBackUnregisteredEvent =
         await this.postBackUnregisteredEventRepository.findOne({
-          where: { eventName: event_name, campaign: campaign },
+          where: {
+            event_name: event_name,
+            subMedia: subMedia,
+          },
         });
 
       if (postBackUnregisteredEventEntity) {
         postBackUnregisteredEventEntity.event_count =
           +postBackUnregisteredEventEntity.event_count + 1;
+
         await this.postBackUnregisteredEventRepository.save(
           postBackUnregisteredEventEntity,
         );
       } else {
         const postBackUnregisteredEvent: PostBackUnregisteredEventMetaData = {
-          campaign,
+          subMedia,
           event_name,
         };
 

@@ -6,12 +6,12 @@ import {
   Column,
   ManyToOne,
 } from 'typeorm';
-import { Campaign } from './Campaign';
+import { SubMedia } from './SubMedia';
 
 export interface PostBackUnregisteredEventMetaData {
   event_name: string;
   event_count?: number;
-  campaign: Campaign;
+  subMedia: SubMedia;
 }
 
 @Entity('mcp_postback_unregistered_event')
@@ -31,8 +31,8 @@ export class PostBackUnregisteredEvent {
   @UpdateDateColumn({ name: 'updated_at' })
   updated_at: Date;
 
-  @ManyToOne(() => Campaign, (campaign) => campaign.postBackUnregisteredEvent, {
+  @ManyToOne(() => SubMedia, (subMedia) => subMedia.postBackUnregisteredEvent, {
     onDelete: 'CASCADE',
   })
-  campaign: Campaign;
+  subMedia: SubMedia;
 }

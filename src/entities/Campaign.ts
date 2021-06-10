@@ -84,12 +84,6 @@ export class Campaign {
   @OneToMany(() => PostBackEvent, (postBackEvent) => postBackEvent.campaign)
   postBackEvent: PostBackEvent[];
 
-  @OneToMany(
-    () => PostBackUnregisteredEvent,
-    (postBackUnregisteredEvent) => postBackUnregisteredEvent.campaign,
-  )
-  postBackUnregisteredEvent: PostBackUnregisteredEvent[];
-
   @ManyToOne(() => Reservation, (reservation) => reservation.campaign)
   reservation: Reservation[];
 

@@ -1,3 +1,11 @@
+export function decodeUnicode(unicodeString) {
+  const r = /\\u([\d\w]{4})/gi;
+  unicodeString = unicodeString.replace(r, function (match, grp) {
+    return String.fromCharCode(parseInt(grp, 16));
+  });
+  return unescape(unicodeString);
+}
+
 /**
  * 4.메크로스Pro 트래킹 URL 를 트래커 트래킹 URL 변환
  * false 반환 시 잘못된 트래커
