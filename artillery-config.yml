@@ -9,4 +9,4 @@ scenarios:
   - name: 'tracking test'
     flow:
       - get:
-          url: '/tracking?token=8139b786ce614c76830bd144228970cf&click_id=click_id_test&pub_id=pub_id_test&sub_id=sub_id_test&idfa=idfa_test'
+          url: '/tracking?token=8139b786ce614c76830bd144228970cf&click_id=appsflyer_clickid11&pub_id=appsflyer_pub_id1&sub_id=sub_id_test&idfa=appsflyer_idfa'

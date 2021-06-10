@@ -1,6 +1,3 @@
-import { TrackingDto } from 'src/tracking/dto/tracking.dto';
-import * as moment from 'moment-timezone';
-
 /**
  * 4.메크로스Pro 트래킹 URL 를 트래커 트래킹 URL 변환
  * false 반환 시 잘못된 트래커
@@ -8,12 +5,11 @@ import * as moment from 'moment-timezone';
 export function convertTrackerTrackingUrl(
   tkCode: string,
   trackerTrackingUrl: string,
-  requestQuery: TrackingDto,
+  query: any,
   viewCode: string,
 ) {
-  const android_device_id =
-    requestQuery.adid === '{adid}' ? '' : requestQuery.adid;
-  const ios_device_id = requestQuery.idfa === '{idfa}' ? '' : requestQuery.idfa;
+  const android_device_id = query.adid === '{adid}' ? '' : query.adid;
+  const ios_device_id = query.idfa === '{idfa}' ? '' : query.idfa;
   const deviceId: string = android_device_id
     ? android_device_id
     : ios_device_id;
@@ -48,9 +44,9 @@ export function convertTrackerTrackingUrl(
         )
         .replace(
           '{cb_param1}', //캠페인 토큰
-          requestQuery.token,
+          query.token,
         )
-        .replace('{cb_param3}', requestQuery.click_id)
+        .replace('{cb_param3}', query.click_id)
         .replace('{cb_param4}', viewCode)
         .replace('{cb_param2}', '')
         .replace('{cb_param5}', '');
@@ -85,11 +81,11 @@ export function convertTrackerTrackingUrl(
         )
         .replace(
           '{cb_1}', //캠페인 토큰
-          requestQuery.token,
+          query.token,
         )
         .replace(
           '{cb_3}', //클릭 id
-          requestQuery.click_id,
+          query.click_id,
         )
         .replace(
           '{m_publisher}', //노출용 코드
@@ -124,7 +120,7 @@ export function convertTrackerTrackingUrl(
       convertedTrackerTrackingUrl = trackerTrackingUrl
         .replace(
           '{clickid}', //클릭 id
-          requestQuery.click_id,
+          query.click_id,
         )
         .replace(
           '{af_siteid}', //노출용 코드
@@ -132,7 +128,7 @@ export function convertTrackerTrackingUrl(
         )
         .replace(
           '{af_c_id}', //캠페인 토큰
-          requestQuery.token,
+          query.token,
         )
         .replace(
           '{advertising_id}', //android device id
@@ -164,8 +160,8 @@ export function convertTrackerTrackingUrl(
       offer_id, pu_id 는 모비커넥트가 채우는 용??		
     */
       convertedTrackerTrackingUrl = trackerTrackingUrl
-        .replace(/{mecross_clickid}/gi, requestQuery.click_id)
-        .replace('{mecross_token}', requestQuery.token)
+        .replace(/{mecross_clickid}/gi, query.click_id)
+        .replace('{mecross_token}', query.token)
         .replace('{mecross_pubid}', viewCode)
         .replace('{gaid}', android_device_id)
         .replace('{ifa}', ios_device_id);
@@ -196,11 +192,11 @@ export function convertTrackerTrackingUrl(
         )
         .replace(
           '{custom_sub1}', //캠페인 토큰
-          requestQuery.token,
+          query.token,
         )
         .replace(
           '{CLICK_ID}', //클릭 id
-          requestQuery.click_id,
+          query.click_id,
         )
         .replace('{custom_sub2}', '')
         .replace('{custom_sub3}', '')
@@ -212,26 +208,26 @@ export function convertTrackerTrackingUrl(
   return convertedTrackerTrackingUrl;
 }
 
-interface postBackData {
-  tkCode?: string;
-  viewCode?: string;
-  clickId?: string;
-  deviceId?: string;
-  deviceIosId?: string;
-  deviceAndroidId?: string;
-  deviceCarrier?: string;
-  deviceCountry?: string;
-  deviceLanguage?: string;
-  deviceIp?: string;
-  appkey?: string;
-  clickDatetime?: string;
-  installDatetime?: string;
-  eventName?: string;
-  eventDatetime?: string;
-  productId?: string;
-  price?: number;
-  currency?: string;
-}
+// interface postBackData {
+//   tkCode?: string;
+//   viewCode?: string;
+//   clickId?: string;
+//   deviceId?: string;
+//   deviceIosId?: string;
+//   deviceAndroidId?: string;
+//   deviceCarrier?: string;
+//   deviceCountry?: string;
+//   deviceLanguage?: string;
+//   deviceIp?: string;
+//   appkey?: string;
+//   clickDatetime?: string;
+//   installDatetime?: string;
+//   eventName?: string;
+//   eventDatetime?: string;
+//   productId?: string;
+//   price?: number;
+//   currency?: string;
+// }
 
 // export function postBackInstall(req: PostbackInstallDto) {
 //   const returnData: postBackData = {};
