@@ -17,7 +17,6 @@ export class TrackingService {
     private readonly redisService: RedisService,
     private readonly lockService: RedisLockService,
   ) {}
-
   async tracking(request: any): Promise<string> {
     const cp_token: string = ['', undefined, '{token}'].includes(
       request.query.token,
@@ -45,6 +44,7 @@ export class TrackingService {
     const idfa: string = ['', undefined, '{idfa}'].includes(request.query.idfa)
       ? ''
       : request.query.idfa;
+
     console.log(
       `[ media ---> mecrosspro ] token: ${cp_token}, click_id: ${click_id}, pub_id: ${pub_id}, sub_id: ${sub_id}, adid: ${adid}, idfa: ${idfa} `,
     );
@@ -66,21 +66,20 @@ export class TrackingService {
     //새로운 노출용코드 생성
     let view_code: string;
 
-    await getConnection().transaction(async (tm) => {
-      const subMedia: SubMedia = await tm
+    await getConnection().transaction(async (transactionManager) => {
+      const subMedia = await transactionManager
         .getRepository(SubMedia)
         .createQueryBuilder('subMedia')
-        .leftJoinAndSelect('subMedia.advertising', 'advertising')
-        .leftJoinAndSelect('subMedia.media', 'media')
-        .leftJoinAndSelect('advertising.tracker', 'tracker')
-        .where('subMedia.pub_id =:pubId', { pubId: pub_id })
+        .where('subMedia.pub_id =:pub_id', { pub_id: pub_id })
         .andWhere('subMedia.sub_id =:sub_id', { sub_id: sub_id })
-        .andWhere('media.idx =:mediaIdx', { mediaIdx: media.idx })
-        .andWhere('subMedia.cp_token =:cpToken', { cpToken: cp_token })
+        .andWhere('subMedia.campaign =:campaignIdx', {
+          campaignIdx: campaign.idx,
+        })
         .andWhere('Date(subMedia.created_at) =:date ', {
           date: moment().format('YYYY-MM-DD'),
         })
         .getOne();
+
       //기존 노출용코드 반환
       if (!subMedia) {
         view_code = v4().replace(/-/g, '');
@@ -95,7 +94,7 @@ export class TrackingService {
           advertising,
         };
 
-        await tm.getRepository(SubMedia).save(subMediaMetaData);
+        await transactionManager.getRepository(SubMedia).save(subMediaMetaData);
       } else {
         view_code = subMedia.view_code;
       }

@@ -1,12 +1,26 @@
 config:
-  target: http://localhost:3000
-  tls:
-  rejectUnauthorized: true
-  phases:
-    - duration: 10
-      arrivalRate: 50
+  environments:
+    dev:
+      target: http://localhost:3000
+      rejectUnauthorized: false
+      phases:
+        - duration: 30
+          arrivalRate: 100
+    prod:
+      target: http://api.mecrosspro.com
+      rejectUnauthorized: false
+      phases:
+        - duration: 30
+          arrivalRate: 100
 scenarios:
-  - name: 'tracking test'
+  - name: 'mecrosspro system tracking test'
     flow:
       - get:
-          url: '/tracking?token=8139b786ce614c76830bd144228970cf&click_id=appsflyer_clickid11&pub_id=appsflyer_pub_id1&sub_id=sub_id_test&idfa=appsflyer_idfa'
+          url: '/tracking'
+          followRedirect: false
+          qs:
+            token: '8139b786ce614c76830bd144228970cf'
+            click_id: 'appsflyer_clickid11'
+            pub_id: 'appsflyer_pub_id1'
+            sub_id: 'sub_id_test'
+            idfa: 'appsflyer_idfa'
