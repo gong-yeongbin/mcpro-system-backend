@@ -28,7 +28,7 @@ import { RedisLockModule } from 'nestjs-simple-redis-lock';
       database: process.env.MYSQL_DATABASE,
       synchronize: Boolean(process.env.MYSQL_SYNCHRONIZE),
       entities: [__dirname + '/**/*{.ts,.js}'],
-      connectTimeout: 10000,
+      connectTimeout: 5000,
     }),
     TrackingModule,
     PostbackModule,
