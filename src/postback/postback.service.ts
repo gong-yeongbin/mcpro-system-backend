@@ -1,6 +1,6 @@
 import { HttpService, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { SubMedia } from 'src/entities/SubMedia';
+import { PostBackDaily } from 'src/entities/PostBackDaily';
 import { Repository } from 'typeorm';
 import * as moment from 'moment';
 import { PostBackEvent } from 'src/entities/PostBackEvent';
@@ -22,8 +22,8 @@ import { decodeUnicode } from 'src/common/util';
 export class PostbackService {
   constructor(
     private httpService: HttpService,
-    @InjectRepository(SubMedia)
-    private readonly subMediaRepository: Repository<SubMedia>,
+    @InjectRepository(PostBackDaily)
+    private readonly postBackDailyRepository: Repository<PostBackDaily>,
     @InjectRepository(PostBackEvent)
     private readonly postBackEventRepository: Repository<PostBackEvent>,
     @InjectRepository(PostBackUnregisteredEvent)
@@ -60,29 +60,30 @@ export class PostbackService {
       `[ appsflyer ---> mecrosspro ] cp_token:${af_c_id}, view_code:${af_siteid}, click_id:${clickid}`,
     );
 
-    const subMedia: SubMedia = await this.subMediaRepository
-      .createQueryBuilder('subMedia')
-      .leftJoinAndSelect('subMedia.advertising', 'advertising')
-      .leftJoinAndSelect('subMedia.campaign', 'campaign')
-      .leftJoinAndSelect('subMedia.media', 'media')
-      .leftJoinAndSelect('advertising.tracker', 'tracker')
+    const postBackDaily: PostBackDaily = await this.postBackDailyRepository
+      .createQueryBuilder('postBackDaily')
+      .leftJoinAndSelect('postBackDaily.campaign', 'campaign')
+      .leftJoinAndSelect('campaign.advertising', 'advertising')
+      .leftJoinAndSelect('campaign.media', 'media')
       .leftJoinAndSelect('campaign.postBackEvent', 'postBackEvent')
-      .where('subMedia.view_code =:view_code', {
+      .leftJoinAndSelect('advertising.tracker', 'tracker')
+      .where('postBackDaily.view_code =:view_code', {
         view_code: af_siteid,
       })
-      .andWhere('subMedia.cp_token =:cp_token', { cp_token: af_c_id })
+      .andWhere('postBackDaily.cp_token =:cp_token', { cp_token: af_c_id })
       .andWhere('postBackEvent.trackerPostBack =:trackerPostBack', {
         trackerPostBack: 'install',
       })
-      .andWhere('advertising.ad_status =:ad_status', { ad_status: true })
-      .andWhere('Date(subMedia.created_at) =:date ', {
+      .andWhere('advertising.status =:status', { status: true })
+      .andWhere('Date(postBackDaily.created_at) =:date ', {
         date: moment().format('YYYY-MM-DD'),
       })
       .getOne();
 
-    if (!subMedia) throw new NotFoundException();
+    if (!postBackDaily) throw new NotFoundException();
 
-    const { campaign, media } = subMedia;
+    const { campaign } = postBackDaily;
+    const { media } = campaign;
 
     const postBackInstallAppsflyer: PostBackInstallAppsflyerMetaData = {
       clickid,
@@ -105,7 +106,7 @@ export class PostbackService {
         postBackInstallAppsflyer,
       );
 
-    if (campaign.cp_status) {
+    if (campaign.status) {
       const convertedPostbackInstallUrlTemplate =
         media.mediaPostbackInstallUrlTemplate
           .replace('{click_id}', clickid)
@@ -113,9 +114,11 @@ export class PostbackService {
           .replace('{android_device_id}', idfa)
           .replace('{ios_device_id}', idfv)
           .replace('{install_timestamp}', install_time);
+
       console.log(
         `[ mecrosspro ---> media ] install : ${convertedPostbackInstallUrlTemplate}`,
       );
+
       if (
         campaign &&
         campaign.postBackEvent &&
@@ -135,8 +138,8 @@ export class PostbackService {
       }
     }
 
-    subMedia.install = +subMedia.install + 1;
-    await this.subMediaRepository.save(subMedia);
+    postBackDaily.install = +postBackDaily.install + 1;
+    await this.postBackDailyRepository.save(postBackDaily);
 
     return;
   }
@@ -170,23 +173,24 @@ export class PostbackService {
       `[ appsflyer ---> mecrosspro ] cp_token:${af_c_id}, view_code:${af_siteid}, click_id:${clickid}`,
     );
 
-    const subMedia: SubMedia = await this.subMediaRepository
-      .createQueryBuilder('subMedia')
-      .leftJoinAndSelect('subMedia.advertising', 'advertising')
-      .leftJoinAndSelect('subMedia.campaign', 'campaign')
-      .leftJoinAndSelect('subMedia.media', 'media')
-      .leftJoinAndSelect('advertising.tracker', 'tracker')
+    const postBackDaily: PostBackDaily = await this.postBackDailyRepository
+      .createQueryBuilder('postBackDaily')
+      .leftJoinAndSelect('postBackDaily.campaign', 'campaign')
+      .leftJoinAndSelect('campaign.advertising', 'advertising')
+      .leftJoinAndSelect('campaign.media', 'media')
       .leftJoinAndSelect('campaign.postBackEvent', 'postBackEvent')
-      .where('subMedia.view_code =:view_code', {
+      .leftJoinAndSelect('advertising.tracker', 'tracker')
+      .where('postBackDaily.view_code =:view_code', {
         view_code: af_siteid,
       })
-      .andWhere('subMedia.cp_token =:cp_token', { cp_token: af_c_id })
-      .andWhere('advertising.ad_status =:ad_status', { ad_status: true })
+      .andWhere('postBackDaily.cp_token =:cp_token', { cp_token: af_c_id })
+      .andWhere('advertising.status =:status', { status: true })
       .getOne();
 
-    if (!subMedia) throw new NotFoundException();
+    if (!postBackDaily) throw new NotFoundException();
 
-    const { campaign, media } = subMedia;
+    const { campaign } = postBackDaily;
+    const { media } = campaign;
 
     const postBackEventAppsflyer: PostBackEventAppsflyerMetaData = {
       clickid,
@@ -210,7 +214,7 @@ export class PostbackService {
     const postbackEventApppsflyerEntity: PostBackEventAppsflyer =
       await this.postbackEventAppsflyerRepository.save(postBackEventAppsflyer);
 
-    if (campaign.cp_status) {
+    if (campaign.status) {
       const convertedPostbackEventUrlTemplate =
         media.mediaPostbackEventUrlTemplate
           .replace('{click_id}', clickid)
@@ -238,7 +242,6 @@ export class PostbackService {
             postbackEventApppsflyerEntity.isSendDate = new Date();
           })
           .catch();
-
         await this.postbackEventAppsflyerRepository.save(
           postbackEventApppsflyerEntity,
         );
@@ -253,41 +256,41 @@ export class PostbackService {
     if (postBackEventEntity) {
       switch (postBackEventEntity.adminPostback) {
         case 'install':
-          subMedia.install = +subMedia.install + 1;
+          postBackDaily.install = +postBackDaily.install + 1;
           break;
         case 'signup':
-          subMedia.signup = +subMedia.signup + 1;
+          postBackDaily.signup = +postBackDaily.signup + 1;
           break;
         case 'retention':
-          subMedia.retention = +subMedia.retention + 1;
+          postBackDaily.retention = +postBackDaily.retention + 1;
           break;
         case 'buy':
-          subMedia.buy = +subMedia.buy + 1;
+          postBackDaily.buy = +postBackDaily.buy + 1;
           break;
         case 'etc1':
-          subMedia.etc1 = +subMedia.etc1 + 1;
+          postBackDaily.etc1 = +postBackDaily.etc1 + 1;
           break;
         case 'etc2':
-          subMedia.etc2 = +subMedia.etc2 + 1;
+          postBackDaily.etc2 = +postBackDaily.etc2 + 1;
           break;
         case 'etc3':
-          subMedia.etc3 = +subMedia.etc3 + 1;
+          postBackDaily.etc3 = +postBackDaily.etc3 + 1;
           break;
         case 'etc4':
-          subMedia.etc4 = +subMedia.etc4 + 1;
+          postBackDaily.etc4 = +postBackDaily.etc4 + 1;
           break;
         case 'etc5':
-          subMedia.etc5 = +subMedia.etc5 + 1;
+          postBackDaily.etc5 = +postBackDaily.etc5 + 1;
           break;
       }
 
-      await this.subMediaRepository.save(subMedia);
+      await this.postBackDailyRepository.save(postBackDaily);
     } else {
       const postBackUnregisteredEventEntity: PostBackUnregisteredEvent =
         await this.postBackUnregisteredEventRepository.findOne({
           where: {
             event_name: event_name,
-            subMedia: subMedia,
+            postBackDaily: postBackDaily,
           },
         });
 
@@ -300,7 +303,7 @@ export class PostbackService {
         );
       } else {
         const postBackUnregisteredEvent: PostBackUnregisteredEventMetaData = {
-          subMedia,
+          postBackDaily,
           event_name,
         };
 

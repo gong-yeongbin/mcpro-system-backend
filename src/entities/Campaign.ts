@@ -3,19 +3,19 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
   Unique,
   UpdateDateColumn,
+  OneToMany,
+  JoinColumn,
 } from 'typeorm';
 import { Advertising } from './Advertising';
 import { Media } from './Media';
 import { PostBackEvent } from './PostBackEvent';
 import { Reservation } from './Reservation';
-import { SubMedia } from '../entities/SubMedia';
-import { PostBackUnregisteredEvent } from './PostBackUnregisteredEvent';
+import { PostBackDaily } from '../entities/PostBackDaily';
 
-@Entity('mcp_campaign')
+@Entity('campaign')
 @Unique(['cp_code', 'cp_token'])
 export class Campaign {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
@@ -24,8 +24,8 @@ export class Campaign {
   @Column({ type: 'nvarchar', name: 'cp_token' })
   cp_token: string;
 
-  @Column({ type: 'nvarchar', name: 'cp_appkey' })
-  cp_appkey: string;
+  @Column({ type: 'nvarchar', name: 'appkey' })
+  appkey: string;
 
   @Column({
     type: 'nvarchar',
@@ -62,31 +62,31 @@ export class Campaign {
 
   @Column({
     type: 'boolean',
-    name: 'cp_status',
+    name: 'status',
     default: true,
   })
-  cp_status: boolean;
+  status: boolean;
 
-  @CreateDateColumn({ name: 'createdAt' })
-  createdAt: Date;
+  @CreateDateColumn({ name: 'created_at' })
+  created_at: Date;
 
-  @UpdateDateColumn({ name: 'updatedAt' })
-  updatedAt: Date;
+  @UpdateDateColumn({ name: 'updated_at' })
+  updated_at: Date;
 
-  @ManyToOne(() => Advertising, (advertising) => advertising.campaign, {
-    onDelete: 'CASCADE',
-  })
+  @ManyToOne(() => Advertising, (advertising) => advertising.campaign)
+  @JoinColumn({ name: 'advertising' })
   advertising: Advertising;
 
   @ManyToOne(() => Media, (media) => media.campaign)
+  @JoinColumn({ name: 'media' })
   media: Media;
 
   @OneToMany(() => PostBackEvent, (postBackEvent) => postBackEvent.campaign)
   postBackEvent: PostBackEvent[];
 
-  @ManyToOne(() => Reservation, (reservation) => reservation.campaign)
+  @OneToMany(() => Reservation, (reservation) => reservation.campaign)
   reservation: Reservation[];
 
-  @OneToMany(() => SubMedia, (subMedia) => subMedia.campaign)
-  subMedia: SubMedia;
+  @OneToMany(() => PostBackDaily, (postBackDaily) => postBackDaily.campaign)
+  postBackDaily: PostBackDaily[];
 }

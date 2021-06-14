@@ -6,15 +6,15 @@ import {
   Column,
   ManyToOne,
 } from 'typeorm';
-import { SubMedia } from './SubMedia';
+import { PostBackDaily } from './PostBackDaily';
 
 export interface PostBackUnregisteredEventMetaData {
   event_name: string;
   event_count?: number;
-  subMedia: SubMedia;
+  postBackDaily: PostBackDaily;
 }
 
-@Entity('mcp_postback_unregistered_event')
+@Entity('postback_unregistered_event')
 export class PostBackUnregisteredEvent {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
   idx: number;
@@ -31,8 +31,9 @@ export class PostBackUnregisteredEvent {
   @UpdateDateColumn({ name: 'updated_at' })
   updated_at: Date;
 
-  @ManyToOne(() => SubMedia, (subMedia) => subMedia.postBackUnregisteredEvent, {
-    onDelete: 'CASCADE',
-  })
-  subMedia: SubMedia;
+  @ManyToOne(
+    () => PostBackDaily,
+    (postBackDaily) => postBackDaily.postBackUnregisteredEvent,
+  )
+  postBackDaily: PostBackDaily;
 }

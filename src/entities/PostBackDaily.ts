@@ -1,21 +1,19 @@
-import { Advertising } from '../entities/Advertising';
 import { Campaign } from '../entities/Campaign';
-import { Media } from '../entities/Media';
 
 import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
   Unique,
   UpdateDateColumn,
   OneToMany,
+  JoinColumn,
 } from 'typeorm';
 import { PostBackUnregisteredEvent } from './PostBackUnregisteredEvent';
 
-export interface SubMediaMetaData {
+export interface PostBackDailyMetaData {
   cp_token: string;
   pub_id: string;
   sub_id?: string;
@@ -31,13 +29,12 @@ export interface SubMediaMetaData {
   etc3?: number;
   etc4?: number;
   etc5?: number;
-  advertising: Advertising;
   campaign: Campaign;
-  media: Media;
 }
-@Entity('mcp_submedia')
+
+@Entity('postback_daily')
 @Unique(['view_code'])
-export class SubMedia {
+export class PostBackDaily {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
   idx: string;
 
@@ -142,22 +139,13 @@ export class SubMedia {
   @UpdateDateColumn({ name: 'updated_at' })
   updated_at: Date;
 
-  @ManyToOne(() => Advertising, (advertising) => advertising.subMedia)
-  @JoinColumn({ name: 'advertising' })
-  advertising: Advertising;
-
-  @ManyToOne(() => Campaign, (campaign) => campaign.subMedia)
+  @ManyToOne(() => Campaign, (campaign) => campaign.postBackDaily)
   @JoinColumn({ name: 'campaign' })
   campaign: Campaign;
 
-  @ManyToOne(() => Media, (media) => media.subMedia)
-  @JoinColumn({ name: 'media' })
-  media: Media;
-
   @OneToMany(
     () => PostBackUnregisteredEvent,
-    (postBackUnregisteredEvent) => postBackUnregisteredEvent.subMedia,
-    { nullable: true },
+    (postBackUnregisteredEvent) => postBackUnregisteredEvent.postBackDaily,
   )
   postBackUnregisteredEvent: PostBackUnregisteredEvent[];
 }

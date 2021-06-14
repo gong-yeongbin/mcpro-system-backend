@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { Advertising } from './Advertising';
 
-@Entity('mcp_advertiser')
+@Entity('advertiser')
 @Unique(['ar_code', 'ar_name'])
 export class Advertiser {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
@@ -27,8 +27,6 @@ export class Advertiser {
   @UpdateDateColumn({ name: 'updated_at' })
   updated_at: Date;
 
-  @OneToMany(() => Advertising, (advertising) => advertising.advertiser, {
-    onDelete: 'CASCADE',
-  })
+  @OneToMany(() => Advertising, (advertising) => advertising.advertiser)
   advertising: Advertising[];
 }

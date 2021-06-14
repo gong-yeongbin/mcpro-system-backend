@@ -4,11 +4,11 @@ import { Campaign } from 'src/entities/Campaign';
 import { TrackingController } from './tracking.controller';
 import { TrackingService } from './tracking.service';
 import { RedisLockModule } from 'nestjs-simple-redis-lock';
-import { SubMedia } from 'src/entities/SubMedia';
+import { PostBackDaily } from 'src/entities/PostBackDaily';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Campaign, SubMedia]),
+    TypeOrmModule.forFeature([Campaign, PostBackDaily]),
     RedisLockModule.register({}),
   ],
   controllers: [TrackingController],

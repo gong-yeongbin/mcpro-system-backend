@@ -6,10 +6,9 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Advertising } from './Advertising';
 import { Campaign } from './Campaign';
 
-@Entity('mcp_reservation')
+@Entity('reservation')
 export class Reservation {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
   idx: number;
@@ -29,22 +28,12 @@ export class Reservation {
   @Column({ type: 'boolean', name: 'status', default: false })
   status: boolean;
 
-  @Column({ name: 'reserved_at' })
+  @CreateDateColumn({ name: 'reserved_at' })
   reserved_at: Date;
-
-  @CreateDateColumn({ name: 'created_at' })
-  created_at: Date;
 
   @UpdateDateColumn({ name: 'updated_at' })
   updated_at: Date;
 
-  @ManyToOne(() => Advertising, (advertising) => advertising.reservation, {
-    onDelete: 'CASCADE',
-  })
-  advertising: Advertising;
-
-  @ManyToOne(() => Campaign, (campaign) => campaign.reservation, {
-    onDelete: 'CASCADE',
-  })
+  @ManyToOne(() => Campaign, (campaign) => campaign.reservation)
   campaign: Campaign;
 }

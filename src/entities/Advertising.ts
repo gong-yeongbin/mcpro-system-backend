@@ -2,19 +2,18 @@ import {
   Column,
   Entity,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
   Unique,
+  OneToMany,
+  JoinColumn,
 } from 'typeorm';
 import { Advertiser } from './Advertiser';
-import { Tracker } from './Tracker';
 import { Campaign } from './Campaign';
-import { Reservation } from './Reservation';
-import { SubMedia } from '../entities/SubMedia';
+import { Tracker } from './Tracker';
 
-@Entity('mcp_advertising')
+@Entity('advertising')
 @Unique(['ad_code'])
 export class Advertising {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
@@ -26,22 +25,22 @@ export class Advertising {
   @Column({ type: 'nvarchar', name: 'ad_name' })
   ad_name: string;
 
-  @Column({ type: 'nvarchar', name: 'ad_platform' })
-  ad_platform: string;
+  @Column({ type: 'nvarchar', name: 'platform' })
+  platform: string;
 
   @Column({
     type: 'nvarchar',
-    name: 'ad_image_url',
+    name: 'image_url',
     nullable: true,
   })
-  ad_image_url: string;
+  image_url: string;
 
   @Column({
     type: 'boolean',
-    name: 'ad_status',
+    name: 'status',
     default: true,
   })
-  ad_status: boolean;
+  status: boolean;
 
   @CreateDateColumn({ name: 'created_at' })
   created_at: Date;
@@ -49,22 +48,14 @@ export class Advertising {
   @UpdateDateColumn({ name: 'updated_at' })
   updated_at: Date;
 
-  @OneToMany(() => Campaign, (campaign) => campaign.advertising)
-  campaign: Campaign[];
-
-  @OneToMany(() => Reservation, (reservation) => reservation.advertising)
-  reservation: Reservation[];
-
-  @ManyToOne(() => Advertiser, (advertiser) => advertiser.advertising, {
-    onDelete: 'CASCADE',
-  })
+  @ManyToOne(() => Advertiser, (advertiser) => advertiser.advertising)
+  @JoinColumn({ name: 'advertiser' })
   advertiser: Advertiser;
 
-  @ManyToOne(() => Tracker, (tracker) => tracker.advertising, {
-    onDelete: 'CASCADE',
-  })
+  @ManyToOne(() => Tracker, (tracker) => tracker.advertising)
+  @JoinColumn({ name: 'tracker' })
   tracker: Tracker;
 
-  @OneToMany(() => SubMedia, (subMedia) => subMedia.advertising)
-  subMedia: SubMedia;
+  @OneToMany(() => Campaign, (campaign) => campaign.advertising)
+  campaign: Campaign[];
 }

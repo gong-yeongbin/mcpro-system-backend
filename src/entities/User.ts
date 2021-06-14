@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import { UserLog } from '../entities/UserLog';
 
-@Entity('mcp_user')
+@Entity('user')
 export class User {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
   idx: number;
@@ -29,5 +29,5 @@ export class User {
   updated_at: Date;
 
   @OneToMany(() => UserLog, (userLog) => userLog.user)
-  userLog: UserLog;
+  user_log: UserLog;
 }

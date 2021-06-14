@@ -1,4 +1,3 @@
-import { SubMedia } from '../entities/SubMedia';
 import {
   Column,
   Entity,
@@ -10,7 +9,7 @@ import {
 } from 'typeorm';
 import { Campaign } from './Campaign';
 
-@Entity('mcp_media')
+@Entity('media')
 @Unique(['md_code'])
 export class Media {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
@@ -24,10 +23,10 @@ export class Media {
 
   @Column({
     type: 'boolean',
-    name: 'md_status',
+    name: 'status',
     default: true,
   })
-  md_status: boolean;
+  status: boolean;
 
   @Column({
     type: 'nvarchar',
@@ -47,9 +46,6 @@ export class Media {
   @UpdateDateColumn({ name: 'updated_at' })
   updated_at: Date;
 
-  @OneToMany(() => SubMedia, (subMedia) => subMedia.media)
-  subMedia: SubMedia;
-
   @OneToMany(() => Campaign, (campaign) => campaign.media)
-  campaign: Campaign;
+  campaign: Campaign[];
 }

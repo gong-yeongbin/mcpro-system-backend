@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import { Campaign } from './Campaign';
 
-@Entity('mcp_postback_event')
+@Entity('postback_event')
 export class PostBackEvent {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
   idx: number;
@@ -31,8 +31,6 @@ export class PostBackEvent {
   @UpdateDateColumn({ name: 'updated_at' })
   updated_at: Date;
 
-  @ManyToOne(() => Campaign, (campaign) => campaign.postBackEvent, {
-    onDelete: 'CASCADE',
-  })
+  @ManyToOne(() => Campaign, (campaign) => campaign.postBackEvent)
   campaign: Campaign;
 }

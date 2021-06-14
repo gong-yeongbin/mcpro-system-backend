@@ -25,7 +25,7 @@ export interface PostBackEventAppsflyerMetaData {
   isSendDate?: Date;
 }
 
-@Entity('mcp_postback_event_appsflyer')
+@Entity('postback_event_appsflyer')
 export class PostBackEventAppsflyer {
   @PrimaryGeneratedColumn({ name: 'idx', type: 'bigint' })
   idx: number;
@@ -75,10 +75,10 @@ export class PostBackEventAppsflyer {
   @Column({ name: 'device_ip', type: 'nvarchar', nullable: true })
   device_ip: string;
 
-  @Column({ name: 'pbUrl', type: 'text', nullable: true })
+  @Column({ name: 'originalUrl', type: 'text', nullable: true })
   originalUrl: string;
 
-  @Column({ name: 'isSendDate', nullable: true })
+  @Column({ name: 'isSendDate', type: 'datetime', nullable: true })
   isSendDate: Date;
 
   @CreateDateColumn({ name: 'created_at' })

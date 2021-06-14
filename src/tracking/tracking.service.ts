@@ -1,7 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Campaign } from 'src/entities/Campaign';
-import { SubMedia, SubMediaMetaData } from 'src/entities/SubMedia';
+import {
+  PostBackDaily,
+  PostBackDailyMetaData,
+} from 'src/entities/PostBackDaily';
 import { getConnection, Repository } from 'typeorm';
 import { v4 } from 'uuid';
 import { convertTrackerTrackingUrl } from '../common/util';
@@ -60,7 +63,7 @@ export class TrackingService {
     const campaign: Campaign = await this.campaignRepository.findOne({
       where: {
         cp_token: cp_token,
-        cp_status: true,
+        status: true,
       },
       relations: ['media', 'advertising', 'advertising.tracker'],
     });
@@ -74,36 +77,39 @@ export class TrackingService {
     let view_code: string;
 
     await getConnection().transaction(async (transactionManager) => {
-      const subMedia = await transactionManager
-        .getRepository(SubMedia)
-        .createQueryBuilder('subMedia')
-        .where('subMedia.pub_id =:pub_id', { pub_id: pub_id })
-        .andWhere('subMedia.sub_id =:sub_id', { sub_id: sub_id })
-        .andWhere('subMedia.campaign =:campaignIdx', {
+      const postBackDaily = await transactionManager
+        .getRepository(PostBackDaily)
+        .createQueryBuilder('postBackDaily')
+        .leftJoinAndSelect('postBackDaily.campaign', 'campaign')
+        .leftJoinAndSelect('campaign.media', 'media')
+        .where('postBackDaily.pub_id =:pub_id', { pub_id: pub_id })
+        .andWhere('postBackDaily.sub_id =:sub_id', { sub_id: sub_id })
+        .andWhere('campaign =:campaignIdx', {
           campaignIdx: campaign.idx,
         })
-        .andWhere('Date(subMedia.created_at) =:date ', {
+        .andWhere('media =:mediaIdx', { mediaIdx: media.idx })
+        .andWhere('Date(postBackDaily.created_at) =:date ', {
           date: moment().format('YYYY-MM-DD'),
         })
         .getOne();
 
       //기존 노출용코드 반환
-      if (!subMedia) {
+      if (!postBackDaily) {
         view_code = v4().replace(/-/g, '');
 
-        const subMediaMetaData: SubMediaMetaData = {
-          media,
+        const postBackDailyMetaData: PostBackDailyMetaData = {
           cp_token,
           view_code,
           pub_id,
           sub_id,
           campaign,
-          advertising,
         };
 
-        await transactionManager.getRepository(SubMedia).save(subMediaMetaData);
+        await transactionManager
+          .getRepository(PostBackDaily)
+          .save(postBackDailyMetaData);
       } else {
-        view_code = subMedia.view_code;
+        view_code = postBackDaily.view_code;
       }
     });
 

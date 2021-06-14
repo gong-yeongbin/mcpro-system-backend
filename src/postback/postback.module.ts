@@ -4,14 +4,14 @@ import { PostBackEvent } from 'src/entities/PostBackEvent';
 import { PostBackEventAppsflyer } from 'src/entities/PostBackEventAppsflyer';
 import { PostBackInstallAppsflyer } from 'src/entities/PostBackInstallAppsflyer';
 import { PostBackUnregisteredEvent } from 'src/entities/PostBackUnregisteredEvent';
-import { SubMedia } from 'src/entities/SubMedia';
+import { PostBackDaily } from 'src/entities/PostBackDaily';
 import { PostbackController } from './postback.controller';
 import { PostbackService } from './postback.service';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
-      SubMedia,
+      PostBackDaily,
       PostBackEvent,
       PostBackUnregisteredEvent,
       PostBackEventAppsflyer,

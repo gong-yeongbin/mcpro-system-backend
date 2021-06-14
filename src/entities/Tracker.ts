@@ -1,15 +1,16 @@
 import {
   Column,
   Entity,
-  OneToMany,
   PrimaryGeneratedColumn,
   Unique,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
+  JoinColumn,
 } from 'typeorm';
 import { Advertising } from '../entities/Advertising';
 
-@Entity('mcp_tracker')
+@Entity('tracker')
 @Unique(['tk_code'])
 export class Tracker {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
@@ -29,8 +30,8 @@ export class Tracker {
   })
   type: string;
 
-  @Column({ type: 'boolean', name: 'tk_status', default: true })
-  tk_status: boolean;
+  @Column({ type: 'boolean', name: 'status', default: true })
+  status: boolean;
 
   @Column({ type: 'text', name: 'trackerTrackingUrlTemplate' })
   trackerTrackingUrlTemplate: string;
@@ -54,5 +55,6 @@ export class Tracker {
   updated_At: Date;
 
   @OneToMany(() => Advertising, (advertising) => advertising.tracker)
+  @JoinColumn()
   advertising: Advertising[];
 }

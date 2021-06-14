@@ -22,7 +22,7 @@ export interface PostBackInstallAppsflyerMetaData {
   isSendDate?: Date;
 }
 
-@Entity('mcp_postback_install_appsflyer')
+@Entity('postback_install_appsflyer')
 export class PostBackInstallAppsflyer {
   @PrimaryGeneratedColumn({ name: 'idx', type: 'bigint' })
   idx: number;
@@ -63,7 +63,7 @@ export class PostBackInstallAppsflyer {
   @Column({ name: 'device_ip', type: 'nvarchar', nullable: true })
   device_ip: string;
 
-  @Column({ name: 'pbUrl', type: 'text', nullable: true })
+  @Column({ name: 'originalUrl', type: 'text', nullable: true })
   originalUrl: string;
 
   @Column({ name: 'isSendDate', nullable: true })
