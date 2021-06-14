@@ -5,7 +5,7 @@ config:
       rejectUnauthorized: false
       phases:
         - duration: 30
-          arrivalRate: 100
+          arrivalRate: 95
     prod:
       target: http://api.mecrosspro.com
       rejectUnauthorized: false

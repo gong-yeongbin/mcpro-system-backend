@@ -8,6 +8,7 @@ import { convertTrackerTrackingUrl } from '../common/util';
 import * as moment from 'moment';
 import { RedisService } from 'nestjs-redis';
 import { RedisLockService } from 'nestjs-simple-redis-lock';
+import { decodeUnicode } from 'src/common/util';
 
 @Injectable()
 export class TrackingService {
@@ -18,6 +19,10 @@ export class TrackingService {
     private readonly lockService: RedisLockService,
   ) {}
   async tracking(request: any): Promise<string> {
+    const originalUrl: string = decodeUnicode(
+      `${request.protocol}://${request.get('host')}${request.originalUrl}`,
+    );
+
     const cp_token: string = ['', undefined, '{token}'].includes(
       request.query.token,
     )
@@ -46,7 +51,9 @@ export class TrackingService {
       : request.query.idfa;
 
     console.log(
-      `[ media ---> mecrosspro ] token: ${cp_token}, click_id: ${click_id}, pub_id: ${pub_id}, sub_id: ${sub_id}, adid: ${adid}, idfa: ${idfa} `,
+      `[ media ---> mecrosspro ] 
+      ${originalUrl}
+      token: ${cp_token}, click_id: ${click_id}, pub_id: ${pub_id}, sub_id: ${sub_id}, adid: ${adid}, idfa: ${idfa} `,
     );
 
     //2. 캠페인 토큰 검증 (캠페인 및 광고앱 차단 여부 확인)
