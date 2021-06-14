@@ -5,6 +5,7 @@ import {
   UpdateDateColumn,
   Column,
   ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 import { PostBackDaily } from './PostBackDaily';
 
@@ -35,5 +36,6 @@ export class PostBackUnregisteredEvent {
     () => PostBackDaily,
     (postBackDaily) => postBackDaily.postBackUnregisteredEvent,
   )
+  @JoinColumn({ name: 'postBackDaily' })
   postBackDaily: PostBackDaily;
 }

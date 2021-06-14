@@ -5,6 +5,7 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  JoinColumn,
 } from 'typeorm';
 import { Campaign } from './Campaign';
 
@@ -35,5 +36,6 @@ export class Reservation {
   updated_at: Date;
 
   @ManyToOne(() => Campaign, (campaign) => campaign.reservation)
+  @JoinColumn({ name: 'campaign' })
   campaign: Campaign;
 }

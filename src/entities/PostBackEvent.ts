@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  JoinColumn,
 } from 'typeorm';
 import { Campaign } from './Campaign';
 
@@ -32,5 +33,6 @@ export class PostBackEvent {
   updated_at: Date;
 
   @ManyToOne(() => Campaign, (campaign) => campaign.postBackEvent)
+  @JoinColumn({ name: 'campaign' })
   campaign: Campaign;
 }
