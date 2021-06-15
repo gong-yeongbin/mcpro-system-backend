@@ -2,7 +2,7 @@ import { HttpService, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PostBackDaily } from 'src/entities/PostBackDaily';
 import { Repository } from 'typeorm';
-import * as moment from 'moment';
+import * as moment from 'moment-timezone';
 import { PostBackEvent } from 'src/entities/PostBackEvent';
 import {
   PostBackEventAppsflyer,
@@ -48,17 +48,21 @@ export class PostbackService {
       advertising_id,
       idfa,
       idfv,
-      install_time,
       country_code,
       language,
-      click_time,
       device_carrier,
       device_ip,
     } = req.query;
 
-    console.log(
-      `[ appsflyer ---> mecrosspro ] cp_token:${af_c_id}, view_code:${af_siteid}, click_id:${clickid}`,
-    );
+    const install_time = moment
+      .utc(req.query.install_time)
+      .tz('Asia/Seoul')
+      .format('YYYY-MM-DD HH:mm:ss');
+
+    const click_time = moment
+      .utc(req.query.click_time)
+      .tz('Asia/Seoul')
+      .format('YYYY-MM-DD HH:mm:ss');
 
     const postBackDaily: PostBackDaily = await this.postBackDailyRepository
       .createQueryBuilder('postBackDaily')
@@ -155,20 +159,24 @@ export class PostbackService {
       advertising_id,
       idfa,
       idfv,
-      install_time,
       country_code,
       language,
       event_name,
       event_revenue_currency,
       event_revenue,
-      event_time,
       device_carrier,
       device_ip,
     } = req.query;
 
-    console.log(
-      `[ appsflyer ---> mecrosspro ] cp_token:${af_c_id}, view_code:${af_siteid}, click_id:${clickid}`,
-    );
+    const install_time = moment
+      .utc(req.query.install_time)
+      .tz('Asia/Seoul')
+      .format('YYYY-MM-DD HH:mm:ss');
+
+    const event_time = moment
+      .utc(req.query.event_time)
+      .tz('Asia/Seoul')
+      .format('YYYY-MM-DD HH:mm:ss');
 
     const postBackDaily: PostBackDaily = await this.postBackDailyRepository
       .createQueryBuilder('postBackDaily')
@@ -293,7 +301,8 @@ export class PostbackService {
         );
 
         await this.httpService
-          .get(convertedPostbackEventUrlTemplate)
+          // .get(convertedPostbackEventUrlTemplate)
+          .get('http://www.naver.com')
           .toPromise()
           .then(() => {
             postbackEventApppsflyerEntity.isSendDate = new Date();
