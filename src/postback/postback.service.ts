@@ -65,15 +65,11 @@ export class PostbackService {
       .leftJoinAndSelect('postBackDaily.campaign', 'campaign')
       .leftJoinAndSelect('campaign.advertising', 'advertising')
       .leftJoinAndSelect('campaign.media', 'media')
-      .leftJoinAndSelect('campaign.postBackEvent', 'postBackEvent')
       .leftJoinAndSelect('advertising.tracker', 'tracker')
       .where('postBackDaily.view_code =:view_code', {
         view_code: af_siteid,
       })
       .andWhere('postBackDaily.cp_token =:cp_token', { cp_token: af_c_id })
-      .andWhere('postBackEvent.trackerPostBack =:trackerPostBack', {
-        trackerPostBack: 'install',
-      })
       .andWhere('advertising.status =:status', { status: true })
       .andWhere('Date(postBackDaily.created_at) =:date ', {
         date: moment().format('YYYY-MM-DD'),
@@ -119,11 +115,12 @@ export class PostbackService {
         `[ mecrosspro ---> media ] install : ${convertedPostbackInstallUrlTemplate}`,
       );
 
-      if (
-        campaign &&
-        campaign.postBackEvent &&
-        campaign.postBackEvent[0].sendPostback === true
-      ) {
+      const postBackEvent: PostBackEvent =
+        await this.postBackEventRepository.findOne({
+          where: { campaign: campaign, trackerPostback: 'install' },
+        });
+
+      if (postBackEvent && postBackEvent.sendPostback) {
         await this.httpService
           .get(convertedPostbackInstallUrlTemplate)
           .toPromise()
@@ -136,10 +133,10 @@ export class PostbackService {
           postBackInstallAppsflyerEntity,
         );
       }
-    }
 
-    postBackDaily.install = +postBackDaily.install + 1;
-    await this.postBackDailyRepository.save(postBackDaily);
+      postBackDaily.install = +postBackDaily.install + 1;
+      await this.postBackDailyRepository.save(postBackDaily);
+    }
 
     return;
   }
@@ -178,7 +175,6 @@ export class PostbackService {
       .leftJoinAndSelect('postBackDaily.campaign', 'campaign')
       .leftJoinAndSelect('campaign.advertising', 'advertising')
       .leftJoinAndSelect('campaign.media', 'media')
-      .leftJoinAndSelect('campaign.postBackEvent', 'postBackEvent')
       .leftJoinAndSelect('advertising.tracker', 'tracker')
       .where('postBackDaily.view_code =:view_code', {
         view_code: af_siteid,
@@ -230,88 +226,83 @@ export class PostbackService {
         `[ mecrosspro ---> media ] event : ${convertedPostbackEventUrlTemplate}`,
       );
 
-      if (
-        campaign &&
-        campaign.postBackEvent &&
-        campaign.postBackEvent[0].sendPostback
-      ) {
-        await this.httpService
-          .get(convertedPostbackEventUrlTemplate)
-          .toPromise()
-          .then(() => {
-            postbackEventApppsflyerEntity.isSendDate = new Date();
-          })
-          .catch();
-        await this.postbackEventAppsflyerRepository.save(
-          postbackEventApppsflyerEntity,
-        );
-      }
-    }
-
-    const postBackEventEntity: PostBackEvent =
-      await this.postBackEventRepository.findOne({
-        where: { campaign: campaign, trackerPostback: event_name },
-      });
-
-    if (postBackEventEntity) {
-      switch (postBackEventEntity.adminPostback) {
-        case 'install':
-          postBackDaily.install = +postBackDaily.install + 1;
-          break;
-        case 'signup':
-          postBackDaily.signup = +postBackDaily.signup + 1;
-          break;
-        case 'retention':
-          postBackDaily.retention = +postBackDaily.retention + 1;
-          break;
-        case 'buy':
-          postBackDaily.buy = +postBackDaily.buy + 1;
-          break;
-        case 'etc1':
-          postBackDaily.etc1 = +postBackDaily.etc1 + 1;
-          break;
-        case 'etc2':
-          postBackDaily.etc2 = +postBackDaily.etc2 + 1;
-          break;
-        case 'etc3':
-          postBackDaily.etc3 = +postBackDaily.etc3 + 1;
-          break;
-        case 'etc4':
-          postBackDaily.etc4 = +postBackDaily.etc4 + 1;
-          break;
-        case 'etc5':
-          postBackDaily.etc5 = +postBackDaily.etc5 + 1;
-          break;
-      }
-
-      await this.postBackDailyRepository.save(postBackDaily);
-    } else {
-      const postBackUnregisteredEventEntity: PostBackUnregisteredEvent =
-        await this.postBackUnregisteredEventRepository.findOne({
-          where: {
-            event_name: event_name,
-            postBackDaily: postBackDaily,
-          },
+      const postBackEvent: PostBackEvent =
+        await this.postBackEventRepository.findOne({
+          where: { campaign: campaign, trackerPostback: event_name },
         });
 
-      if (postBackUnregisteredEventEntity) {
-        postBackUnregisteredEventEntity.event_count =
-          +postBackUnregisteredEventEntity.event_count + 1;
+      if (postBackEvent && postBackEvent.sendPostback) {
+        switch (postBackEvent.adminPostback) {
+          case 'install':
+            postBackDaily.install = +postBackDaily.install + 1;
+            break;
+          case 'signup':
+            postBackDaily.signup = +postBackDaily.signup + 1;
+            break;
+          case 'retention':
+            postBackDaily.retention = +postBackDaily.retention + 1;
+            break;
+          case 'buy':
+            postBackDaily.buy = +postBackDaily.buy + 1;
+            break;
+          case 'etc1':
+            postBackDaily.etc1 = +postBackDaily.etc1 + 1;
+            break;
+          case 'etc2':
+            postBackDaily.etc2 = +postBackDaily.etc2 + 1;
+            break;
+          case 'etc3':
+            postBackDaily.etc3 = +postBackDaily.etc3 + 1;
+            break;
+          case 'etc4':
+            postBackDaily.etc4 = +postBackDaily.etc4 + 1;
+            break;
+          case 'etc5':
+            postBackDaily.etc5 = +postBackDaily.etc5 + 1;
+            break;
+        }
 
-        await this.postBackUnregisteredEventRepository.save(
-          postBackUnregisteredEventEntity,
-        );
+        await this.postBackDailyRepository.save(postBackDaily);
       } else {
-        const postBackUnregisteredEvent: PostBackUnregisteredEventMetaData = {
-          postBackDaily,
-          event_name,
-        };
+        const postBackUnregisteredEventEntity: PostBackUnregisteredEvent =
+          await this.postBackUnregisteredEventRepository.findOne({
+            where: {
+              event_name: event_name,
+              postBackDaily: postBackDaily,
+            },
+          });
 
-        await this.postBackUnregisteredEventRepository.save(
-          postBackUnregisteredEvent,
-        );
+        if (postBackUnregisteredEventEntity) {
+          postBackUnregisteredEventEntity.event_count =
+            +postBackUnregisteredEventEntity.event_count + 1;
+
+          await this.postBackUnregisteredEventRepository.save(
+            postBackUnregisteredEventEntity,
+          );
+        } else {
+          const postBackUnregisteredEvent: PostBackUnregisteredEventMetaData = {
+            postBackDaily,
+            event_name,
+          };
+
+          await this.postBackUnregisteredEventRepository.save(
+            postBackUnregisteredEvent,
+          );
+        }
       }
+
+      await this.httpService
+        .get(convertedPostbackEventUrlTemplate)
+        .toPromise()
+        .then(() => {
+          postbackEventApppsflyerEntity.isSendDate = new Date();
+        })
+        .catch();
+      await this.postbackEventAppsflyerRepository.save(
+        postbackEventApppsflyerEntity,
+      );
     }
+
     return;
   }
 }

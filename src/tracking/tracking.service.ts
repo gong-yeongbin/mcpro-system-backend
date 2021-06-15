@@ -7,7 +7,6 @@ import {
 } from 'src/entities/PostBackDaily';
 import { getConnection, Repository } from 'typeorm';
 import { v4 } from 'uuid';
-import { convertTrackerTrackingUrl } from '../common/util';
 import * as moment from 'moment';
 import { RedisService } from 'nestjs-redis';
 import { RedisLockService } from 'nestjs-simple-redis-lock';
@@ -21,6 +20,7 @@ export class TrackingService {
     private readonly redisService: RedisService,
     private readonly lockService: RedisLockService,
   ) {}
+
   async tracking(request: any): Promise<string> {
     const originalUrl: string = decodeUnicode(
       `${request.protocol}://${request.get('host')}${request.originalUrl}`,
@@ -152,4 +152,60 @@ export class TrackingService {
       return convertedTrackingUrl;
     }
   }
+}
+
+function convertTrackerTrackingUrl(
+  tk_code: string,
+  trackerTrackingUrl: string,
+  query: any,
+  view_code: string,
+) {
+  const android_device_id = query.adid === '{adid}' ? '' : query.adid;
+  const ios_device_id = query.idfa === '{idfa}' ? '' : query.idfa;
+  const device_id: string = android_device_id
+    ? android_device_id
+    : ios_device_id;
+
+  let convertedTrackerTrackingUrl: string = null;
+
+  switch (tk_code) {
+    case 'appsflyer':
+      convertedTrackerTrackingUrl = trackerTrackingUrl
+        .replace(
+          '{clickid}', //click id
+          query.click_id,
+        )
+        .replace(
+          '{af_siteid}', //view code
+          view_code,
+        )
+        .replace(
+          '{af_c_id}', //campaign token
+          query.token,
+        )
+        .replace(
+          '{advertising_id}', //android device id
+          android_device_id,
+        )
+        .replace(
+          '{idfa}', //ios device id
+          ios_device_id,
+        )
+        .replace('{af_adset_id}', '')
+        .replace('{af_ad_id}', '')
+        .replace('{af_ip}', '') //device ip
+        .replace('{af_ua}', '') //user agent
+        .replace('{af_lang}', ''); //device language
+      break;
+    case 'adbrix':
+      break;
+    case 'adbrix_remaster':
+      break;
+    case 'mobiconnect':
+      break;
+    case 'airbridge':
+      break;
+  }
+
+  return convertedTrackerTrackingUrl;
 }
