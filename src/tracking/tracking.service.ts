@@ -54,9 +54,6 @@ export class TrackingService {
       : request.query.idfa;
 
     console.log(`[ media ---> mecrosspro ] ${originalUrl}`);
-    console.log(
-      `[ media ---> mecrosspro ] token: ${cp_token}, click_id: ${click_id}, pub_id: ${pub_id}, sub_id: ${sub_id}, adid: ${adid}, idfa: ${idfa} `,
-    );
 
     //2. 캠페인 토큰 검증 (캠페인 및 광고앱 차단 여부 확인)
     const campaign: Campaign = await this.campaignRepository.findOne({
@@ -74,43 +71,45 @@ export class TrackingService {
 
     //새로운 노출용코드 생성
     let view_code: string;
-
-    await getConnection().transaction(async (transactionManager) => {
-      const postBackDaily = await transactionManager
-        .getRepository(PostBackDaily)
-        .createQueryBuilder('postBackDaily')
-        .leftJoinAndSelect('postBackDaily.campaign', 'campaign')
-        .leftJoinAndSelect('campaign.media', 'media')
-        .where('postBackDaily.pub_id =:pub_id', { pub_id: pub_id })
-        .andWhere('postBackDaily.sub_id =:sub_id', { sub_id: sub_id })
-        .andWhere('campaign =:campaignIdx', {
-          campaignIdx: campaign.idx,
-        })
-        .andWhere('media =:mediaIdx', { mediaIdx: media.idx })
-        .andWhere('Date(postBackDaily.created_at) =:date ', {
-          date: moment().format('YYYY-MM-DD'),
-        })
-        .getOne();
-
-      //기존 노출용코드 반환
-      if (!postBackDaily) {
-        view_code = v4().replace(/-/g, '');
-
-        const postBackDailyMetaData: PostBackDailyMetaData = {
-          cp_token,
-          view_code,
-          pub_id,
-          sub_id,
-          campaign,
-        };
-
-        await transactionManager
+    await getConnection().transaction(
+      'SERIALIZABLE',
+      async (transactionManager) => {
+        const postBackDaily = await transactionManager
           .getRepository(PostBackDaily)
-          .save(postBackDailyMetaData);
-      } else {
-        view_code = postBackDaily.view_code;
-      }
-    });
+          .createQueryBuilder('postBackDaily')
+          .leftJoinAndSelect('postBackDaily.campaign', 'campaign')
+          .leftJoinAndSelect('campaign.media', 'media')
+          .where('postBackDaily.pub_id =:pub_id', { pub_id: pub_id })
+          .andWhere('postBackDaily.sub_id =:sub_id', { sub_id: sub_id })
+          .andWhere('postBackDaily.cp_token =:cp_token', {
+            cp_token: campaign.cp_token,
+          })
+          .andWhere('media =:mediaIdx', { mediaIdx: media.idx })
+          .andWhere('Date(postBackDaily.created_at) =:date ', {
+            date: moment().format('YYYY-MM-DD'),
+          })
+          .getOne();
+
+        //기존 노출용코드 반환
+        if (!postBackDaily) {
+          view_code = v4().replace(/-/g, '');
+
+          const postBackDailyMetaData: PostBackDailyMetaData = {
+            cp_token,
+            view_code,
+            pub_id,
+            sub_id,
+            campaign,
+          };
+
+          await transactionManager
+            .getRepository(PostBackDaily)
+            .save(postBackDailyMetaData);
+        } else {
+          view_code = postBackDaily.view_code;
+        }
+      },
+    );
 
     //4. 메크로스Pro 트래킹 URL 를 트래커 트래킹 URL 변환
     const convertedTrackingUrl: string = convertTrackerTrackingUrl(
@@ -162,9 +161,9 @@ function convertTrackerTrackingUrl(
 ) {
   const android_device_id = query.adid === '{adid}' ? '' : query.adid;
   const ios_device_id = query.idfa === '{idfa}' ? '' : query.idfa;
-  // const device_id: string = android_device_id
-  //   ? android_device_id
-  //   : ios_device_id;
+  const device_id: string = android_device_id
+    ? android_device_id
+    : ios_device_id;
 
   let convertedTrackerTrackingUrl: string = null;
 

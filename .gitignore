@@ -37,4 +37,4 @@ lerna-debug.log*
 .env.*
 
 #test
-artillery-config.yml
+/artillery-config.yml

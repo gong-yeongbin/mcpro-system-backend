@@ -5,7 +5,7 @@ config:
       rejectUnauthorized: false
       phases:
         - duration: 30
-          arrivalRate: 95
+          arrivalRate: 100
     prod:
       target: http://api.mecrosspro.com
       rejectUnauthorized: false
@@ -19,7 +19,7 @@ scenarios:
           url: '/tracking'
           followRedirect: false
           qs:
-            token: '8139b786ce614c76830bd144228970cf'
+            token: 'f638f12880c1452f9a9037b0969faa9e'
             click_id: 'appsflyer_clickid11'
             pub_id: 'appsflyer_pub_id1'
             sub_id: 'sub_id_test'
