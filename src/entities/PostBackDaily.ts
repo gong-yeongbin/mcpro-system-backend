@@ -33,7 +33,6 @@ export interface PostBackDailyMetaData {
 }
 
 @Entity('postback_daily')
-@Unique(['view_code'])
 export class PostBackDaily {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
   idx: string;
@@ -47,7 +46,7 @@ export class PostBackDaily {
   @Column({ type: 'nvarchar', name: 'sub_id', nullable: true })
   sub_id: string;
 
-  @Column({ type: 'nvarchar', name: 'view_code' })
+  @Column({ type: 'nvarchar', name: 'view_code', nullable: true })
   view_code: string;
 
   @Column({

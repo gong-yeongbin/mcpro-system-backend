@@ -17,6 +17,8 @@ export class TrackingService {
   constructor(
     @InjectRepository(Campaign)
     private readonly campaignRepository: Repository<Campaign>,
+    @InjectRepository(PostBackDaily)
+    private readonly postBackDailyRepository: Repository<PostBackDaily>,
     private readonly redisService: RedisService,
     private readonly lockService: RedisLockService,
   ) {}
@@ -69,47 +71,7 @@ export class TrackingService {
     const { media, advertising } = campaign;
     const { tracker } = advertising;
 
-    //새로운 노출용코드 생성
-    let view_code: string;
-    await getManager().transaction(
-      'SERIALIZABLE',
-      async (transactionManager) => {
-        const postBackDaily = await transactionManager
-          .getRepository(PostBackDaily)
-          .createQueryBuilder('postBackDaily')
-          .leftJoinAndSelect('postBackDaily.campaign', 'campaign')
-          .leftJoinAndSelect('campaign.media', 'media')
-          .where('postBackDaily.pub_id =:pub_id', { pub_id: pub_id })
-          .andWhere('postBackDaily.sub_id =:sub_id', { sub_id: sub_id })
-          .andWhere('postBackDaily.cp_token =:cp_token', {
-            cp_token: campaign.cp_token,
-          })
-          .andWhere('media =:mediaIdx', { mediaIdx: media.idx })
-          .andWhere('Date(postBackDaily.created_at) =:date ', {
-            date: moment().format('YYYY-MM-DD'),
-          })
-          .getOne();
-
-        //기존 노출용코드 반환
-        if (!postBackDaily) {
-          view_code = v4().replace(/-/g, '');
-
-          const postBackDailyMetaData: PostBackDailyMetaData = {
-            cp_token,
-            view_code,
-            pub_id,
-            sub_id,
-            campaign,
-          };
-
-          await transactionManager
-            .getRepository(PostBackDaily)
-            .save(postBackDailyMetaData);
-        } else {
-          view_code = postBackDaily.view_code;
-        }
-      },
-    );
+    const view_code = v4().replace(/-/g, '');
 
     //4. 메크로스Pro 트래킹 URL 를 트래커 트래킹 URL 변환
     const convertedTrackingUrl: string = convertTrackerTrackingUrl(
@@ -132,7 +94,7 @@ export class TrackingService {
           .getClient()
           .hsetnx(
             moment().format('YYYYMMDD'),
-            `${cp_token}/${view_code}/${pub_id}/${sub_id}`,
+            `${cp_token}/${pub_id}/${sub_id}/${media.idx}/${view_code}`,
             1,
           );
 
@@ -141,7 +103,7 @@ export class TrackingService {
             .getClient()
             .hincrby(
               moment().format('YYYYMMDD'),
-              `${cp_token}/${view_code}/${pub_id}/${sub_id}`,
+              `${cp_token}/${pub_id}/${sub_id}/${media.idx}/${view_code}`,
               1,
             );
         }
