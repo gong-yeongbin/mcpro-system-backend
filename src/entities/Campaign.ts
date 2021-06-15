@@ -40,10 +40,10 @@ export class Campaign {
   @Column({ type: 'nvarchar', name: 'type' })
   type: string;
 
-  @Column({ type: 'nvarchar', name: 'trackerTrackingUrl' })
+  @Column({ type: 'text', name: 'trackerTrackingUrl' })
   trackerTrackingUrl: string;
 
-  @Column({ type: 'nvarchar', name: 'mecrossTrackingUrl' })
+  @Column({ type: 'text', name: 'mecrossTrackingUrl' })
   mecrossTrackingUrl: string;
 
   @Column({
