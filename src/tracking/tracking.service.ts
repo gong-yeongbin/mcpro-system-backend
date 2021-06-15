@@ -161,9 +161,9 @@ function convertTrackerTrackingUrl(
 ) {
   const android_device_id = query.adid === '{adid}' ? '' : query.adid;
   const ios_device_id = query.idfa === '{idfa}' ? '' : query.idfa;
-  const device_id: string = android_device_id
-    ? android_device_id
-    : ios_device_id;
+  // const device_id: string = android_device_id
+  //   ? android_device_id
+  //   : ios_device_id;
 
   let convertedTrackerTrackingUrl: string = null;
 
