@@ -111,16 +111,19 @@ export class PostbackService {
           .replace('{ios_device_id}', idfv)
           .replace('{install_timestamp}', install_time);
 
-      console.log(
-        `[ mecrosspro ---> media ] install : ${convertedPostbackInstallUrlTemplate}`,
-      );
-
       const postBackEvent: PostBackEvent =
         await this.postBackEventRepository.findOne({
           where: { campaign: campaign, trackerPostback: 'install' },
         });
 
-      if (postBackEvent && postBackEvent.sendPostback) {
+      postBackDaily.install = +postBackDaily.install + 1;
+      await this.postBackDailyRepository.save(postBackDaily);
+
+      if (postBackEvent.sendPostback) {
+        console.log(
+          `[ mecrosspro ---> media ] install : ${convertedPostbackInstallUrlTemplate}`,
+        );
+
         await this.httpService
           .get(convertedPostbackInstallUrlTemplate)
           .toPromise()
@@ -133,9 +136,6 @@ export class PostbackService {
           postBackInstallAppsflyerEntity,
         );
       }
-
-      postBackDaily.install = +postBackDaily.install + 1;
-      await this.postBackDailyRepository.save(postBackDaily);
     }
 
     return;
@@ -222,16 +222,12 @@ export class PostbackService {
           .replace('{install_timestamp}', install_time)
           .replace('{event_timestamp}', event_time);
 
-      console.log(
-        `[ mecrosspro ---> media ] event : ${convertedPostbackEventUrlTemplate}`,
-      );
-
       const postBackEvent: PostBackEvent =
         await this.postBackEventRepository.findOne({
           where: { campaign: campaign, trackerPostback: event_name },
         });
 
-      if (postBackEvent && postBackEvent.sendPostback) {
+      if (postBackEvent) {
         switch (postBackEvent.adminPostback) {
           case 'install':
             postBackDaily.install = +postBackDaily.install + 1;
@@ -291,16 +287,22 @@ export class PostbackService {
         }
       }
 
-      await this.httpService
-        .get(convertedPostbackEventUrlTemplate)
-        .toPromise()
-        .then(() => {
-          postbackEventApppsflyerEntity.isSendDate = new Date();
-        })
-        .catch();
-      await this.postbackEventAppsflyerRepository.save(
-        postbackEventApppsflyerEntity,
-      );
+      if (postBackEvent.sendPostback) {
+        console.log(
+          `[ mecrosspro ---> media ] event : ${convertedPostbackEventUrlTemplate}`,
+        );
+
+        await this.httpService
+          .get(convertedPostbackEventUrlTemplate)
+          .toPromise()
+          .then(() => {
+            postbackEventApppsflyerEntity.isSendDate = new Date();
+          })
+          .catch();
+        await this.postbackEventAppsflyerRepository.save(
+          postbackEventApppsflyerEntity,
+        );
+      }
     }
 
     return;
