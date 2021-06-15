@@ -5,7 +5,7 @@ import {
   PostBackDaily,
   PostBackDailyMetaData,
 } from 'src/entities/PostBackDaily';
-import { getConnection, Repository } from 'typeorm';
+import { getConnection, getManager, Repository } from 'typeorm';
 import { v4 } from 'uuid';
 import * as moment from 'moment';
 import { RedisService } from 'nestjs-redis';
@@ -71,7 +71,7 @@ export class TrackingService {
 
     //새로운 노출용코드 생성
     let view_code: string;
-    await getConnection().transaction(
+    await getManager().transaction(
       'SERIALIZABLE',
       async (transactionManager) => {
         const postBackDaily = await transactionManager
