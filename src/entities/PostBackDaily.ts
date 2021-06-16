@@ -33,7 +33,6 @@ export interface PostBackDailyMetaData {
 }
 
 @Entity('postback_daily')
-@Unique(['cp_token', 'pub_id', 'sub_id'])
 export class PostBackDaily {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
   idx: string;
