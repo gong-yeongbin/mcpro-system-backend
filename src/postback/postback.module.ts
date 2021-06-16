@@ -7,16 +7,20 @@ import { PostBackUnregisteredEvent } from 'src/entities/PostBackUnregisteredEven
 import { PostBackDaily } from 'src/entities/PostBackDaily';
 import { PostbackController } from './postback.controller';
 import { PostbackService } from './postback.service';
+import { RedisLockModule } from 'nestjs-simple-redis-lock';
+import { Campaign } from 'src/entities/Campaign';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
+      Campaign,
       PostBackDaily,
       PostBackEvent,
       PostBackUnregisteredEvent,
       PostBackEventAppsflyer,
       PostBackInstallAppsflyer,
     ]),
+    RedisLockModule.register({}),
     HttpModule.register({
       timeout: 5000,
       maxRedirects: 3,

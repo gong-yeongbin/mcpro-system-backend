@@ -12,16 +12,24 @@ import {
   PostBackInstallAppsflyer,
   PostBackInstallAppsflyerMetaData,
 } from 'src/entities/PostBackInstallAppsflyer';
-import {
-  PostBackUnregisteredEvent,
-  PostBackUnregisteredEventMetaData,
-} from 'src/entities/PostBackUnregisteredEvent';
+import { PostBackUnregisteredEvent } from 'src/entities/PostBackUnregisteredEvent';
+import { RedisService } from 'nestjs-redis';
+import { RedisLockService } from 'nestjs-simple-redis-lock';
 import { decodeUnicode } from 'src/common/util';
+import { Campaign } from 'src/entities/Campaign';
+
+interface KeyType {
+  created_at: string;
+  view_code: string;
+  click_count: number;
+}
 
 @Injectable()
 export class PostbackService {
   constructor(
     private httpService: HttpService,
+    @InjectRepository(Campaign)
+    private readonly campaignRepository: Repository<Campaign>,
     @InjectRepository(PostBackDaily)
     private readonly postBackDailyRepository: Repository<PostBackDaily>,
     @InjectRepository(PostBackEvent)
@@ -32,6 +40,8 @@ export class PostbackService {
     private readonly postBackInstallAppsflyerRepository: Repository<PostBackInstallAppsflyer>,
     @InjectRepository(PostBackEventAppsflyer)
     private readonly postbackEventAppsflyerRepository: Repository<PostBackEventAppsflyer>,
+    private readonly redisService: RedisService,
+    private readonly lockService: RedisLockService,
   ) {}
 
   async postBackInstallAppsflyer(req: any) {
@@ -64,7 +74,9 @@ export class PostbackService {
       .tz('Asia/Seoul')
       .format('YYYY-MM-DD HH:mm:ss');
 
-    const postBackDaily: PostBackDaily = await this.postBackDailyRepository
+    let postBackDailyEntity: PostBackDaily = null;
+
+    postBackDailyEntity = await this.postBackDailyRepository
       .createQueryBuilder('postBackDaily')
       .leftJoinAndSelect('postBackDaily.campaign', 'campaign')
       .leftJoinAndSelect('campaign.advertising', 'advertising')
@@ -80,9 +92,60 @@ export class PostbackService {
       })
       .getOne();
 
-    if (!postBackDaily) throw new NotFoundException();
+    if (!postBackDailyEntity) {
+      try {
+        await this.lockService.lock(
+          moment().format('YYYYMMDD'),
+          2 * 60 * 1000,
+          50,
+          50,
+        );
+        const redis: any = this.redisService.getClient();
+        const keys: Array<string> = await redis.keys('*');
 
-    const { campaign } = postBackDaily;
+        for (let i = 0; i < keys.length; i++) {
+          if (keys[i] == `lock:${moment().format('YYYYMMDD')}`) continue;
+
+          const data: KeyType = await redis.hgetall(keys[i]);
+          const key: Array<string> = keys[i].split('/');
+          const cp_token: string = key[0];
+          const pub_id: string = key[1];
+          const sub_id: string = key[2];
+          const media_idx: number = +key[3];
+          const view_code: string = data.view_code;
+          const created_at: string = data.created_at;
+
+          if (
+            view_code != af_siteid ||
+            created_at != moment().format('YYYYMMDD')
+          )
+            continue;
+          const campaignEntity: Campaign =
+            await this.campaignRepository.findOne({
+              where: { media: { idx: media_idx } },
+              relations: ['media'],
+            });
+
+          const postBackDaily: PostBackDaily = new PostBackDaily();
+          postBackDaily.cp_token = cp_token;
+          postBackDaily.pub_id = pub_id;
+          postBackDaily.sub_id = sub_id;
+          postBackDaily.view_code = view_code;
+          postBackDaily.install = 1;
+          postBackDaily.campaign = campaignEntity;
+
+          postBackDailyEntity = await this.postBackDailyRepository.save(
+            postBackDaily,
+          );
+        }
+      } finally {
+        this.lockService.unlock(moment().format('YYYYMMDD'));
+      }
+    }
+
+    if (!postBackDailyEntity) throw new NotFoundException();
+
+    const { campaign } = postBackDailyEntity;
     const { media } = campaign;
 
     const postBackInstallAppsflyer: PostBackInstallAppsflyerMetaData = {
@@ -119,9 +182,6 @@ export class PostbackService {
         await this.postBackEventRepository.findOne({
           where: { campaign: campaign, trackerPostback: 'install' },
         });
-
-      postBackDaily.install = +postBackDaily.install + 1;
-      await this.postBackDailyRepository.save(postBackDaily);
 
       if (postBackEvent.sendPostback) {
         console.log(
@@ -178,7 +238,9 @@ export class PostbackService {
       .tz('Asia/Seoul')
       .format('YYYY-MM-DD HH:mm:ss');
 
-    const postBackDaily: PostBackDaily = await this.postBackDailyRepository
+    let postBackDailyEntity: PostBackDaily = null;
+
+    postBackDailyEntity = await this.postBackDailyRepository
       .createQueryBuilder('postBackDaily')
       .leftJoinAndSelect('postBackDaily.campaign', 'campaign')
       .leftJoinAndSelect('campaign.advertising', 'advertising')
@@ -191,9 +253,60 @@ export class PostbackService {
       .andWhere('advertising.status =:status', { status: true })
       .getOne();
 
-    if (!postBackDaily) throw new NotFoundException();
+    if (!postBackDailyEntity) {
+      try {
+        await this.lockService.lock(
+          moment().format('YYYYMMDD'),
+          2 * 60 * 1000,
+          50,
+          50,
+        );
+        const redis: any = this.redisService.getClient();
+        const keys: Array<string> = await redis.keys('*');
 
-    const { campaign } = postBackDaily;
+        for (let i = 0; i < keys.length; i++) {
+          if (keys[i] == `lock:${moment().format('YYYYMMDD')}`) continue;
+
+          const data: KeyType = await redis.hgetall(keys[i]);
+          const key: Array<string> = keys[i].split('/');
+          const cp_token: string = key[0];
+          const pub_id: string = key[1];
+          const sub_id: string = key[2];
+          const media_idx: number = +key[3];
+          const view_code: string = data.view_code;
+          const created_at: string = data.created_at;
+
+          if (
+            view_code != af_siteid ||
+            created_at != moment().format('YYYYMMDD')
+          )
+            continue;
+
+          const campaignEntity: Campaign =
+            await this.campaignRepository.findOne({
+              where: { media: { idx: media_idx } },
+              relations: ['media'],
+            });
+
+          const postBackDaily: PostBackDaily = new PostBackDaily();
+          postBackDaily.cp_token = cp_token;
+          postBackDaily.pub_id = pub_id;
+          postBackDaily.sub_id = sub_id;
+          postBackDaily.view_code = view_code;
+          postBackDaily.campaign = campaignEntity;
+
+          postBackDailyEntity = await this.postBackDailyRepository.save(
+            postBackDaily,
+          );
+        }
+      } finally {
+        this.lockService.unlock(moment().format('YYYYMMDD'));
+      }
+    }
+
+    if (!postBackDailyEntity) throw new NotFoundException();
+
+    const { campaign } = postBackDailyEntity;
     const { media } = campaign;
 
     const postBackEventAppsflyer: PostBackEventAppsflyerMetaData = {
@@ -238,41 +351,41 @@ export class PostbackService {
       if (postBackEvent) {
         switch (postBackEvent.adminPostback) {
           case 'install':
-            postBackDaily.install = +postBackDaily.install + 1;
+            postBackDailyEntity.install = +postBackDailyEntity.install + 1;
             break;
           case 'signup':
-            postBackDaily.signup = +postBackDaily.signup + 1;
+            postBackDailyEntity.signup = +postBackDailyEntity.signup + 1;
             break;
           case 'retention':
-            postBackDaily.retention = +postBackDaily.retention + 1;
+            postBackDailyEntity.retention = +postBackDailyEntity.retention + 1;
             break;
           case 'buy':
-            postBackDaily.buy = +postBackDaily.buy + 1;
+            postBackDailyEntity.buy = +postBackDailyEntity.buy + 1;
             break;
           case 'etc1':
-            postBackDaily.etc1 = +postBackDaily.etc1 + 1;
+            postBackDailyEntity.etc1 = +postBackDailyEntity.etc1 + 1;
             break;
           case 'etc2':
-            postBackDaily.etc2 = +postBackDaily.etc2 + 1;
+            postBackDailyEntity.etc2 = +postBackDailyEntity.etc2 + 1;
             break;
           case 'etc3':
-            postBackDaily.etc3 = +postBackDaily.etc3 + 1;
+            postBackDailyEntity.etc3 = +postBackDailyEntity.etc3 + 1;
             break;
           case 'etc4':
-            postBackDaily.etc4 = +postBackDaily.etc4 + 1;
+            postBackDailyEntity.etc4 = +postBackDailyEntity.etc4 + 1;
             break;
           case 'etc5':
-            postBackDaily.etc5 = +postBackDaily.etc5 + 1;
+            postBackDailyEntity.etc5 = +postBackDailyEntity.etc5 + 1;
             break;
         }
 
-        await this.postBackDailyRepository.save(postBackDaily);
+        await this.postBackDailyRepository.save(postBackDailyEntity);
       } else {
         const postBackUnregisteredEventEntity: PostBackUnregisteredEvent =
           await this.postBackUnregisteredEventRepository.findOne({
             where: {
               event_name: event_name,
-              postBackDaily: postBackDaily,
+              postBackDaily: postBackDailyEntity,
             },
           });
 
@@ -284,10 +397,10 @@ export class PostbackService {
             postBackUnregisteredEventEntity,
           );
         } else {
-          const postBackUnregisteredEvent: PostBackUnregisteredEventMetaData = {
-            postBackDaily,
-            event_name,
-          };
+          const postBackUnregisteredEvent: PostBackUnregisteredEvent =
+            new PostBackUnregisteredEvent();
+          postBackUnregisteredEvent.postBackDaily = postBackDailyEntity;
+          postBackUnregisteredEvent.event_name = event_name;
 
           await this.postBackUnregisteredEventRepository.save(
             postBackUnregisteredEvent,
@@ -301,8 +414,7 @@ export class PostbackService {
         );
 
         await this.httpService
-          // .get(convertedPostbackEventUrlTemplate)
-          .get('http://www.naver.com')
+          .get(convertedPostbackEventUrlTemplate)
           .toPromise()
           .then(() => {
             postbackEventApppsflyerEntity.isSendDate = new Date();

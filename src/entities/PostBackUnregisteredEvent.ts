@@ -9,12 +9,6 @@ import {
 } from 'typeorm';
 import { PostBackDaily } from './PostBackDaily';
 
-export interface PostBackUnregisteredEventMetaData {
-  event_name: string;
-  event_count?: number;
-  postBackDaily: PostBackDaily;
-}
-
 @Entity('postback_unregistered_event')
 export class PostBackUnregisteredEvent {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
