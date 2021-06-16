@@ -1,11 +1,7 @@
-import { Injectable, NotFoundException, Post } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Campaign } from 'src/entities/Campaign';
-import {
-  PostBackDaily,
-  PostBackDailyMetaData,
-} from 'src/entities/PostBackDaily';
-import { getConnection, getManager, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { v4 } from 'uuid';
 import * as moment from 'moment';
 import { RedisService } from 'nestjs-redis';
@@ -17,8 +13,6 @@ export class TrackingService {
   constructor(
     @InjectRepository(Campaign)
     private readonly campaignRepository: Repository<Campaign>,
-    @InjectRepository(PostBackDaily)
-    private readonly postBackDailyRepository: Repository<PostBackDaily>,
     private readonly redisService: RedisService,
     private readonly lockService: RedisLockService,
   ) {}
