@@ -88,18 +88,24 @@ export class TrackingService {
         view_code = v4().replace(/-/g, '');
 
         await redis.hmset(
-          `${cp_token}/${pub_id}/${sub_id}/${media.idx}`,
+          `${cp_token}/${pub_id}/${sub_id}/${media.idx}/${moment().format(
+            'YYYYMMDD',
+          )}`,
           'view_code',
           `${view_code}`,
         );
       } else {
         view_code = await redis.hget(
-          `${cp_token}/${pub_id}/${sub_id}/${media.idx}`,
+          `${cp_token}/${pub_id}/${sub_id}/${media.idx}/${moment().format(
+            'YYYYMMDD',
+          )}`,
           'view_code',
         );
 
         await redis.hincrby(
-          `${cp_token}/${pub_id}/${sub_id}/${media.idx}`,
+          `${cp_token}/${pub_id}/${sub_id}/${media.idx}/${moment().format(
+            'YYYYMMDD',
+          )}`,
           'click_count',
           1,
         );
