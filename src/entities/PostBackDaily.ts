@@ -6,10 +6,10 @@ import {
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
-  Unique,
   UpdateDateColumn,
   OneToMany,
   JoinColumn,
+  Unique,
 } from 'typeorm';
 import { PostBackUnregisteredEvent } from './PostBackUnregisteredEvent';
 
@@ -33,6 +33,7 @@ export interface PostBackDailyMetaData {
 }
 
 @Entity('postback_daily')
+@Unique(['cp_token', 'pub_id', 'sub_id'])
 export class PostBackDaily {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
   idx: string;

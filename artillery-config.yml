@@ -19,7 +19,7 @@ scenarios:
           url: '/tracking'
           followRedirect: false
           qs:
-            token: 'f638f12880c1452f9a9037b0969faa9e'
+            token: '77bdc657434e48f8a39f9f2af31945c4'
             click_id: 'appsflyer_clickid11'
             pub_id: 'appsflyer_pub_id1'
             sub_id: 'sub_id_test'

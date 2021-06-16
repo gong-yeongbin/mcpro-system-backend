@@ -58,7 +58,7 @@ export class TrackingService {
     console.log(`[ media ---> mecrosspro ] ${originalUrl}`);
 
     //2. 캠페인 토큰 검증 (캠페인 및 광고앱 차단 여부 확인)
-    const campaign: Campaign = await this.campaignRepository.findOne({
+    const campaignEntity: Campaign = await this.campaignRepository.findOne({
       where: {
         cp_token: cp_token,
         status: true,
@@ -66,99 +66,62 @@ export class TrackingService {
       relations: ['media', 'advertising', 'advertising.tracker'],
     });
 
-    if (!campaign) throw new NotFoundException();
+    if (!campaignEntity) throw new NotFoundException();
 
-    const { media, advertising } = campaign;
+    const { media, advertising } = campaignEntity;
     const { tracker } = advertising;
 
-    //새로운 노출용코드 생성
-    let view_code: string;
+    try {
+      await this.lockService.lock(
+        moment().format('YYYYMMDD'),
+        2 * 60 * 1000,
+        50,
+        50,
+      );
 
-    await getConnection().transaction(async (transactionManager) => {
-      const postBackDailyEntity = await transactionManager
-        .getRepository(PostBackDaily)
-        .createQueryBuilder('postBackDaily')
-        .leftJoinAndSelect('postBackDaily.campaign', 'campaign')
-        .leftJoinAndSelect('campaign.media', 'media')
-        .where('postBackDaily.pub_id =:pub_id', { pub_id: pub_id })
-        .andWhere('postBackDaily.sub_id =:sub_id', { sub_id: sub_id })
-        .andWhere('postBackDaily.cp_token =:cp_token', {
-          cp_token: campaign.cp_token,
-        })
-        .andWhere('media =:mediaIdx', { mediaIdx: media.idx })
-        .andWhere('Date(postBackDaily.created_at) =:date ', {
-          date: moment().format('YYYY-MM-DD'),
-        })
-        .getOne();
+      let view_code: string;
+      const redis: any = this.redisService.getClient();
 
-      //기존 노출용코드 반환
-      if (!postBackDailyEntity) {
+      const isExists: number = await redis.hsetnx(
+        `${cp_token}/${pub_id}/${sub_id}/${media.idx}`,
+        'created_at',
+        moment().format('YYYYMMDD'),
+      );
+
+      if (isExists) {
         view_code = v4().replace(/-/g, '');
 
-        const postBackDaily: PostBackDaily = new PostBackDaily();
-        postBackDaily.cp_token = cp_token;
-        postBackDaily.view_code = view_code;
-        postBackDaily.pub_id = pub_id;
-        postBackDaily.sub_id = sub_id;
-        postBackDaily.campaign = campaign;
-        postBackDaily.click = 1;
-        // const postBackDailyMetaData: PostBackDailyMetaData = {
-        //   cp_token,
-        //   view_code,
-        //   pub_id,
-        //   sub_id,
-        //   campaign,
-        // };
-
-        await transactionManager
-          .getRepository(PostBackDaily)
-          .save(postBackDaily);
+        await redis.hmset(
+          `${cp_token}/${pub_id}/${sub_id}/${media.idx}`,
+          'view_code',
+          `${view_code}`,
+          'click_count',
+          1,
+        );
       } else {
-        view_code = postBackDailyEntity.view_code;
-        postBackDailyEntity.click = +postBackDailyEntity.click + 1;
-        this.postBackDailyRepository.save(postBackDailyEntity);
+        view_code = await redis.hget(
+          `${cp_token}/${pub_id}/${sub_id}/${media.idx}`,
+          'view_code',
+        );
+
+        await redis.hincrby(
+          `${cp_token}/${pub_id}/${sub_id}/${media.idx}`,
+          'click_count',
+          1,
+        );
       }
-    });
 
-    //4. 메크로스Pro 트래킹 URL 를 트래커 트래킹 URL 변환
-    const convertedTrackingUrl: string = convertTrackerTrackingUrl(
-      tracker.tk_code,
-      campaign.trackerTrackingUrl,
-      request.query,
-      view_code,
-    );
+      const convertedTrackingUrl: string = convertTrackerTrackingUrl(
+        tracker.tk_code,
+        campaignEntity.trackerTrackingUrl,
+        request.query,
+        view_code,
+      );
 
-    //5. 트래커 트래킹 URL를 실행
-    // if (convertedTrackingUrl !== null) {
-    //   try {
-    //     await this.lockService.lock(
-    //       moment().format('YYYYMMDD'),
-    //       2 * 60 * 1000,
-    //       50,
-    //       50,
-    //     );
-    //     const isExists: number = await this.redisService
-    //       .getClient()
-    //       .hsetnx(
-    //         moment().format('YYYYMMDD'),
-    //         `${cp_token}/${view_code}/${pub_id}/${sub_id}`,
-    //         1,
-    //       );
-
-    //     if (!isExists) {
-    //       await this.redisService
-    //         .getClient()
-    //         .hincrby(
-    //           moment().format('YYYYMMDD'),
-    //           `${cp_token}/${view_code}/${pub_id}/${sub_id}`,
-    //           1,
-    //         );
-    //     }
-    //   } finally {
-    //     this.lockService.unlock(moment().format('YYYYMMDD'));
-    //   }
-    return convertedTrackingUrl;
-    // }
+      return convertedTrackingUrl;
+    } finally {
+      this.lockService.unlock(moment().format('YYYYMMDD'));
+    }
   }
 }
 
