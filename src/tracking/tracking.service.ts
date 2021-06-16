@@ -101,7 +101,7 @@ export class TrackingService {
         postBackDaily.pub_id = pub_id;
         postBackDaily.sub_id = sub_id;
         postBackDaily.campaign = campaign;
-        postBackDaily.click = +postBackDaily.click + 1;
+        postBackDaily.click = 1;
         // const postBackDailyMetaData: PostBackDailyMetaData = {
         //   cp_token,
         //   view_code,
