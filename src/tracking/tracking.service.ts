@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Post } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Campaign } from 'src/entities/Campaign';
 import {
@@ -17,6 +17,8 @@ export class TrackingService {
   constructor(
     @InjectRepository(Campaign)
     private readonly campaignRepository: Repository<Campaign>,
+    @InjectRepository(PostBackDaily)
+    private readonly postBackDailyRepository: Repository<PostBackDaily>,
     private readonly redisService: RedisService,
     private readonly lockService: RedisLockService,
   ) {}
@@ -72,8 +74,8 @@ export class TrackingService {
     //새로운 노출용코드 생성
     let view_code: string;
 
-    await getManager().transaction(async (transactionManager) => {
-      const postBackDaily = await transactionManager
+    await getConnection().transaction(async (transactionManager) => {
+      const postBackDailyEntity = await transactionManager
         .getRepository(PostBackDaily)
         .createQueryBuilder('postBackDaily')
         .leftJoinAndSelect('postBackDaily.campaign', 'campaign')
@@ -90,22 +92,31 @@ export class TrackingService {
         .getOne();
 
       //기존 노출용코드 반환
-      if (!postBackDaily) {
+      if (!postBackDailyEntity) {
         view_code = v4().replace(/-/g, '');
 
-        const postBackDailyMetaData: PostBackDailyMetaData = {
-          cp_token,
-          view_code,
-          pub_id,
-          sub_id,
-          campaign,
-        };
+        const postBackDaily: PostBackDaily = new PostBackDaily();
+        postBackDaily.cp_token = cp_token;
+        postBackDaily.view_code = view_code;
+        postBackDaily.pub_id = pub_id;
+        postBackDaily.sub_id = sub_id;
+        postBackDaily.campaign = campaign;
+        postBackDaily.click = 1;
+        // const postBackDailyMetaData: PostBackDailyMetaData = {
+        //   cp_token,
+        //   view_code,
+        //   pub_id,
+        //   sub_id,
+        //   campaign,
+        // };
 
         await transactionManager
           .getRepository(PostBackDaily)
-          .save(postBackDailyMetaData);
+          .save(postBackDailyEntity);
       } else {
-        view_code = postBackDaily.view_code;
+        view_code = postBackDailyEntity.view_code;
+        postBackDailyEntity.click = +postBackDailyEntity.click + 1;
+        this.postBackDailyRepository.save(postBackDailyEntity);
       }
     });
 
@@ -118,36 +129,36 @@ export class TrackingService {
     );
 
     //5. 트래커 트래킹 URL를 실행
-    if (convertedTrackingUrl !== null) {
-      try {
-        await this.lockService.lock(
-          moment().format('YYYYMMDD'),
-          2 * 60 * 1000,
-          50,
-          50,
-        );
-        const isExists: number = await this.redisService
-          .getClient()
-          .hsetnx(
-            moment().format('YYYYMMDD'),
-            `${cp_token}/${view_code}/${pub_id}/${sub_id}`,
-            1,
-          );
+    // if (convertedTrackingUrl !== null) {
+    //   try {
+    //     await this.lockService.lock(
+    //       moment().format('YYYYMMDD'),
+    //       2 * 60 * 1000,
+    //       50,
+    //       50,
+    //     );
+    //     const isExists: number = await this.redisService
+    //       .getClient()
+    //       .hsetnx(
+    //         moment().format('YYYYMMDD'),
+    //         `${cp_token}/${view_code}/${pub_id}/${sub_id}`,
+    //         1,
+    //       );
 
-        if (!isExists) {
-          await this.redisService
-            .getClient()
-            .hincrby(
-              moment().format('YYYYMMDD'),
-              `${cp_token}/${view_code}/${pub_id}/${sub_id}`,
-              1,
-            );
-        }
-      } finally {
-        this.lockService.unlock(moment().format('YYYYMMDD'));
-      }
-      return convertedTrackingUrl;
-    }
+    //     if (!isExists) {
+    //       await this.redisService
+    //         .getClient()
+    //         .hincrby(
+    //           moment().format('YYYYMMDD'),
+    //           `${cp_token}/${view_code}/${pub_id}/${sub_id}`,
+    //           1,
+    //         );
+    //     }
+    //   } finally {
+    //     this.lockService.unlock(moment().format('YYYYMMDD'));
+    //   }
+    return convertedTrackingUrl;
+    // }
   }
 }
 
