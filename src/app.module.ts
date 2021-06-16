@@ -26,7 +26,7 @@ import { RedisLockModule } from 'nestjs-simple-redis-lock';
       username: process.env.MYSQL_USERNAME,
       password: process.env.MYSQL_PASSWORD,
       database: process.env.MYSQL_DATABASE,
-      synchronize: Boolean(process.env.MYSQL_SYNCHRONIZE),
+      synchronize: false,
       entities: [__dirname + '/**/*{.ts,.js}'],
       connectTimeout: 5000,
     }),

@@ -77,9 +77,11 @@ export class TrackingService {
       const redis: any = this.redisService.getClient();
 
       const isExists: number = await redis.hsetnx(
-        `${cp_token}/${pub_id}/${sub_id}/${media.idx}`,
-        'created_at',
-        moment().format('YYYYMMDD'),
+        `${cp_token}/${pub_id}/${sub_id}/${media.idx}/${moment().format(
+          'YYYYMMDD',
+        )}`,
+        'click_count',
+        1,
       );
 
       if (isExists) {
@@ -89,8 +91,6 @@ export class TrackingService {
           `${cp_token}/${pub_id}/${sub_id}/${media.idx}`,
           'view_code',
           `${view_code}`,
-          'click_count',
-          1,
         );
       } else {
         view_code = await redis.hget(
