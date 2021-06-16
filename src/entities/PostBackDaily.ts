@@ -9,7 +9,6 @@ import {
   UpdateDateColumn,
   OneToMany,
   JoinColumn,
-  Unique,
 } from 'typeorm';
 import { PostBackUnregisteredEvent } from './PostBackUnregisteredEvent';
 
