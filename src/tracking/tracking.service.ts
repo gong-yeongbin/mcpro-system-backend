@@ -71,6 +71,7 @@ export class TrackingService {
 
     //새로운 노출용코드 생성
     let view_code: string;
+
     await getManager().transaction(async (transactionManager) => {
       const postBackDaily = await transactionManager
         .getRepository(PostBackDaily)
