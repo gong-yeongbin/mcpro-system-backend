@@ -112,7 +112,7 @@ export class TrackingService {
 
         await transactionManager
           .getRepository(PostBackDaily)
-          .save(postBackDailyEntity);
+          .save(postBackDaily);
       } else {
         view_code = postBackDailyEntity.view_code;
         postBackDailyEntity.click = +postBackDailyEntity.click + 1;
