@@ -7,16 +7,12 @@ import * as moment from 'moment';
 import { RedisService } from 'nestjs-redis';
 import { RedisLockService } from 'nestjs-simple-redis-lock';
 import { decodeUnicode } from 'src/common/util';
-import { SubMedia } from 'src/entities/SubMedia';
-import { isRFC3339 } from 'class-validator';
 
 @Injectable()
 export class TrackingService {
   constructor(
     @InjectRepository(Campaign)
     private readonly campaignRepository: Repository<Campaign>,
-    @InjectRepository(SubMedia)
-    private readonly subMediaRepository: Repository<SubMedia>,
     private readonly redisService: RedisService,
     private readonly lockService: RedisLockService,
   ) {}
@@ -65,15 +61,6 @@ export class TrackingService {
 
     if (!campaignEntity) throw new NotFoundException();
 
-    const subMediaEntity: SubMedia = await this.subMediaRepository.findOne({
-      where: {
-        cp_token: cp_token,
-        pub_id: pub_id,
-        sub_id: sub_id,
-        md_code: campaignEntity.media.md_code,
-      },
-    });
-
     try {
       await this.lockService.lock(
         moment().format('YYYYMMDD'),
@@ -94,20 +81,7 @@ export class TrackingService {
       );
 
       if (isExists) {
-        if (!subMediaEntity) {
-          view_code = v4().replace(/-/g, '');
-
-          const subMedia: SubMedia = new SubMedia();
-          subMedia.cp_token = cp_token;
-          subMedia.view_code = view_code;
-          subMedia.pub_id = pub_id;
-          subMedia.sub_id = sub_id;
-          subMedia.md_code = campaignEntity.media.md_code;
-
-          await this.subMediaRepository.save(subMedia);
-        } else {
-          view_code = subMediaEntity.view_code;
-        }
+        view_code = v4().replace(/-/g, '');
 
         await redis.hmset(
           `${cp_token}/${pub_id}/${sub_id}/${
