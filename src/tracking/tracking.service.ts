@@ -73,10 +73,8 @@ export class TrackingService {
       const redis: any = this.redisService.getClient();
 
       const isExists: number = await redis.hsetnx(
-        `${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}/${moment()
-          .tz('Asia/Seoul')
-          .format('YYYYMMDD')}`,
-        'click_count',
+        `${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`,
+        `${moment().tz('Asia/Seoul').format('YYYYMMDD')}:click`,
         1,
       );
 
@@ -84,25 +82,19 @@ export class TrackingService {
         view_code = v4().replace(/-/g, '');
 
         await redis.hmset(
-          `${cp_token}/${pub_id}/${sub_id}/${
-            campaignEntity.media.idx
-          }/${moment().tz('Asia/Seoul').format('YYYYMMDD')}`,
+          `${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`,
           'view_code',
           `${view_code}`,
         );
       } else {
         view_code = await redis.hget(
-          `${cp_token}/${pub_id}/${sub_id}/${
-            campaignEntity.media.idx
-          }/${moment().tz('Asia/Seoul').format('YYYYMMDD')}`,
+          `${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`,
           'view_code',
         );
 
         await redis.hincrby(
-          `${cp_token}/${pub_id}/${sub_id}/${
-            campaignEntity.media.idx
-          }/${moment().tz('Asia/Seoul').format('YYYYMMDD')}`,
-          'click_count',
+          `${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`,
+          `${moment().tz('Asia/Seoul').format('YYYYMMDD')}:click`,
           1,
         );
       }
