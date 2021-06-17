@@ -68,7 +68,6 @@ export class PostbackService {
       .utc(req.query.install_time)
       .tz('Asia/Seoul')
       .format('YYYY-MM-DD HH:mm:ss');
-
     const click_time = moment
       .utc(req.query.click_time)
       .tz('Asia/Seoul')
