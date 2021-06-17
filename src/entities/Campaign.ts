@@ -14,6 +14,7 @@ import { Media } from './Media';
 import { PostBackEvent } from './PostBackEvent';
 import { Reservation } from './Reservation';
 import { PostBackDaily } from '../entities/PostBackDaily';
+import { SubMedia } from './SubMedia';
 
 @Entity('campaign')
 @Unique(['cp_code', 'cp_token'])

@@ -7,16 +7,31 @@ import * as moment from 'moment';
 import { RedisService } from 'nestjs-redis';
 import { RedisLockService } from 'nestjs-simple-redis-lock';
 import { decodeUnicode } from 'src/common/util';
+import { SubMedia } from 'src/entities/SubMedia';
+import { isRFC3339 } from 'class-validator';
 
 @Injectable()
 export class TrackingService {
   constructor(
     @InjectRepository(Campaign)
     private readonly campaignRepository: Repository<Campaign>,
+    @InjectRepository(SubMedia)
+    private readonly subMediaRepository: Repository<SubMedia>,
     private readonly redisService: RedisService,
     private readonly lockService: RedisLockService,
   ) {}
 
+  // const adid: string = ['', undefined, '{adid}'].includes(request.query.adid)
+  //   ? ''
+  //   : request.query.adid;
+  // const idfa: string = ['', undefined, '{idfa}'].includes(request.query.idfa)
+  //   ? ''
+  //   : request.query.idfa;
+  // const click_id: string = ['', undefined, '{click_id}'].includes(
+  //   request.query.click_id,
+  // )
+  //   ? ''
+  //   : request.query.click_id;
   async tracking(request: any): Promise<string> {
     const originalUrl: string = decodeUnicode(
       `${request.protocol}://${request.get('host')}${request.originalUrl}`,
@@ -32,26 +47,14 @@ export class TrackingService {
     )
       ? ''
       : request.query.pub_id;
-    const click_id: string = ['', undefined, '{click_id}'].includes(
-      request.query.click_id,
-    )
-      ? ''
-      : request.query.click_id;
     const sub_id: string = ['', undefined, '{sub_id}'].includes(
       request.query.sub_id,
     )
       ? ''
       : request.query.sub_id;
-    const adid: string = ['', undefined, '{adid}'].includes(request.query.adid)
-      ? ''
-      : request.query.adid;
-    const idfa: string = ['', undefined, '{idfa}'].includes(request.query.idfa)
-      ? ''
-      : request.query.idfa;
 
     console.log(`[ media ---> mecrosspro ] ${originalUrl}`);
 
-    //2. 캠페인 토큰 검증 (캠페인 및 광고앱 차단 여부 확인)
     const campaignEntity: Campaign = await this.campaignRepository.findOne({
       where: {
         cp_token: cp_token,
@@ -62,8 +65,14 @@ export class TrackingService {
 
     if (!campaignEntity) throw new NotFoundException();
 
-    const { media, advertising } = campaignEntity;
-    const { tracker } = advertising;
+    const subMediaEntity: SubMedia = await this.subMediaRepository.findOne({
+      where: {
+        cp_token: cp_token,
+        pub_id: pub_id,
+        sub_id: sub_id,
+        md_code: campaignEntity.media.md_code,
+      },
+    });
 
     try {
       await this.lockService.lock(
@@ -77,41 +86,55 @@ export class TrackingService {
       const redis: any = this.redisService.getClient();
 
       const isExists: number = await redis.hsetnx(
-        `${cp_token}/${pub_id}/${sub_id}/${media.idx}/${moment()
+        `${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}/${moment()
           .tz('Asia/Seoul')
           .format('YYYYMMDD')}`,
         'click_count',
         1,
       );
+
       if (isExists) {
-        view_code = v4().replace(/-/g, '');
+        if (!subMediaEntity) {
+          view_code = v4().replace(/-/g, '');
+
+          const subMedia: SubMedia = new SubMedia();
+          subMedia.cp_token = cp_token;
+          subMedia.view_code = view_code;
+          subMedia.pub_id = pub_id;
+          subMedia.sub_id = sub_id;
+          subMedia.md_code = campaignEntity.media.md_code;
+
+          await this.subMediaRepository.save(subMedia);
+        } else {
+          view_code = subMediaEntity.view_code;
+        }
 
         await redis.hmset(
-          `${cp_token}/${pub_id}/${sub_id}/${media.idx}/${moment()
-            .tz('Asia/Seoul')
-            .format('YYYYMMDD')}`,
+          `${cp_token}/${pub_id}/${sub_id}/${
+            campaignEntity.media.idx
+          }/${moment().tz('Asia/Seoul').format('YYYYMMDD')}`,
           'view_code',
           `${view_code}`,
         );
       } else {
         view_code = await redis.hget(
-          `${cp_token}/${pub_id}/${sub_id}/${media.idx}/${moment()
-            .tz('Asia/Seoul')
-            .format('YYYYMMDD')}`,
+          `${cp_token}/${pub_id}/${sub_id}/${
+            campaignEntity.media.idx
+          }/${moment().tz('Asia/Seoul').format('YYYYMMDD')}`,
           'view_code',
         );
 
         await redis.hincrby(
-          `${cp_token}/${pub_id}/${sub_id}/${media.idx}/${moment()
-            .tz('Asia/Seoul')
-            .format('YYYYMMDD')}`,
+          `${cp_token}/${pub_id}/${sub_id}/${
+            campaignEntity.media.idx
+          }/${moment().tz('Asia/Seoul').format('YYYYMMDD')}`,
           'click_count',
           1,
         );
       }
 
       const convertedTrackingUrl: string = convertTrackerTrackingUrl(
-        tracker.tk_code,
+        campaignEntity.advertising.tracker.tk_code,
         campaignEntity.trackerTrackingUrl,
         request.query,
         view_code,
