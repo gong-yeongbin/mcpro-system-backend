@@ -88,7 +88,7 @@ export class PostbackService {
       .andWhere('postBackDaily.cp_token =:cp_token', { cp_token: af_c_id })
       .andWhere('advertising.status =:status', { status: true })
       .andWhere('Date(postBackDaily.created_at) =:date ', {
-        date: moment().format('YYYY-MM-DD'),
+        date: moment().tz('Asia/Seoul').format('YYYYMMDD'),
       })
       .getOne();
 
@@ -112,14 +112,15 @@ export class PostbackService {
           const pub_id: string = key[1];
           const sub_id: string = key[2];
           const media_idx: number = +key[3];
+          const created_at: string = key[4];
           const view_code: string = data.view_code;
-          const created_at: string = data.created_at;
 
           if (
             view_code != af_siteid ||
             created_at != moment().format('YYYYMMDD')
           )
             continue;
+
           const campaignEntity: Campaign =
             await this.campaignRepository.findOne({
               where: { media: { idx: media_idx } },
@@ -184,14 +185,13 @@ export class PostbackService {
         });
 
       if (postBackEvent.sendPostback) {
-        console.log(
-          `[ mecrosspro ---> media ] install : ${convertedPostbackInstallUrlTemplate}`,
-        );
-
         await this.httpService
           .get(convertedPostbackInstallUrlTemplate)
           .toPromise()
           .then(() => {
+            console.log(
+              `[ mecrosspro ---> media ] install : ${convertedPostbackInstallUrlTemplate}`,
+            );
             postBackInstallAppsflyerEntity.isSendDate = new Date();
           })
           .catch();
@@ -251,6 +251,9 @@ export class PostbackService {
       })
       .andWhere('postBackDaily.cp_token =:cp_token', { cp_token: af_c_id })
       .andWhere('advertising.status =:status', { status: true })
+      .andWhere('Date(postBackDaily.created_at) =:date ', {
+        date: moment().tz('Asia/Seoul').format('YYYYMMDD'),
+      })
       .getOne();
 
     if (!postBackDailyEntity) {
@@ -273,8 +276,8 @@ export class PostbackService {
           const pub_id: string = key[1];
           const sub_id: string = key[2];
           const media_idx: number = +key[3];
+          const created_at: string = key[4];
           const view_code: string = data.view_code;
-          const created_at: string = data.created_at;
 
           if (
             view_code != af_siteid ||
@@ -409,14 +412,13 @@ export class PostbackService {
       }
 
       if (postBackEvent.sendPostback) {
-        console.log(
-          `[ mecrosspro ---> media ] event : ${convertedPostbackEventUrlTemplate}`,
-        );
-
         await this.httpService
           .get(convertedPostbackEventUrlTemplate)
           .toPromise()
           .then(() => {
+            console.log(
+              `[ mecrosspro ---> media ] event : ${convertedPostbackEventUrlTemplate}`,
+            );
             postbackEventApppsflyerEntity.isSendDate = new Date();
           })
           .catch();
