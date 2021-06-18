@@ -1,3 +1,4 @@
+/* eslint-disable prefer-const */
 import { HttpService, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PostBackDaily } from 'src/entities/PostBackDaily';
@@ -17,12 +18,6 @@ import { RedisService } from 'nestjs-redis';
 import { RedisLockService } from 'nestjs-simple-redis-lock';
 import { decodeUnicode } from 'src/common/util';
 import { Campaign } from 'src/entities/Campaign';
-
-interface KeyType {
-  created_at: string;
-  view_code: string;
-  click_count: number;
-}
 
 @Injectable()
 export class PostbackService {
@@ -73,77 +68,25 @@ export class PostbackService {
       .tz('Asia/Seoul')
       .format('YYYY-MM-DD HH:mm:ss');
 
-    let postBackDailyEntity: PostBackDaily = null;
-
-    postBackDailyEntity = await this.postBackDailyRepository
-      .createQueryBuilder('postBackDaily')
-      .leftJoinAndSelect('postBackDaily.campaign', 'campaign')
-      .leftJoinAndSelect('campaign.advertising', 'advertising')
-      .leftJoinAndSelect('campaign.media', 'media')
-      .leftJoinAndSelect('advertising.tracker', 'tracker')
-      .where('postBackDaily.view_code =:view_code', {
-        view_code: af_siteid,
-      })
-      .andWhere('postBackDaily.cp_token =:cp_token', { cp_token: af_c_id })
-      .andWhere('advertising.status =:status', { status: true })
-      .andWhere('Date(postBackDaily.created_at) =:date ', {
-        date: moment().tz('Asia/Seoul').format('YYYYMMDD'),
-      })
-      .getOne();
+    const postBackDailyEntity: PostBackDaily =
+      await this.postBackDailyRepository
+        .createQueryBuilder('postBackDaily')
+        .leftJoinAndSelect('postBackDaily.campaign', 'campaign')
+        .leftJoinAndSelect('campaign.media', 'media')
+        .where('postBackDaily.view_code =:view_code', {
+          view_code: af_siteid,
+        })
+        .andWhere('postBackDaily.cp_token =:cp_token', { cp_token: af_c_id })
+        .andWhere('Date(postBackDaily.created_at) =:date ', {
+          date: moment().tz('Asia/Seoul').format('YYYYMMDD'),
+        })
+        .getOne();
 
     if (!postBackDailyEntity) {
-      try {
-        await this.lockService.lock(
-          moment().format('YYYYMMDD'),
-          2 * 60 * 1000,
-          50,
-          50,
-        );
-        const redis: any = this.redisService.getClient();
-        const keys: Array<string> = await redis.keys('*');
-
-        for (let i = 0; i < keys.length; i++) {
-          if (keys[i] == `lock:${moment().format('YYYYMMDD')}`) continue;
-
-          const data: KeyType = await redis.hgetall(keys[i]);
-          const key: Array<string> = keys[i].split('/');
-          const cp_token: string = key[0];
-          const pub_id: string = key[1];
-          const sub_id: string = key[2];
-          const media_idx: number = +key[3];
-          const created_at: string = key[4];
-          const view_code: string = data.view_code;
-
-          if (
-            view_code != af_siteid ||
-            created_at != moment().format('YYYYMMDD')
-          )
-            continue;
-
-          const campaignEntity: Campaign =
-            await this.campaignRepository.findOne({
-              where: { media: { idx: media_idx } },
-              relations: ['media'],
-            });
-
-          const postBackDaily: PostBackDaily = new PostBackDaily();
-          postBackDaily.cp_token = cp_token;
-          postBackDaily.pub_id = pub_id;
-          postBackDaily.sub_id = sub_id;
-          postBackDaily.view_code = view_code;
-          postBackDaily.install = 1;
-          postBackDaily.campaign = campaignEntity;
-
-          postBackDailyEntity = await this.postBackDailyRepository.save(
-            postBackDaily,
-          );
-        }
-      } finally {
-        this.lockService.unlock(moment().format('YYYYMMDD'));
+      if (!(await this.createPostBackDaily(af_siteid, af_c_id))) {
+        throw new NotFoundException();
       }
     }
-
-    if (!postBackDailyEntity) throw new NotFoundException();
 
     const { campaign } = postBackDailyEntity;
     const { media } = campaign;
@@ -168,6 +111,9 @@ export class PostbackService {
       await this.postBackInstallAppsflyerRepository.save(
         postBackInstallAppsflyer,
       );
+
+    postBackDailyEntity.install = +postBackDailyEntity.install + 1;
+    await this.postBackDailyRepository.save(postBackDailyEntity);
 
     if (campaign.status) {
       const convertedPostbackInstallUrlTemplate =
@@ -256,57 +202,10 @@ export class PostbackService {
       .getOne();
 
     if (!postBackDailyEntity) {
-      try {
-        await this.lockService.lock(
-          moment().format('YYYYMMDD'),
-          2 * 60 * 1000,
-          50,
-          50,
-        );
-        const redis: any = this.redisService.getClient();
-        const keys: Array<string> = await redis.keys('*');
-
-        for (let i = 0; i < keys.length; i++) {
-          if (keys[i] == `lock:${moment().format('YYYYMMDD')}`) continue;
-
-          const data: KeyType = await redis.hgetall(keys[i]);
-          const key: Array<string> = keys[i].split('/');
-          const cp_token: string = key[0];
-          const pub_id: string = key[1];
-          const sub_id: string = key[2];
-          const media_idx: number = +key[3];
-          const created_at: string = key[4];
-          const view_code: string = data.view_code;
-
-          if (
-            view_code != af_siteid ||
-            created_at != moment().format('YYYYMMDD')
-          )
-            continue;
-
-          const campaignEntity: Campaign =
-            await this.campaignRepository.findOne({
-              where: { media: { idx: media_idx } },
-              relations: ['media'],
-            });
-
-          const postBackDaily: PostBackDaily = new PostBackDaily();
-          postBackDaily.cp_token = cp_token;
-          postBackDaily.pub_id = pub_id;
-          postBackDaily.sub_id = sub_id;
-          postBackDaily.view_code = view_code;
-          postBackDaily.campaign = campaignEntity;
-
-          postBackDailyEntity = await this.postBackDailyRepository.save(
-            postBackDaily,
-          );
-        }
-      } finally {
-        this.lockService.unlock(moment().format('YYYYMMDD'));
+      if (!(await this.createPostBackDaily(af_siteid, af_c_id))) {
+        throw new NotFoundException();
       }
     }
-
-    if (!postBackDailyEntity) throw new NotFoundException();
 
     const { campaign } = postBackDailyEntity;
     const { media } = campaign;
@@ -428,5 +327,73 @@ export class PostbackService {
     }
 
     return;
+  }
+
+  async createPostBackDaily(
+    view_code: string,
+    cp_token: string,
+  ): Promise<boolean> {
+    let status: boolean;
+    status = false;
+    try {
+      await this.lockService.lock(
+        moment().format('YYYYMMDD'),
+        2 * 60 * 1000,
+        50,
+        50,
+      );
+
+      const redis: any = this.redisService.getClient();
+
+      let cursor: number;
+      cursor = 0;
+      do {
+        const data: any = await redis.scan(
+          cursor,
+          'MATCH',
+          `*${cp_token}*`,
+          'COUNT',
+          1000,
+        );
+
+        cursor = data[0];
+        const keys: Array<string> = data[1];
+        for (let i = 0; i < keys.length; i++) {
+          const isViewCode: string = await redis.hget(keys[i], 'view_code');
+          if (view_code === isViewCode) {
+            const splitData: Array<string> = keys[i].split('/');
+            const pub_id: string = splitData[1];
+            const sub_id: string = splitData[2];
+            const media_idx: string = splitData[3];
+
+            const campaignEntity: Campaign =
+              await this.campaignRepository.findOne({
+                where: {
+                  cp_token: cp_token,
+                  media: { idx: media_idx },
+                },
+                relations: ['media'],
+              });
+
+            if (!campaignEntity) {
+              throw new NotFoundException();
+            }
+
+            const postBackDaily: PostBackDaily = new PostBackDaily();
+            postBackDaily.cp_token = cp_token;
+            postBackDaily.pub_id = pub_id;
+            postBackDaily.sub_id = sub_id;
+            postBackDaily.view_code = view_code;
+            postBackDaily.campaign = campaignEntity;
+
+            await this.postBackDailyRepository.save(postBackDaily);
+            status = true;
+          }
+        }
+      } while (cursor != 0);
+    } finally {
+      this.lockService.unlock(moment().format('YYYYMMDD'));
+    }
+    return status;
   }
 }
