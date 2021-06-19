@@ -78,24 +78,26 @@ export class TrackingService {
         1,
       );
 
-      if (isExists) {
+      if (!isExists) {
+        await redis.hincrby(
+          `${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`,
+          `${moment().tz('Asia/Seoul').format('YYYYMMDD')}:click`,
+          1,
+        );
+      }
+
+      view_code = await redis.hget(
+        `${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`,
+        'view_code',
+      );
+
+      if (!view_code) {
         view_code = v4().replace(/-/g, '');
 
         await redis.hmset(
           `${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`,
           'view_code',
           `${view_code}`,
-        );
-      } else {
-        view_code = await redis.hget(
-          `${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`,
-          'view_code',
-        );
-
-        await redis.hincrby(
-          `${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`,
-          `${moment().tz('Asia/Seoul').format('YYYYMMDD')}:click`,
-          1,
         );
       }
 
