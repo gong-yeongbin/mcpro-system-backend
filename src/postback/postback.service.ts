@@ -63,6 +63,7 @@ export class PostbackService {
       .utc(req.query.install_time)
       .tz('Asia/Seoul')
       .format('YYYY-MM-DD HH:mm:ss');
+
     const click_time = moment
       .utc(req.query.click_time)
       .tz('Asia/Seoul')
@@ -78,7 +79,7 @@ export class PostbackService {
         })
         .andWhere('postBackDaily.cp_token =:cp_token', { cp_token: af_c_id })
         .andWhere('Date(postBackDaily.created_at) =:date ', {
-          date: moment().tz('Asia/Seoul').format('YYYYMMDD'),
+          date: moment(click_time).tz('Asia/Seoul').format('YYYYMMDD'),
         })
         .getOne();
 
@@ -197,7 +198,7 @@ export class PostbackService {
       .andWhere('postBackDaily.cp_token =:cp_token', { cp_token: af_c_id })
       .andWhere('advertising.status =:status', { status: true })
       .andWhere('Date(postBackDaily.created_at) =:date ', {
-        date: moment().tz('Asia/Seoul').format('YYYYMMDD'),
+        date: moment(install_time).tz('Asia/Seoul').format('YYYYMMDD'),
       })
       .getOne();
 
@@ -281,6 +282,22 @@ export class PostbackService {
         }
 
         await this.postBackDailyRepository.save(postBackDailyEntity);
+
+        if (postBackEvent.sendPostback) {
+          await this.httpService
+            .get(convertedPostbackEventUrlTemplate)
+            .toPromise()
+            .then(() => {
+              console.log(
+                `[ mecrosspro ---> media ] event : ${convertedPostbackEventUrlTemplate}`,
+              );
+              postbackEventApppsflyerEntity.isSendDate = new Date();
+            })
+            .catch();
+          await this.postbackEventAppsflyerRepository.save(
+            postbackEventApppsflyerEntity,
+          );
+        }
       } else {
         const postBackUnregisteredEventEntity: PostBackUnregisteredEvent =
           await this.postBackUnregisteredEventRepository.findOne({
@@ -307,22 +324,6 @@ export class PostbackService {
             postBackUnregisteredEvent,
           );
         }
-      }
-
-      if (postBackEvent.sendPostback) {
-        await this.httpService
-          .get(convertedPostbackEventUrlTemplate)
-          .toPromise()
-          .then(() => {
-            console.log(
-              `[ mecrosspro ---> media ] event : ${convertedPostbackEventUrlTemplate}`,
-            );
-            postbackEventApppsflyerEntity.isSendDate = new Date();
-          })
-          .catch();
-        await this.postbackEventAppsflyerRepository.save(
-          postbackEventApppsflyerEntity,
-        );
       }
     }
 
