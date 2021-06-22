@@ -5,14 +5,8 @@ import { PostBackDaily } from 'src/entities/PostBackDaily';
 import { Repository } from 'typeorm';
 import * as moment from 'moment-timezone';
 import { PostBackEvent } from 'src/entities/PostBackEvent';
-import {
-  PostBackEventAppsflyer,
-  PostBackEventAppsflyerMetaData,
-} from 'src/entities/PostBackEventAppsflyer';
-import {
-  PostBackInstallAppsflyer,
-  PostBackInstallAppsflyerMetaData,
-} from 'src/entities/PostBackInstallAppsflyer';
+import { PostBackEventAppsflyer } from 'src/entities/PostBackEventAppsflyer';
+import { PostBackInstallAppsflyer } from 'src/entities/PostBackInstallAppsflyer';
 import { PostBackUnregisteredEvent } from 'src/entities/PostBackUnregisteredEvent';
 import { RedisService } from 'nestjs-redis';
 import { RedisLockService } from 'nestjs-simple-redis-lock';
@@ -92,21 +86,24 @@ export class PostbackService {
     const { campaign } = postBackDailyEntity;
     const { media } = campaign;
 
-    const postBackInstallAppsflyer: PostBackInstallAppsflyerMetaData = {
-      clickid,
-      af_siteid,
-      af_c_id,
-      advertising_id,
-      idfa,
-      idfv,
-      install_time,
-      country_code,
-      language,
-      click_time,
-      device_carrier,
-      device_ip,
-      originalUrl,
-    };
+    const postBackInstallAppsflyer: PostBackInstallAppsflyer =
+      new PostBackInstallAppsflyer();
+
+    postBackInstallAppsflyer.cp_token = af_c_id;
+    postBackInstallAppsflyer.view_code = af_siteid;
+    postBackInstallAppsflyer.clickid = clickid;
+    postBackInstallAppsflyer.af_siteid = af_siteid;
+    postBackInstallAppsflyer.af_c_id = af_c_id;
+    postBackInstallAppsflyer.advertising_id = advertising_id;
+    postBackInstallAppsflyer.idfa = idfa;
+    postBackInstallAppsflyer.idfv = idfv;
+    postBackInstallAppsflyer.install_time = install_time;
+    postBackInstallAppsflyer.country_code = country_code;
+    postBackInstallAppsflyer.language = language;
+    postBackInstallAppsflyer.click_time = click_time;
+    postBackInstallAppsflyer.device_carrier = device_carrier;
+    postBackInstallAppsflyer.device_ip = device_ip;
+    postBackInstallAppsflyer.originalUrl = originalUrl;
 
     const postBackInstallAppsflyerEntity: PostBackInstallAppsflyer =
       await this.postBackInstallAppsflyerRepository.save(
@@ -211,24 +208,27 @@ export class PostbackService {
     const { campaign } = postBackDailyEntity;
     const { media } = campaign;
 
-    const postBackEventAppsflyer: PostBackEventAppsflyerMetaData = {
-      clickid,
-      af_siteid,
-      af_c_id,
-      advertising_id,
-      idfa,
-      idfv,
-      install_time,
-      country_code,
-      language,
-      event_name,
-      event_revenue_currency,
-      event_revenue,
-      event_time,
-      device_carrier,
-      device_ip,
-      originalUrl,
-    };
+    const postBackEventAppsflyer: PostBackEventAppsflyer =
+      new PostBackEventAppsflyer();
+
+    postBackEventAppsflyer.clickid = clickid;
+    postBackEventAppsflyer.cp_token = af_c_id;
+    postBackEventAppsflyer.view_code = af_siteid;
+    postBackEventAppsflyer.af_siteid = af_siteid;
+    postBackEventAppsflyer.af_c_id = af_c_id;
+    postBackEventAppsflyer.advertising_id = advertising_id;
+    postBackEventAppsflyer.idfa = idfa;
+    postBackEventAppsflyer.idfv = idfv;
+    postBackEventAppsflyer.install_time = install_time;
+    postBackEventAppsflyer.country_code = country_code;
+    postBackEventAppsflyer.language = language;
+    postBackEventAppsflyer.event_name = event_name;
+    postBackEventAppsflyer.event_revenue_currency = event_revenue_currency;
+    postBackEventAppsflyer.event_revenue = event_revenue;
+    postBackEventAppsflyer.event_time = event_time;
+    postBackEventAppsflyer.device_carrier = device_carrier;
+    postBackEventAppsflyer.device_ip = device_ip;
+    postBackEventAppsflyer.originalUrl = originalUrl;
 
     const postbackEventApppsflyerEntity: PostBackEventAppsflyer =
       await this.postbackEventAppsflyerRepository.save(postBackEventAppsflyer);

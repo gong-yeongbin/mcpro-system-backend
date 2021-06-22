@@ -20,10 +20,10 @@ export class Reservation {
   @Column({ type: 'nvarchar', name: 'newCampaignName' })
   newCampaignName: string;
 
-  @Column({ type: 'nvarchar', name: 'oldTrackerTrackingUrl' })
+  @Column({ type: 'text', name: 'oldTrackerTrackingUrl' })
   oldTrackerTrackingUrl: string;
 
-  @Column({ type: 'nvarchar', name: 'newTrackerTrackingUrl' })
+  @Column({ type: 'text', name: 'newTrackerTrackingUrl' })
   newTrackerTrackingUrl: string;
 
   @Column({ type: 'boolean', name: 'status', default: false })

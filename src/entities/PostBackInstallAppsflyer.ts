@@ -5,27 +5,16 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-export interface PostBackInstallAppsflyerMetaData {
-  clickid: string;
-  af_siteid: string;
-  af_c_id: string;
-  advertising_id: string;
-  idfa: string;
-  idfv: string;
-  install_time: string;
-  country_code: string;
-  language: string;
-  click_time: string;
-  device_carrier: string;
-  device_ip: string;
-  originalUrl: string;
-  isSendDate?: Date;
-}
-
 @Entity('postback_install_appsflyer')
 export class PostBackInstallAppsflyer {
   @PrimaryGeneratedColumn({ name: 'idx', type: 'bigint' })
   idx: number;
+
+  @Column({ name: 'cp_token', type: 'nvarchar' })
+  cp_token: string;
+
+  @Column({ name: 'view_code', type: 'nvarchar' })
+  view_code: string;
 
   @Column({ name: 'clickid', type: 'nvarchar' })
   clickid: string;
