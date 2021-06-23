@@ -62,6 +62,6 @@ export class PostBackInstallAppsflyer {
   createdAt: Date;
 
   @ManyToOne(() => Campaign, (campaign) => campaign.postBackInstallAppsflyer)
-  @JoinColumn({ name: 'campain' })
+  @JoinColumn({ name: 'campaign' })
   campaign: Campaign;
 }
