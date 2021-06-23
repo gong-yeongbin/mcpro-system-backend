@@ -73,7 +73,7 @@ export class PostbackService {
         })
         .andWhere('postBackDaily.cp_token =:cp_token', { cp_token: af_c_id })
         .andWhere('Date(postBackDaily.created_at) =:date ', {
-          date: moment(click_time).tz('Asia/Seoul').format('YYYYMMDD'),
+          date: moment().tz('Asia/Seoul').format('YYYYMMDD'),
         })
         .getOne();
 
@@ -195,7 +195,7 @@ export class PostbackService {
       .andWhere('postBackDaily.cp_token =:cp_token', { cp_token: af_c_id })
       .andWhere('advertising.status =:status', { status: true })
       .andWhere('Date(postBackDaily.created_at) =:date ', {
-        date: moment(install_time).tz('Asia/Seoul').format('YYYYMMDD'),
+        date: moment().tz('Asia/Seoul').format('YYYYMMDD'),
       })
       .getOne();
 
