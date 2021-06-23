@@ -2,16 +2,16 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Campaign } from './Campaign';
 
 @Entity('postback_event_appsflyer')
 export class PostBackEventAppsflyer {
   @PrimaryGeneratedColumn({ name: 'idx', type: 'bigint' })
   idx: number;
-
-  @Column({ name: 'cp_token', type: 'nvarchar' })
-  cp_token: string;
 
   @Column({ name: 'view_code', type: 'nvarchar' })
   view_code: string;
@@ -69,4 +69,8 @@ export class PostBackEventAppsflyer {
 
   @CreateDateColumn({ name: 'created_at' })
   created_at: Date;
+
+  @ManyToOne(() => Campaign, (campaign) => campaign.postBackEventAppsflyer)
+  @JoinColumn({ name: 'campain' })
+  campaign: Campaign;
 }

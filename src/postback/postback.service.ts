@@ -89,7 +89,6 @@ export class PostbackService {
     const postBackInstallAppsflyer: PostBackInstallAppsflyer =
       new PostBackInstallAppsflyer();
 
-    postBackInstallAppsflyer.cp_token = af_c_id;
     postBackInstallAppsflyer.view_code = af_siteid;
     postBackInstallAppsflyer.clickid = clickid;
     postBackInstallAppsflyer.af_siteid = af_siteid;
@@ -104,6 +103,7 @@ export class PostbackService {
     postBackInstallAppsflyer.device_carrier = device_carrier;
     postBackInstallAppsflyer.device_ip = device_ip;
     postBackInstallAppsflyer.originalUrl = originalUrl;
+    postBackInstallAppsflyer.campaign = campaign;
 
     const postBackInstallAppsflyerEntity: PostBackInstallAppsflyer =
       await this.postBackInstallAppsflyerRepository.save(
@@ -212,7 +212,6 @@ export class PostbackService {
       new PostBackEventAppsflyer();
 
     postBackEventAppsflyer.clickid = clickid;
-    postBackEventAppsflyer.cp_token = af_c_id;
     postBackEventAppsflyer.view_code = af_siteid;
     postBackEventAppsflyer.af_siteid = af_siteid;
     postBackEventAppsflyer.af_c_id = af_c_id;
@@ -229,6 +228,7 @@ export class PostbackService {
     postBackEventAppsflyer.device_carrier = device_carrier;
     postBackEventAppsflyer.device_ip = device_ip;
     postBackEventAppsflyer.originalUrl = originalUrl;
+    postBackEventAppsflyer.campaign = campaign;
 
     const postbackEventApppsflyerEntity: PostBackEventAppsflyer =
       await this.postbackEventAppsflyerRepository.save(postBackEventAppsflyer);

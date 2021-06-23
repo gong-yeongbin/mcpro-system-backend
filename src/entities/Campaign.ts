@@ -15,6 +15,8 @@ import { PostBackEvent } from './PostBackEvent';
 import { Reservation } from './Reservation';
 import { PostBackDaily } from '../entities/PostBackDaily';
 import { SubMedia } from './SubMedia';
+import { PostBackEventAppsflyer } from './PostBackEventAppsflyer';
+import { PostBackInstallAppsflyer } from './PostBackInstallAppsflyer';
 
 @Entity('campaign')
 @Unique(['cp_code', 'cp_token'])
@@ -93,4 +95,16 @@ export class Campaign {
 
   @OneToMany(() => SubMedia, (subMedia) => subMedia.campaign)
   subMedia: SubMedia[];
+
+  @OneToMany(
+    () => PostBackEventAppsflyer,
+    (postBackEventAppsflyer) => postBackEventAppsflyer.campaign,
+  )
+  postBackEventAppsflyer: PostBackEventAppsflyer[];
+
+  @OneToMany(
+    () => PostBackInstallAppsflyer,
+    (postBackInstallAppsflyer) => postBackInstallAppsflyer.campaign,
+  )
+  postBackInstallAppsflyer: PostBackInstallAppsflyer[];
 }
