@@ -80,7 +80,7 @@ export class Campaign {
   @JoinColumn({ name: 'advertising' })
   advertising: Advertising;
 
-  @ManyToOne(() => Media, (media) => media.campaign)
+  @ManyToOne(() => Media, (media) => media.campaign, { onUpdate: 'CASCADE' })
   @JoinColumn({ name: 'media' })
   media: Media;
 

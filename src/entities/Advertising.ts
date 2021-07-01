@@ -48,11 +48,15 @@ export class Advertising {
   @UpdateDateColumn({ name: 'updated_at' })
   updated_at: Date;
 
-  @ManyToOne(() => Advertiser, (advertiser) => advertiser.advertising)
+  @ManyToOne(() => Advertiser, (advertiser) => advertiser.advertising, {
+    onUpdate: 'CASCADE',
+  })
   @JoinColumn({ name: 'advertiser' })
   advertiser: Advertiser;
 
-  @ManyToOne(() => Tracker, (tracker) => tracker.advertising)
+  @ManyToOne(() => Tracker, (tracker) => tracker.advertising, {
+    onUpdate: 'CASCADE',
+  })
   @JoinColumn({ name: 'tracker' })
   tracker: Tracker;
 

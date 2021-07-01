@@ -1,22 +1,19 @@
 import {
   Column,
   Entity,
-  PrimaryGeneratedColumn,
   Unique,
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
   JoinColumn,
+  PrimaryColumn,
 } from 'typeorm';
 import { Advertising } from '../entities/Advertising';
 
 @Entity('tracker')
 @Unique(['tk_code'])
 export class Tracker {
-  @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
-  idx: number;
-
-  @Column({ type: 'nvarchar', name: 'tk_code' })
+  @PrimaryColumn({ type: 'nvarchar', name: 'tk_code' })
   tk_code: string;
 
   @Column({ type: 'nvarchar', name: 'tk_name' })
@@ -54,7 +51,9 @@ export class Tracker {
   @UpdateDateColumn({ name: 'updated_At' })
   updated_At: Date;
 
-  @OneToMany(() => Advertising, (advertising) => advertising.tracker)
+  @OneToMany(() => Advertising, (advertising) => advertising.tracker, {
+    cascade: true,
+  })
   @JoinColumn()
   advertising: Advertising[];
 }

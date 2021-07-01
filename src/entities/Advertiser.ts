@@ -2,20 +2,17 @@ import {
   Column,
   Entity,
   OneToMany,
-  PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
   Unique,
+  PrimaryColumn,
 } from 'typeorm';
 import { Advertising } from './Advertising';
 
 @Entity('advertiser')
 @Unique(['ar_code', 'ar_name'])
 export class Advertiser {
-  @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
-  idx: number;
-
-  @Column({ type: 'nvarchar', name: 'ar_code' })
+  @PrimaryColumn({ type: 'nvarchar', name: 'ar_code' })
   ar_code: string;
 
   @Column({ type: 'nvarchar', name: 'ar_name' })
@@ -27,6 +24,8 @@ export class Advertiser {
   @UpdateDateColumn({ name: 'updated_at' })
   updated_at: Date;
 
-  @OneToMany(() => Advertising, (advertising) => advertising.advertiser)
+  @OneToMany(() => Advertising, (advertising) => advertising.advertiser, {
+    cascade: true,
+  })
   advertising: Advertising[];
 }
