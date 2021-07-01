@@ -6,14 +6,17 @@ import {
   UpdateDateColumn,
   OneToMany,
   JoinColumn,
-  PrimaryColumn,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Advertising } from '../entities/Advertising';
 
 @Entity('tracker')
 @Unique(['tk_code'])
 export class Tracker {
-  @PrimaryColumn({ type: 'nvarchar', name: 'tk_code' })
+  @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
+  idx: number;
+
+  @Column({ type: 'nvarchar', name: 'tk_code' })
   tk_code: string;
 
   @Column({ type: 'nvarchar', name: 'tk_name' })

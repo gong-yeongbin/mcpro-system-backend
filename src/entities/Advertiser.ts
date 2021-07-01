@@ -5,14 +5,17 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   Unique,
-  PrimaryColumn,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Advertising } from './Advertising';
 
 @Entity('advertiser')
 @Unique(['ar_code', 'ar_name'])
 export class Advertiser {
-  @PrimaryColumn({ type: 'nvarchar', name: 'ar_code' })
+  @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
+  idx: number;
+
+  @Column({ type: 'nvarchar', name: 'ar_code' })
   ar_code: string;
 
   @Column({ type: 'nvarchar', name: 'ar_name' })
