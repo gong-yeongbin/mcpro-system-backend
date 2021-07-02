@@ -7,6 +7,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { RedisModule } from 'nestjs-redis';
 import { RedisLockModule } from 'nestjs-simple-redis-lock';
+import { AppClusterService } from './app-cluster.service';
 
 @Module({
   imports: [
@@ -34,7 +35,7 @@ import { RedisLockModule } from 'nestjs-simple-redis-lock';
     PostbackModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, AppClusterService],
   exports: [ConfigModule],
 })
 export class AppModule {}
