@@ -135,7 +135,10 @@ export class PostbackService {
             console.log(
               `[ mecrosspro ---> media ] install : ${convertedPostbackInstallUrlTemplate}`,
             );
-            postBackInstallAppsflyerEntity.isSendDate = new Date();
+            postBackInstallAppsflyerEntity.send_time = moment
+              .utc()
+              .tz('Asia/Seoul')
+              .format('YYYY-MM-DD HH:mm:ss');
           })
           .catch();
 
@@ -291,7 +294,10 @@ export class PostbackService {
               console.log(
                 `[ mecrosspro ---> media ] event : ${convertedPostbackEventUrlTemplate}`,
               );
-              postbackEventApppsflyerEntity.isSendDate = new Date();
+              postbackEventApppsflyerEntity.send_time = moment
+                .utc()
+                .tz('Asia/Seoul')
+                .format('YYYY-MM-DD HH:mm:ss');
             })
             .catch();
           await this.postbackEventAppsflyerRepository.save(

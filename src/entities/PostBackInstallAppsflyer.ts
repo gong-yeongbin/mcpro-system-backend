@@ -58,6 +58,9 @@ export class PostBackInstallAppsflyer {
   @Column({ name: 'isSendDate', type: 'timestamp', nullable: true })
   isSendDate: Date;
 
+  @Column({ name: 'send_time', type: 'nvarchar', nullable: true })
+  send_time: string;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
