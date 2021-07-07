@@ -64,9 +64,6 @@ export class PostBackEventAppsflyer {
   @Column({ name: 'originalUrl', type: 'text', nullable: true })
   originalUrl: string;
 
-  @Column({ name: 'isSendDate', type: 'timestamp', nullable: true })
-  isSendDate: Date;
-
   @Column({ name: 'send_time', type: 'nvarchar', nullable: true })
   send_time: string;
 
