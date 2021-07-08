@@ -17,37 +17,12 @@ export class TrackingService {
     private readonly lockService: RedisLockService,
   ) {}
 
-  // const adid: string = ['', undefined, '{adid}'].includes(request.query.adid)
-  //   ? ''
-  //   : request.query.adid;
-  // const idfa: string = ['', undefined, '{idfa}'].includes(request.query.idfa)
-  //   ? ''
-  //   : request.query.idfa;
-  // const click_id: string = ['', undefined, '{click_id}'].includes(
-  //   request.query.click_id,
-  // )
-  //   ? ''
-  //   : request.query.click_id;
   async tracking(request: any): Promise<string> {
-    const originalUrl: string = decodeUnicode(
-      `${request.protocol}://${request.get('host')}${request.originalUrl}`,
-    );
+    const originalUrl: string = decodeUnicode(`${request.protocol}://${request.get('host')}${request.originalUrl}`);
 
-    const cp_token: string = ['', undefined, '{token}'].includes(
-      request.query.token,
-    )
-      ? ''
-      : request.query.token;
-    const pub_id: string = ['', undefined, '{pub_id}'].includes(
-      request.query.pub_id,
-    )
-      ? ''
-      : request.query.pub_id;
-    const sub_id: string = ['', undefined, '{sub_id}'].includes(
-      request.query.sub_id,
-    )
-      ? ''
-      : request.query.sub_id;
+    const cp_token: string = ['', undefined, '{token}'].includes(request.query.token) ? '' : request.query.token;
+    const pub_id: string = ['', undefined, '{pub_id}'].includes(request.query.pub_id) ? '' : request.query.pub_id;
+    const sub_id: string = ['', undefined, '{sub_id}'].includes(request.query.sub_id) ? '' : request.query.sub_id;
 
     console.log(`[ media ---> mecrosspro ] ${originalUrl}`);
 
@@ -62,12 +37,7 @@ export class TrackingService {
     if (!campaignEntity) throw new NotFoundException();
 
     try {
-      await this.lockService.lock(
-        moment().format('YYYYMMDD'),
-        2 * 60 * 1000,
-        50,
-        50,
-      );
+      await this.lockService.lock(moment().format('YYYYMMDD'), 2 * 60 * 1000, 50, 50);
 
       let view_code: string;
       const redis: any = this.redisService.getClient();
@@ -86,19 +56,12 @@ export class TrackingService {
         );
       }
 
-      view_code = await redis.hget(
-        `${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`,
-        'view_code',
-      );
+      view_code = await redis.hget(`${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`, 'view_code');
 
       if (!view_code) {
         view_code = v4().replace(/-/g, '');
 
-        await redis.hmset(
-          `${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`,
-          'view_code',
-          `${view_code}`,
-        );
+        await redis.hmset(`${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`, 'view_code', `${view_code}`);
       }
 
       const convertedTrackingUrl: string = convertTrackerTrackingUrl(
@@ -115,17 +78,10 @@ export class TrackingService {
   }
 }
 
-function convertTrackerTrackingUrl(
-  tk_code: string,
-  trackerTrackingUrl: string,
-  query: any,
-  view_code: string,
-) {
+function convertTrackerTrackingUrl(tk_code: string, trackerTrackingUrl: string, query: any, view_code: string) {
   const android_device_id = query.adid === '{adid}' ? '' : query.adid;
   const ios_device_id = query.idfa === '{idfa}' ? '' : query.idfa;
-  const device_id: string = android_device_id
-    ? android_device_id
-    : ios_device_id;
+  const device_id: string = android_device_id ? android_device_id : ios_device_id;
 
   let convertedTrackerTrackingUrl: string = null;
 
@@ -158,13 +114,25 @@ function convertTrackerTrackingUrl(
         .replace('{af_ua}', '') //user agent
         .replace('{af_lang}', ''); //device language
       break;
-    case 'adbrix':
-      break;
-    case 'adbrix_remaster':
-      break;
-    case 'mobiconnect':
-      break;
-    case 'airbridge':
+    case 'adbrixremaster':
+      convertedTrackerTrackingUrl = trackerTrackingUrl
+        .replace(
+          '{m_adid}', //device id
+          device_id,
+        )
+        .replace('{m_publisher}', view_code) //view code
+        .replace(
+          '{cb_1}', //campaign code
+          query.token,
+        )
+        .replace(
+          '{cb_2}', //click id
+          query.click_id,
+        )
+        .replace('{cb_3}', '')
+        .replace('{cb_4}', '')
+        .replace('{cb_5}', '');
+
       break;
   }
 

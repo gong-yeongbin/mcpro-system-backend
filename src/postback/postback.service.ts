@@ -12,6 +12,8 @@ import { RedisService } from 'nestjs-redis';
 import { RedisLockService } from 'nestjs-simple-redis-lock';
 import { decodeUnicode } from 'src/common/util';
 import { Campaign } from 'src/entities/Campaign';
+import { AppsflyerInstall } from './dto/appsflyer-install';
+import { AppsflyerEvent } from './dto/appsflyer-event';
 
 @Injectable()
 export class PostbackService {
@@ -34,51 +36,27 @@ export class PostbackService {
   ) {}
 
   async postBackInstallAppsflyer(req: any) {
-    const originalUrl: string = decodeUnicode(
-      `${req.protocol}://${req.get('host')}${req.originalUrl}`,
-    );
+    const originalUrl: string = decodeUnicode(`${req.protocol}://${req.get('host')}${req.originalUrl}`);
 
     console.log(`[ appsflyer ---> mecrosspro ] install : ${originalUrl}`);
 
-    const {
-      clickid,
-      af_siteid,
-      af_c_id,
-      advertising_id,
-      idfa,
-      idfv,
-      country_code,
-      language,
-      device_carrier,
-      device_ip,
-    } = req.query;
+    const appsflyer = new AppsflyerInstall(req.query).build();
 
-    const install_time = moment
-      .utc(req.query.install_time)
-      .tz('Asia/Seoul')
-      .format('YYYY-MM-DD HH:mm:ss');
-
-    const click_time = moment
-      .utc(req.query.click_time)
-      .tz('Asia/Seoul')
-      .format('YYYY-MM-DD HH:mm:ss');
-
-    const postBackDailyEntity: PostBackDaily =
-      await this.postBackDailyRepository
-        .createQueryBuilder('postBackDaily')
-        .leftJoinAndSelect('postBackDaily.campaign', 'campaign')
-        .leftJoinAndSelect('campaign.media', 'media')
-        .where('postBackDaily.view_code =:view_code', {
-          view_code: af_siteid,
-        })
-        .andWhere('postBackDaily.cp_token =:cp_token', { cp_token: af_c_id })
-        .andWhere('Date(postBackDaily.created_at) =:date ', {
-          date: moment().tz('Asia/Seoul').format('YYYYMMDD'),
-        })
-        .getOne();
+    const postBackDailyEntity: PostBackDaily = await this.postBackDailyRepository
+      .createQueryBuilder('postBackDaily')
+      .leftJoinAndSelect('postBackDaily.campaign', 'campaign')
+      .leftJoinAndSelect('campaign.media', 'media')
+      .where('postBackDaily.view_code =:view_code', {
+        view_code: appsflyer.af_siteid,
+      })
+      .andWhere('postBackDaily.cp_token =:cp_token', { cp_token: appsflyer.af_c_id })
+      .andWhere('Date(postBackDaily.created_at) =:date ', {
+        date: moment().tz('Asia/Seoul').format('YYYYMMDD'),
+      })
+      .getOne();
 
     if (!postBackDailyEntity) {
-      if (!(await this.createPostBackDaily(af_siteid, af_c_id))) {
+      if (!(await this.createPostBackDaily(appsflyer.af_siteid, appsflyer.af_c_id))) {
         throw new NotFoundException();
       }
     }
@@ -86,65 +64,54 @@ export class PostbackService {
     const { campaign } = postBackDailyEntity;
     const { media } = campaign;
 
-    const postBackInstallAppsflyer: PostBackInstallAppsflyer =
-      new PostBackInstallAppsflyer();
+    const postBackInstallAppsflyer: PostBackInstallAppsflyer = new PostBackInstallAppsflyer();
 
-    postBackInstallAppsflyer.view_code = af_siteid;
-    postBackInstallAppsflyer.clickid = clickid;
-    postBackInstallAppsflyer.af_siteid = af_siteid;
-    postBackInstallAppsflyer.af_c_id = af_c_id;
-    postBackInstallAppsflyer.advertising_id = advertising_id;
-    postBackInstallAppsflyer.idfa = idfa;
-    postBackInstallAppsflyer.idfv = idfv;
-    postBackInstallAppsflyer.install_time = install_time;
-    postBackInstallAppsflyer.country_code = country_code;
-    postBackInstallAppsflyer.language = language;
-    postBackInstallAppsflyer.click_time = click_time;
-    postBackInstallAppsflyer.device_carrier = device_carrier;
-    postBackInstallAppsflyer.device_ip = device_ip;
+    postBackInstallAppsflyer.view_code = appsflyer.af_siteid;
+    postBackInstallAppsflyer.clickid = appsflyer.clickid;
+    postBackInstallAppsflyer.af_siteid = appsflyer.af_siteid;
+    postBackInstallAppsflyer.af_c_id = appsflyer.af_c_id;
+    postBackInstallAppsflyer.advertising_id = appsflyer.advertising_id;
+    postBackInstallAppsflyer.idfa = appsflyer.idfa;
+    postBackInstallAppsflyer.idfv = appsflyer.idfv;
+    postBackInstallAppsflyer.install_time = appsflyer.install_time;
+    postBackInstallAppsflyer.country_code = appsflyer.country_code;
+    postBackInstallAppsflyer.language = appsflyer.language;
+    postBackInstallAppsflyer.click_time = appsflyer.click_time;
+    postBackInstallAppsflyer.device_carrier = appsflyer.device_carrier;
+    postBackInstallAppsflyer.device_ip = appsflyer.device_ip;
     postBackInstallAppsflyer.originalUrl = originalUrl;
     postBackInstallAppsflyer.campaign = campaign;
 
-    const postBackInstallAppsflyerEntity: PostBackInstallAppsflyer =
-      await this.postBackInstallAppsflyerRepository.save(
-        postBackInstallAppsflyer,
-      );
+    const postBackInstallAppsflyerEntity: PostBackInstallAppsflyer = await this.postBackInstallAppsflyerRepository.save(
+      postBackInstallAppsflyer,
+    );
 
     postBackDailyEntity.install = +postBackDailyEntity.install + 1;
     await this.postBackDailyRepository.save(postBackDailyEntity);
 
     if (campaign.status) {
-      const convertedPostbackInstallUrlTemplate =
-        media.mediaPostbackInstallUrlTemplate
-          .replace('{click_id}', clickid)
-          .replace('{device_id}', idfa ? idfa : idfa)
-          .replace('{android_device_id}', idfa)
-          .replace('{ios_device_id}', idfv)
-          .replace('{install_timestamp}', install_time);
+      const convertedPostbackInstallUrlTemplate = media.mediaPostbackInstallUrlTemplate
+        .replace('{click_id}', appsflyer.clickid)
+        .replace('{device_id}', appsflyer.idfa ? appsflyer.idfa : appsflyer.idfv)
+        .replace('{android_device_id}', appsflyer.idfa)
+        .replace('{ios_device_id}', appsflyer.idfv)
+        .replace('{install_timestamp}', appsflyer.install_time);
 
-      const postBackEvent: PostBackEvent =
-        await this.postBackEventRepository.findOne({
-          where: { campaign: campaign, trackerPostback: 'install' },
-        });
+      const postBackEvent: PostBackEvent = await this.postBackEventRepository.findOne({
+        where: { campaign: campaign, trackerPostback: 'install' },
+      });
 
       if (postBackEvent.sendPostback) {
         await this.httpService
           .get(convertedPostbackInstallUrlTemplate)
           .toPromise()
           .then(() => {
-            console.log(
-              `[ mecrosspro ---> media ] install : ${convertedPostbackInstallUrlTemplate}`,
-            );
-            postBackInstallAppsflyerEntity.send_time = moment
-              .utc()
-              .tz('Asia/Seoul')
-              .format('YYYY-MM-DD HH:mm:ss');
+            console.log(`[ mecrosspro ---> media ] install : ${convertedPostbackInstallUrlTemplate}`);
+            postBackInstallAppsflyerEntity.send_time = moment.utc().tz('Asia/Seoul').format('YYYY-MM-DD HH:mm:ss');
           })
           .catch();
 
-        await this.postBackInstallAppsflyerRepository.save(
-          postBackInstallAppsflyerEntity,
-        );
+        await this.postBackInstallAppsflyerRepository.save(postBackInstallAppsflyerEntity);
       }
     }
 
@@ -152,37 +119,11 @@ export class PostbackService {
   }
 
   async postBackEventAppsflyer(req: any) {
-    const originalUrl: string = decodeUnicode(
-      `${req.protocol}://${req.get('host')}${req.originalUrl}`,
-    );
+    const originalUrl: string = decodeUnicode(`${req.protocol}://${req.get('host')}${req.originalUrl}`);
 
     console.log(`[ appsflyer ---> mecrosspro ] event : ${originalUrl}`);
 
-    const {
-      clickid,
-      af_siteid,
-      af_c_id,
-      advertising_id,
-      idfa,
-      idfv,
-      country_code,
-      language,
-      event_name,
-      event_revenue_currency,
-      event_revenue,
-      device_carrier,
-      device_ip,
-    } = req.query;
-
-    const install_time = moment
-      .utc(req.query.install_time)
-      .tz('Asia/Seoul')
-      .format('YYYY-MM-DD HH:mm:ss');
-
-    const event_time = moment
-      .utc(req.query.event_time)
-      .tz('Asia/Seoul')
-      .format('YYYY-MM-DD HH:mm:ss');
+    const appsflyer = new AppsflyerEvent(req.query).build();
 
     let postBackDailyEntity: PostBackDaily = null;
 
@@ -193,9 +134,9 @@ export class PostbackService {
       .leftJoinAndSelect('campaign.media', 'media')
       .leftJoinAndSelect('advertising.tracker', 'tracker')
       .where('postBackDaily.view_code =:view_code', {
-        view_code: af_siteid,
+        view_code: appsflyer.af_siteid,
       })
-      .andWhere('postBackDaily.cp_token =:cp_token', { cp_token: af_c_id })
+      .andWhere('postBackDaily.cp_token =:cp_token', { cp_token: appsflyer.af_c_id })
       .andWhere('advertising.status =:status', { status: true })
       .andWhere('Date(postBackDaily.created_at) =:date ', {
         date: moment().tz('Asia/Seoul').format('YYYYMMDD'),
@@ -203,7 +144,7 @@ export class PostbackService {
       .getOne();
 
     if (!postBackDailyEntity) {
-      if (!(await this.createPostBackDaily(af_siteid, af_c_id))) {
+      if (!(await this.createPostBackDaily(appsflyer.af_siteid, appsflyer.af_c_id))) {
         throw new NotFoundException();
       }
     }
@@ -211,47 +152,45 @@ export class PostbackService {
     const { campaign } = postBackDailyEntity;
     const { media } = campaign;
 
-    const postBackEventAppsflyer: PostBackEventAppsflyer =
-      new PostBackEventAppsflyer();
+    const postBackEventAppsflyer: PostBackEventAppsflyer = new PostBackEventAppsflyer();
 
-    postBackEventAppsflyer.clickid = clickid;
-    postBackEventAppsflyer.view_code = af_siteid;
-    postBackEventAppsflyer.af_siteid = af_siteid;
-    postBackEventAppsflyer.af_c_id = af_c_id;
-    postBackEventAppsflyer.advertising_id = advertising_id;
-    postBackEventAppsflyer.idfa = idfa;
-    postBackEventAppsflyer.idfv = idfv;
-    postBackEventAppsflyer.install_time = install_time;
-    postBackEventAppsflyer.country_code = country_code;
-    postBackEventAppsflyer.language = language;
-    postBackEventAppsflyer.event_name = event_name;
-    postBackEventAppsflyer.event_revenue_currency = event_revenue_currency;
-    postBackEventAppsflyer.event_revenue = event_revenue;
-    postBackEventAppsflyer.event_time = event_time;
-    postBackEventAppsflyer.device_carrier = device_carrier;
-    postBackEventAppsflyer.device_ip = device_ip;
+    postBackEventAppsflyer.clickid = appsflyer.clickid;
+    postBackEventAppsflyer.view_code = appsflyer.af_siteid;
+    postBackEventAppsflyer.af_siteid = appsflyer.af_siteid;
+    postBackEventAppsflyer.af_c_id = appsflyer.af_c_id;
+    postBackEventAppsflyer.advertising_id = appsflyer.advertising_id;
+    postBackEventAppsflyer.idfa = appsflyer.idfa;
+    postBackEventAppsflyer.idfv = appsflyer.idfv;
+    postBackEventAppsflyer.install_time = appsflyer.install_time;
+    postBackEventAppsflyer.country_code = appsflyer.country_code;
+    postBackEventAppsflyer.language = appsflyer.language;
+    postBackEventAppsflyer.event_name = appsflyer.event_name;
+    postBackEventAppsflyer.event_revenue_currency = appsflyer.event_revenue_currency;
+    postBackEventAppsflyer.event_revenue = appsflyer.event_revenue;
+    postBackEventAppsflyer.event_time = appsflyer.event_time;
+    postBackEventAppsflyer.device_carrier = appsflyer.device_carrier;
+    postBackEventAppsflyer.device_ip = appsflyer.device_ip;
     postBackEventAppsflyer.originalUrl = originalUrl;
     postBackEventAppsflyer.campaign = campaign;
 
-    const postbackEventApppsflyerEntity: PostBackEventAppsflyer =
-      await this.postbackEventAppsflyerRepository.save(postBackEventAppsflyer);
+    const postbackEventApppsflyerEntity: PostBackEventAppsflyer = await this.postbackEventAppsflyerRepository.save(
+      postBackEventAppsflyer,
+    );
 
     if (campaign.status) {
-      const convertedPostbackEventUrlTemplate =
-        media.mediaPostbackEventUrlTemplate
-          .replace('{click_id}', clickid)
-          .replace('{event_name}', event_name)
-          .replace('{event_value}', event_revenue)
-          .replace('{device_id}', idfa ? idfa : idfv)
-          .replace('{android_device_id}', idfa)
-          .replace('{ios_device_id}', idfv)
-          .replace('{install_timestamp}', install_time)
-          .replace('{event_timestamp}', event_time);
+      const convertedPostbackEventUrlTemplate = media.mediaPostbackEventUrlTemplate
+        .replace('{click_id}', appsflyer.clickid)
+        .replace('{event_name}', appsflyer.event_name)
+        .replace('{event_value}', appsflyer.event_revenue)
+        .replace('{device_id}', appsflyer.idfa ? appsflyer.idfa : appsflyer.idfv)
+        .replace('{android_device_id}', appsflyer.idfa)
+        .replace('{ios_device_id}', appsflyer.idfv)
+        .replace('{install_timestamp}', appsflyer.install_time)
+        .replace('{event_timestamp}', appsflyer.event_time);
 
-      const postBackEvent: PostBackEvent =
-        await this.postBackEventRepository.findOne({
-          where: { campaign: campaign, trackerPostback: event_name },
-        });
+      const postBackEvent: PostBackEvent = await this.postBackEventRepository.findOne({
+        where: { campaign: campaign, trackerPostback: appsflyer.event_name },
+      });
 
       if (postBackEvent) {
         switch (postBackEvent.adminPostback) {
@@ -291,44 +230,31 @@ export class PostbackService {
             .get(convertedPostbackEventUrlTemplate)
             .toPromise()
             .then(() => {
-              console.log(
-                `[ mecrosspro ---> media ] event : ${convertedPostbackEventUrlTemplate}`,
-              );
-              postbackEventApppsflyerEntity.send_time = moment
-                .utc()
-                .tz('Asia/Seoul')
-                .format('YYYY-MM-DD HH:mm:ss');
+              console.log(`[ mecrosspro ---> media ] event : ${convertedPostbackEventUrlTemplate}`);
+              postbackEventApppsflyerEntity.send_time = moment.utc().tz('Asia/Seoul').format('YYYY-MM-DD HH:mm:ss');
             })
             .catch();
-          await this.postbackEventAppsflyerRepository.save(
-            postbackEventApppsflyerEntity,
-          );
+          await this.postbackEventAppsflyerRepository.save(postbackEventApppsflyerEntity);
         }
       } else {
         const postBackUnregisteredEventEntity: PostBackUnregisteredEvent =
           await this.postBackUnregisteredEventRepository.findOne({
             where: {
-              event_name: event_name,
+              event_name: appsflyer.event_name,
               postBackDaily: postBackDailyEntity,
             },
           });
 
         if (postBackUnregisteredEventEntity) {
-          postBackUnregisteredEventEntity.event_count =
-            +postBackUnregisteredEventEntity.event_count + 1;
+          postBackUnregisteredEventEntity.event_count = +postBackUnregisteredEventEntity.event_count + 1;
 
-          await this.postBackUnregisteredEventRepository.save(
-            postBackUnregisteredEventEntity,
-          );
+          await this.postBackUnregisteredEventRepository.save(postBackUnregisteredEventEntity);
         } else {
-          const postBackUnregisteredEvent: PostBackUnregisteredEvent =
-            new PostBackUnregisteredEvent();
+          const postBackUnregisteredEvent: PostBackUnregisteredEvent = new PostBackUnregisteredEvent();
           postBackUnregisteredEvent.postBackDaily = postBackDailyEntity;
-          postBackUnregisteredEvent.event_name = event_name;
+          postBackUnregisteredEvent.event_name = appsflyer.event_name;
 
-          await this.postBackUnregisteredEventRepository.save(
-            postBackUnregisteredEvent,
-          );
+          await this.postBackUnregisteredEventRepository.save(postBackUnregisteredEvent);
         }
       }
     }
@@ -336,32 +262,18 @@ export class PostbackService {
     return;
   }
 
-  async createPostBackDaily(
-    view_code: string,
-    cp_token: string,
-  ): Promise<boolean> {
+  async createPostBackDaily(view_code: string, cp_token: string): Promise<boolean> {
     let status: boolean;
     status = false;
     try {
-      await this.lockService.lock(
-        moment().format('YYYYMMDD'),
-        2 * 60 * 1000,
-        50,
-        50,
-      );
+      await this.lockService.lock(moment().format('YYYYMMDD'), 2 * 60 * 1000, 50, 50);
 
       const redis: any = this.redisService.getClient();
 
       let cursor: number;
       cursor = 0;
       do {
-        const data: any = await redis.scan(
-          cursor,
-          'MATCH',
-          `*${cp_token}*`,
-          'COUNT',
-          1000,
-        );
+        const data: any = await redis.scan(cursor, 'MATCH', `*${cp_token}*`, 'COUNT', 1000);
 
         cursor = data[0];
         const keys: Array<string> = data[1];
@@ -373,14 +285,13 @@ export class PostbackService {
             const sub_id: string = splitData[2];
             const media_idx: string = splitData[3];
 
-            const campaignEntity: Campaign =
-              await this.campaignRepository.findOne({
-                where: {
-                  cp_token: cp_token,
-                  media: { idx: media_idx },
-                },
-                relations: ['media'],
-              });
+            const campaignEntity: Campaign = await this.campaignRepository.findOne({
+              where: {
+                cp_token: cp_token,
+                media: { idx: media_idx },
+              },
+              relations: ['media'],
+            });
 
             if (!campaignEntity) {
               throw new NotFoundException();
