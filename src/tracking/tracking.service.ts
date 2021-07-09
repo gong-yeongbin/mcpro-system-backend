@@ -42,10 +42,7 @@ export class TrackingService {
       let view_code: string;
       const redis: any = this.redisService.getClient();
 
-      const oldAndnew: number = await redis.hget(
-        `${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`,
-        `${moment().tz('Asia/Seoul').format('YYYYMMDD')}:click`,
-      );
+      const oldAndnew: any = await redis.hgetall(`${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`);
 
       if (!oldAndnew) {
         view_code = await redis.hget('view_code', `${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`);
@@ -55,10 +52,7 @@ export class TrackingService {
           await redis.hset('view_code', `${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`, view_code);
           await redis.hsetnx(`${moment().tz('Asia/Seoul').format('YYYYMMDD')}`, `${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`, 1);
         } else {
-          // const isValidation: number = await redis.hget(
-          //   `${moment().tz('Asia/Seoul').format('YYYYMMDD')}`,
-          //   `${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`,
-          // );
+          const isValidation: number = await redis.hget('view_code', `${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`);
 
           // if (!isValidation) {
           await redis.hincrby(`${moment().tz('Asia/Seoul').format('YYYYMMDD')}`, `${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`, 1);
