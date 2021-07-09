@@ -43,11 +43,17 @@ export class TrackingService {
       const redis: any = this.redisService.getClient();
 
       const oldAndnew: any = await redis.hgetall(`${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`);
+      console.log('🚀 ~ file: tracking.service.ts ~ line 46 ~ TrackingService ~ tracking ~ oldAndnew', oldAndnew);
+      console.log('🚀 ~ file: tracking.service.ts ~ line 46 ~ TrackingService ~ tracking ~ oldAndnew', !oldAndnew);
+      console.log('🚀 ~ file: tracking.service.ts ~ line 46 ~ TrackingService ~ tracking ~ oldAndnew', !!oldAndnew);
 
       if (!!oldAndnew) {
         view_code = await redis.hget('view_code', `${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`);
+        console.log('🚀 ~ file: tracking.service.ts ~ line 52 ~ TrackingService ~ tracking ~ view_code', view_code);
+        console.log('🚀 ~ file: tracking.service.ts ~ line 52 ~ TrackingService ~ tracking ~ view_code', !view_code);
+        console.log('🚀 ~ file: tracking.service.ts ~ line 52 ~ TrackingService ~ tracking ~ view_code', !!view_code);
 
-        if (!view_code) {
+        if (!view_code || view_code == '') {
           view_code = v4().replace(/-/g, '');
 
           await redis.hset('view_code', `${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`, view_code);
