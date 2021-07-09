@@ -43,9 +43,8 @@ export class TrackingService {
       const redis: any = this.redisService.getClient();
 
       const oldAndnew: any = await redis.hgetall(`${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`);
-      console.log(oldAndnew.view_code);
 
-      if (!oldAndnew) {
+      if (!!oldAndnew) {
         view_code = await redis.hget('view_code', `${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`);
 
         if (!view_code) {
