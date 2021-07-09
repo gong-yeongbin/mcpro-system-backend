@@ -53,16 +53,16 @@ export class TrackingService {
         if (!view_code) {
           view_code = v4().replace(/-/g, '');
           await redis.hset('view_code', `${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`, view_code);
+          await redis.hsetnx(`${moment().tz('Asia/Seoul').format('YYYYMMDD')}`, `${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`, 1);
         } else {
-          const isValidation: number = await redis.hsetnx(
-            `${moment().tz('Asia/Seoul').format('YYYYMMDD')}`,
-            `${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`,
-            1,
-          );
+          // const isValidation: number = await redis.hget(
+          //   `${moment().tz('Asia/Seoul').format('YYYYMMDD')}`,
+          //   `${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`,
+          // );
 
-          if (!isValidation) {
-            await redis.hincrby(`${moment().tz('Asia/Seoul').format('YYYYMMDD')}`, `${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`, 1);
-          }
+          // if (!isValidation) {
+          await redis.hincrby(`${moment().tz('Asia/Seoul').format('YYYYMMDD')}`, `${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`, 1);
+          // }
         }
       } else {
         const isExists: number = await redis.hsetnx(
