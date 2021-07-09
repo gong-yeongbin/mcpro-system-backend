@@ -32,7 +32,7 @@ export class CommonService {
       let cursor: number;
       cursor = 0;
       do {
-        const data: any = await redis.scan(cursor, 'MATCH', `*${cp_token}*`, 'COUNT', 1000);
+        const data: any = await redis.hscan('view_code', cursor, 'MATCH', `${cp_token}/*`, 'COUNT', 20000);
 
         cursor = data[0];
         const keys: Array<string> = data[1];
