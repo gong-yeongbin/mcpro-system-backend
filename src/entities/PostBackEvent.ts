@@ -1,12 +1,4 @@
-import {
-  Column,
-  Entity,
-  UpdateDateColumn,
-  CreateDateColumn,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-  JoinColumn,
-} from 'typeorm';
+import { Column, Entity, UpdateDateColumn, CreateDateColumn, ManyToOne, PrimaryGeneratedColumn, JoinColumn } from 'typeorm';
 import { Campaign } from './Campaign';
 
 @Entity('postback_event')

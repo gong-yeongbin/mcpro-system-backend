@@ -1,12 +1,4 @@
-import {
-  Column,
-  Entity,
-  OneToMany,
-  CreateDateColumn,
-  UpdateDateColumn,
-  Unique,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, OneToMany, CreateDateColumn, UpdateDateColumn, Unique, PrimaryGeneratedColumn } from 'typeorm';
 import { Advertising } from './Advertising';
 
 @Entity('advertiser')

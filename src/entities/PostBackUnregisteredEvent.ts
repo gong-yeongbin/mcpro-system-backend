@@ -1,12 +1,4 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
-  Column,
-  ManyToOne,
-  JoinColumn,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { PostBackDaily } from './PostBackDaily';
 
 @Entity('postback_unregistered_event')
@@ -26,10 +18,7 @@ export class PostBackUnregisteredEvent {
   @UpdateDateColumn({ name: 'updated_at' })
   updated_at: Date;
 
-  @ManyToOne(
-    () => PostBackDaily,
-    (postBackDaily) => postBackDaily.postBackUnregisteredEvent,
-  )
+  @ManyToOne(() => PostBackDaily, (postBackDaily) => postBackDaily.postBackUnregisteredEvent)
   @JoinColumn({ name: 'postBackDaily' })
   postBackDaily: PostBackDaily;
 }

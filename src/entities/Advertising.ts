@@ -1,14 +1,4 @@
-import {
-  Column,
-  Entity,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
-  Unique,
-  OneToMany,
-  JoinColumn,
-} from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, Unique, OneToMany, JoinColumn } from 'typeorm';
 import { Advertiser } from './Advertiser';
 import { Campaign } from './Campaign';
 import { Tracker } from './Tracker';

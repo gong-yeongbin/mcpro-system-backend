@@ -1,12 +1,4 @@
-import {
-  Column,
-  Entity,
-  OneToMany,
-  Unique,
-  CreateDateColumn,
-  UpdateDateColumn,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, OneToMany, Unique, CreateDateColumn, UpdateDateColumn, PrimaryGeneratedColumn } from 'typeorm';
 import { Campaign } from './Campaign';
 
 @Entity('media')

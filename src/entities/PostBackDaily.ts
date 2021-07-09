@@ -1,15 +1,6 @@
 import { Campaign } from '../entities/Campaign';
 
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-  OneToMany,
-  JoinColumn,
-} from 'typeorm';
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn, OneToMany, JoinColumn } from 'typeorm';
 import { PostBackUnregisteredEvent } from './PostBackUnregisteredEvent';
 
 export interface PostBackDailyMetaData {
@@ -141,9 +132,6 @@ export class PostBackDaily {
   @JoinColumn({ name: 'campaign' })
   campaign: Campaign;
 
-  @OneToMany(
-    () => PostBackUnregisteredEvent,
-    (postBackUnregisteredEvent) => postBackUnregisteredEvent.postBackDaily,
-  )
+  @OneToMany(() => PostBackUnregisteredEvent, (postBackUnregisteredEvent) => postBackUnregisteredEvent.postBackDaily)
   postBackUnregisteredEvent: PostBackUnregisteredEvent[];
 }

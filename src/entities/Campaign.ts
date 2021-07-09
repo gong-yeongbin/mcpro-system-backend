@@ -1,14 +1,4 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-  Unique,
-  UpdateDateColumn,
-  OneToMany,
-  JoinColumn,
-} from 'typeorm';
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn, OneToMany, JoinColumn } from 'typeorm';
 import { Advertising } from './Advertising';
 import { Media } from './Media';
 import { PostBackEvent } from './PostBackEvent';
@@ -96,15 +86,9 @@ export class Campaign {
   @OneToMany(() => SubMedia, (subMedia) => subMedia.campaign)
   subMedia: SubMedia[];
 
-  @OneToMany(
-    () => PostBackEventAppsflyer,
-    (postBackEventAppsflyer) => postBackEventAppsflyer.campaign,
-  )
+  @OneToMany(() => PostBackEventAppsflyer, (postBackEventAppsflyer) => postBackEventAppsflyer.campaign)
   postBackEventAppsflyer: PostBackEventAppsflyer[];
 
-  @OneToMany(
-    () => PostBackInstallAppsflyer,
-    (postBackInstallAppsflyer) => postBackInstallAppsflyer.campaign,
-  )
+  @OneToMany(() => PostBackInstallAppsflyer, (postBackInstallAppsflyer) => postBackInstallAppsflyer.campaign)
   postBackInstallAppsflyer: PostBackInstallAppsflyer[];
 }

@@ -7,6 +7,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { RedisModule } from 'nestjs-redis';
 import { RedisLockModule } from 'nestjs-simple-redis-lock';
+import { CommonModule } from './common/common.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { RedisLockModule } from 'nestjs-simple-redis-lock';
     }),
     TrackingModule,
     PostbackModule,
+    CommonModule,
   ],
   controllers: [AppController],
   providers: [AppService],

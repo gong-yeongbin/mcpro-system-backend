@@ -1,13 +1,4 @@
-import {
-  Column,
-  Entity,
-  Unique,
-  CreateDateColumn,
-  UpdateDateColumn,
-  OneToMany,
-  JoinColumn,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, Unique, CreateDateColumn, UpdateDateColumn, OneToMany, JoinColumn, PrimaryGeneratedColumn } from 'typeorm';
 import { Advertising } from '../entities/Advertising';
 
 @Entity('tracker')

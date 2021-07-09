@@ -6,7 +6,7 @@ import { v4 } from 'uuid';
 import * as moment from 'moment';
 import { RedisService } from 'nestjs-redis';
 import { RedisLockService } from 'nestjs-simple-redis-lock';
-import { decodeUnicode } from 'src/common/util';
+import { decodeUnicode } from 'src/util';
 
 @Injectable()
 export class TrackingService {
@@ -42,26 +42,46 @@ export class TrackingService {
       let view_code: string;
       const redis: any = this.redisService.getClient();
 
-      const isExists: number = await redis.hsetnx(
+      const oldAndnew: number = await redis.hget(
         `${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`,
         `${moment().tz('Asia/Seoul').format('YYYYMMDD')}:click`,
-        1,
       );
 
-      if (!isExists) {
-        await redis.hincrby(
+      if (!oldAndnew) {
+        view_code = await redis.hget('view_code', `${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`);
+
+        if (!view_code) {
+          view_code = v4().replace(/-/g, '');
+          await redis.hset('view_code', `${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`, view_code);
+        } else {
+          const isValidation: number = await redis.hsetnx(
+            `${moment().tz('Asia/Seoul').format('YYYYMMDD')}`,
+            `${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`,
+            1,
+          );
+
+          if (!isValidation) {
+            await redis.hincrby(`${moment().tz('Asia/Seoul').format('YYYYMMDD')}`, `${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`, 1);
+          }
+        }
+      } else {
+        const isExists: number = await redis.hsetnx(
           `${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`,
           `${moment().tz('Asia/Seoul').format('YYYYMMDD')}:click`,
           1,
         );
-      }
 
-      view_code = await redis.hget(`${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`, 'view_code');
+        if (!isExists) {
+          await redis.hincrby(`${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`, `${moment().tz('Asia/Seoul').format('YYYYMMDD')}:click`, 1);
+        }
 
-      if (!view_code) {
-        view_code = v4().replace(/-/g, '');
+        view_code = await redis.hget(`${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`, 'view_code');
 
-        await redis.hmset(`${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`, 'view_code', `${view_code}`);
+        if (!view_code) {
+          view_code = v4().replace(/-/g, '');
+
+          await redis.hmset(`${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`, 'view_code', `${view_code}`);
+        }
       }
 
       const convertedTrackingUrl: string = convertTrackerTrackingUrl(
