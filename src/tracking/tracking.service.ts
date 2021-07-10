@@ -46,10 +46,10 @@ export class TrackingService {
 
       if (!!oldAndnew) {
         view_code = await redis.hget('view_code', `${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`);
-
+        console.log('**** view code check', view_code);
         if (!view_code) {
           view_code = v4().replace(/-/g, '');
-
+          console.log('**** new view code', view_code);
           await redis.hset('view_code', `${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`, view_code);
           await redis.hset(`${moment().tz('Asia/Seoul').format('YYYYMMDD')}`, `${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`, 1);
         } else {
