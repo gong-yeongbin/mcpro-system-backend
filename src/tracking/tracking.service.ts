@@ -43,18 +43,15 @@ export class TrackingService {
       const redis: any = this.redisService.getClient();
 
       const oldAndnew: any = await redis.hgetall(`${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`);
-      console.log('🚀 ~ file: tracking.service.ts ~ line 46 ~ TrackingService ~ tracking ~ oldAndnew', oldAndnew);
-      console.log('🚀 ~ file: tracking.service.ts ~ line 46 ~ TrackingService ~ tracking ~ oldAndnew', !oldAndnew);
-      console.log('🚀 ~ file: tracking.service.ts ~ line 46 ~ TrackingService ~ tracking ~ oldAndnew', !!oldAndnew);
 
       if (!!oldAndnew) {
         view_code = await redis.hget('view_code', `${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`);
 
-        if (!view_code || typeof view_code != 'string') {
+        if (!view_code) {
           view_code = v4().replace(/-/g, '');
 
           await redis.hset('view_code', `${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`, view_code);
-          await redis.hsetnx(`${moment().tz('Asia/Seoul').format('YYYYMMDD')}`, `${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`, 1);
+          await redis.hset(`${moment().tz('Asia/Seoul').format('YYYYMMDD')}`, `${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`, 1);
         } else {
           await redis.hincrby(`${moment().tz('Asia/Seoul').format('YYYYMMDD')}`, `${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`, 1);
         }
