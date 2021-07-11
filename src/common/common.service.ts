@@ -37,7 +37,8 @@ export class CommonService {
         cursor = data[0];
         const keys: Array<string> = data[1];
         for (let i = 0; i < keys.length; i++) {
-          const isViewCode: string = await redis.hget(keys[i], 'view_code');
+          const isViewCode: string = await redis.hget('view_code', keys[i]);
+
           if (view_code === isViewCode) {
             const splitData: Array<string> = keys[i].split('/');
             const pub_id: string = splitData[1];
