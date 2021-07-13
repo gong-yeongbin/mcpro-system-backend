@@ -52,7 +52,7 @@ export class PostBackInstallAppsflyer {
   send_time: string;
 
   @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date;
+  created_at: Date;
 
   @ManyToOne(() => Campaign, (campaign) => campaign.postBackInstallAppsflyer)
   @JoinColumn({ name: 'campaign' })
