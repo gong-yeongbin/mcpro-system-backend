@@ -7,6 +7,8 @@ import { PostBackDaily } from '../entities/PostBackDaily';
 import { SubMedia } from './SubMedia';
 import { PostBackEventAppsflyer } from './PostBackEventAppsflyer';
 import { PostBackInstallAppsflyer } from './PostBackInstallAppsflyer';
+import { PostBackInstallAdbrixremaster } from './PostBackInstallAdbrixremaster';
+import { PostBackEventAdbrixremaster } from './PostBackEventAdbrixremaster';
 
 @Entity('campaign')
 @Unique(['cp_code', 'cp_token'])
@@ -91,4 +93,10 @@ export class Campaign {
 
   @OneToMany(() => PostBackInstallAppsflyer, (postBackInstallAppsflyer) => postBackInstallAppsflyer.campaign)
   postBackInstallAppsflyer: PostBackInstallAppsflyer[];
+
+  @OneToMany(() => PostBackEventAdbrixremaster, (postBackEventAdbrixremaster) => postBackEventAdbrixremaster.campaign)
+  postBackEventAdbrixremaster: PostBackEventAdbrixremaster[];
+
+  @OneToMany(() => PostBackInstallAdbrixremaster, (postBackInstallAdbrixremaster) => postBackInstallAdbrixremaster.campaign)
+  postBackInstallAdbrixremaster: PostBackInstallAdbrixremaster[];
 }
