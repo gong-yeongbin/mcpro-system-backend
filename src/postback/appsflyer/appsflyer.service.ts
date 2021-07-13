@@ -1,17 +1,12 @@
 import { HttpService, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { PostBackDaily } from 'src/entities/PostBackDaily';
 import { Repository } from 'typeorm';
 import * as moment from 'moment-timezone';
-import { PostBackEvent } from 'src/entities/PostBackEvent';
-import { PostBackEventAppsflyer } from 'src/entities/PostBackEventAppsflyer';
-import { PostBackInstallAppsflyer } from 'src/entities/PostBackInstallAppsflyer';
 import { decodeUnicode } from 'src/util';
 import { AppsflyerInstall } from '../dto/appsflyer-install';
 import { AppsflyerEvent } from '../dto/appsflyer-event';
 import { CommonService } from 'src/common/common.service';
-import { Campaign } from 'src/entities/Campaign';
-import { Media } from 'src/entities/Media';
+import { PostBackDaily, Campaign, Media, PostBackEvent, PostBackEventAppsflyer, PostBackInstallAppsflyer } from '../../entities/Entity';
 
 @Injectable()
 export class AppsflyerService {

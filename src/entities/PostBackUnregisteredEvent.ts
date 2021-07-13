@@ -1,8 +1,16 @@
-import { Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
-import { PostBackDaily } from './PostBackDaily';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
+import { PostBackDaily } from './Entity';
 
 @Entity('postback_unregistered_event')
-export class PostBackUnregisteredEvent {
+export default class PostBackUnregisteredEvent {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
   idx: number;
 

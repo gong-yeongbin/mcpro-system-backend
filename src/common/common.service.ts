@@ -3,11 +3,8 @@ import { Repository } from 'typeorm';
 import { RedisService } from 'nestjs-redis';
 import { RedisLockService } from 'nestjs-simple-redis-lock';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Campaign } from 'src/entities/Campaign';
-import { PostBackDaily } from 'src/entities/PostBackDaily';
 import * as moment from 'moment-timezone';
-import { PostBackEvent } from 'src/entities/PostBackEvent';
-import { PostBackUnregisteredEvent } from 'src/entities/PostBackUnregisteredEvent';
+import { Campaign, PostBackDaily, PostBackUnregisteredEvent, PostBackEvent } from '../entities/Entity';
 
 @Injectable()
 export class CommonService {

@@ -1,8 +1,16 @@
-import { Column, Entity, UpdateDateColumn, CreateDateColumn, ManyToOne, PrimaryGeneratedColumn, JoinColumn } from 'typeorm';
-import { Campaign } from './Campaign';
+import {
+  Column,
+  Entity,
+  UpdateDateColumn,
+  CreateDateColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  JoinColumn,
+} from 'typeorm';
+import { Campaign } from './Entity';
 
 @Entity('postback_event')
-export class PostBackEvent {
+export default class PostBackEvent {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
   idx: number;
 

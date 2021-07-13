@@ -1,17 +1,12 @@
 import { HttpService, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CommonService } from 'src/common/common.service';
-import { Campaign } from 'src/entities/Campaign';
-import { Media } from 'src/entities/Media';
-import { PostBackDaily } from 'src/entities/PostBackDaily';
-import { PostBackEvent } from 'src/entities/PostBackEvent';
 import { decodeUnicode } from 'src/util';
 import { Repository } from 'typeorm';
 import * as moment from 'moment-timezone';
 import { AdbrixremasterInstall } from '../dto/adbrixremaster-install';
-import { PostBackInstallAdbrixremaster } from 'src/entities/PostBackInstallAdbrixremaster';
 import { AdbrixremasterEvent } from '../dto/adbrixremaster-event';
-import { PostBackEventAdbrixremaster } from 'src/entities/PostBackEventAdbrixremaster';
+import { PostBackInstallAdbrixremaster, PostBackEventAdbrixremaster, Campaign, Media, PostBackDaily, PostBackEvent } from '../../entities/Entity';
 
 @Injectable()
 export class AdbrixremasterService {

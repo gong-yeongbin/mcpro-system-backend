@@ -1,18 +1,30 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn, OneToMany, JoinColumn } from 'typeorm';
-import { Advertising } from './Advertising';
-import { Media } from './Media';
-import { PostBackEvent } from './PostBackEvent';
-import { Reservation } from './Reservation';
-import { PostBackDaily } from '../entities/PostBackDaily';
-import { SubMedia } from './SubMedia';
-import { PostBackEventAppsflyer } from './PostBackEventAppsflyer';
-import { PostBackInstallAppsflyer } from './PostBackInstallAppsflyer';
-import { PostBackInstallAdbrixremaster } from './PostBackInstallAdbrixremaster';
-import { PostBackEventAdbrixremaster } from './PostBackEventAdbrixremaster';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  Unique,
+  UpdateDateColumn,
+  OneToMany,
+  JoinColumn,
+} from 'typeorm';
+import {
+  Advertising,
+  Media,
+  PostBackEvent,
+  Reservation,
+  PostBackDaily,
+  SubMedia,
+  PostBackEventAppsflyer,
+  PostBackInstallAppsflyer,
+  PostBackInstallAdbrixremaster,
+  PostBackEventAdbrixremaster,
+} from './Entity';
 
 @Entity('campaign')
 @Unique(['cp_code', 'cp_token'])
-export class Campaign {
+export default class Campaign {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
   idx: number;
 
@@ -97,6 +109,9 @@ export class Campaign {
   @OneToMany(() => PostBackEventAdbrixremaster, (postBackEventAdbrixremaster) => postBackEventAdbrixremaster.campaign)
   postBackEventAdbrixremaster: PostBackEventAdbrixremaster[];
 
-  @OneToMany(() => PostBackInstallAdbrixremaster, (postBackInstallAdbrixremaster) => postBackInstallAdbrixremaster.campaign)
+  @OneToMany(
+    () => PostBackInstallAdbrixremaster,
+    (postBackInstallAdbrixremaster) => postBackInstallAdbrixremaster.campaign
+  )
   postBackInstallAdbrixremaster: PostBackInstallAdbrixremaster[];
 }

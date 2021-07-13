@@ -1,7 +1,14 @@
-import { Campaign } from '../entities/Campaign';
-
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn, OneToMany, JoinColumn } from 'typeorm';
-import { PostBackUnregisteredEvent } from './PostBackUnregisteredEvent';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+  OneToMany,
+  JoinColumn,
+} from 'typeorm';
+import { Campaign, PostBackUnregisteredEvent } from './Entity';
 
 export interface PostBackDailyMetaData {
   cp_token: string;
@@ -23,7 +30,7 @@ export interface PostBackDailyMetaData {
 }
 
 @Entity('postback_daily')
-export class PostBackDaily {
+export default class PostBackDaily {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
   idx: string;
 

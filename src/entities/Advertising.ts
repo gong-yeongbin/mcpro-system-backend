@@ -1,11 +1,19 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, Unique, OneToMany, JoinColumn } from 'typeorm';
-import { Advertiser } from './Advertiser';
-import { Campaign } from './Campaign';
-import { Tracker } from './Tracker';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  Unique,
+  OneToMany,
+  JoinColumn,
+} from 'typeorm';
+import { Advertiser, Campaign, Tracker } from './Entity';
 
 @Entity('advertising')
 @Unique(['ad_code'])
-export class Advertising {
+export default class Advertising {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
   idx: number;
 

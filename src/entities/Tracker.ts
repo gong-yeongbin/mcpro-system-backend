@@ -1,9 +1,18 @@
-import { Column, Entity, Unique, CreateDateColumn, UpdateDateColumn, OneToMany, JoinColumn, PrimaryGeneratedColumn } from 'typeorm';
-import { Advertising } from '../entities/Advertising';
+import {
+  Column,
+  Entity,
+  Unique,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToMany,
+  JoinColumn,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Advertising } from './Entity';
 
 @Entity('tracker')
 @Unique(['tk_code'])
-export class Tracker {
+export default class Tracker {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
   idx: number;
 

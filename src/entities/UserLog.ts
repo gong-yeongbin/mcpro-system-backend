@@ -1,8 +1,16 @@
-import { Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { User } from '../entities/User';
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
+import { User } from './Entity';
 
 @Entity('user_log')
-export class UserLog {
+export default class UserLog {
   @PrimaryGeneratedColumn({ name: 'idx', type: 'bigint' })
   idx: number;
 

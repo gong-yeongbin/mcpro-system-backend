@@ -1,19 +1,20 @@
 import { HttpModule, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { PostBackEvent } from 'src/entities/PostBackEvent';
-import { PostBackEventAppsflyer } from 'src/entities/PostBackEventAppsflyer';
-import { PostBackInstallAppsflyer } from 'src/entities/PostBackInstallAppsflyer';
-import { PostBackUnregisteredEvent } from 'src/entities/PostBackUnregisteredEvent';
-import { PostBackDaily } from 'src/entities/PostBackDaily';
 import { PostbackController } from './postback.controller';
-import { PostbackService } from './postback.service';
 import { RedisLockModule } from 'nestjs-simple-redis-lock';
-import { Campaign } from 'src/entities/Campaign';
 import { AdbrixremasterService } from './adbrixremaster/adbrixremaster.service';
 import { AppsflyerService } from './appsflyer/appsflyer.service';
 import { CommonService } from 'src/common/common.service';
-import { PostBackInstallAdbrixremaster } from 'src/entities/PostBackInstallAdbrixremaster';
-import { PostBackEventAdbrixremaster } from 'src/entities/PostBackEventAdbrixremaster';
+import {
+  PostBackInstallAppsflyer,
+  PostBackEventAppsflyer,
+  Campaign,
+  PostBackInstallAdbrixremaster,
+  PostBackEventAdbrixremaster,
+  PostBackEvent,
+  PostBackUnregisteredEvent,
+  PostBackDaily,
+} from '../entities/Entity';
 
 @Module({
   imports: [
@@ -34,6 +35,6 @@ import { PostBackEventAdbrixremaster } from 'src/entities/PostBackEventAdbrixrem
     }),
   ],
   controllers: [PostbackController],
-  providers: [PostbackService, CommonService, AdbrixremasterService, AppsflyerService],
+  providers: [CommonService, AdbrixremasterService, AppsflyerService],
 })
 export class PostbackModule {}

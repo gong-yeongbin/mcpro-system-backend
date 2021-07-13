@@ -1,9 +1,9 @@
 import { Column, Entity, OneToMany, CreateDateColumn, UpdateDateColumn, Unique, PrimaryGeneratedColumn } from 'typeorm';
-import { Advertising } from './Advertising';
+import { Advertising } from './Entity';
 
 @Entity('advertiser')
 @Unique(['ar_code', 'ar_name'])
-export class Advertiser {
+export default class Advertiser {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
   idx: number;
 

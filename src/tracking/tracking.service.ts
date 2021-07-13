@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Campaign } from 'src/entities/Campaign';
+import { Campaign } from '../entities/Entity';
 import { Repository } from 'typeorm';
 import { v4 } from 'uuid';
 import * as moment from 'moment';
