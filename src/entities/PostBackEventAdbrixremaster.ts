@@ -123,7 +123,7 @@ export class PostBackEventAdbrixremaster {
   @Column({ name: 'event_timestamp_d', type: 'nvarchar', nullable: true })
   event_timestamp_d: string;
 
-  @Column({ name: 'param_json', type: 'nvarchar', nullable: true })
+  @Column({ name: 'param_json', type: 'text', nullable: true })
   param_json: string;
 
   @Column({ name: 'cb_1', type: 'nvarchar' }) // campaign token
