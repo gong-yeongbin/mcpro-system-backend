@@ -89,7 +89,8 @@ export class AppsflyerService {
         .replace('{device_id}', idfa ? idfa : idfv)
         .replace('{android_device_id}', idfa)
         .replace('{ios_device_id}', idfv)
-        .replace('{install_timestamp}', install_time);
+        .replace('{install_timestamp}', install_time)
+        .replace('{payout}', '');
 
       await this.httpService
         .get(convertedPostbackInstallUrlTemplate)
@@ -188,6 +189,7 @@ export class AppsflyerService {
           .replace('{click_id}', clickid)
           .replace('{event_name}', event_name)
           .replace('{event_value}', event_revenue)
+          .replace('{event-value}', '')
           .replace('{device_id}', idfa ? idfa : idfv)
           .replace('{android_device_id}', idfa)
           .replace('{ios_device_id}', idfv)

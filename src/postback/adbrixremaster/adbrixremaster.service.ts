@@ -165,7 +165,8 @@ export class AdbrixremasterService {
         .replace('{device_id}', adid ? adid : idfv)
         .replace('{android_device_id}', adid)
         .replace('{ios_device_id}', idfv)
-        .replace('{install_timestamp}', event_datetime);
+        .replace('{install_timestamp}', event_datetime)
+        .replace('{payout}', '');
 
       await this.httpService
         .get(convertedPostbackInstallUrlTemplate)
@@ -319,7 +320,8 @@ export class AdbrixremasterService {
           .replace('{click_id}', cb_3)
           .replace('{event-name}', event_name)
           .replace('{event_name}', event_name)
-          // .replace('{event_value}', event_revenue)
+          .replace('{event_value}', '')
+          .replace('{event-value}', '')
           .replace('{device_id}', adid ? adid : idfv)
           .replace('{android_device_id}', adid)
           .replace('{ios_device_id}', idfv)
