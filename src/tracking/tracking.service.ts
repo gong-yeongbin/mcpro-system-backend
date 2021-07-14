@@ -122,9 +122,9 @@ function convertTrackerTrackingUrl(tk_code: string, trackerTrackingUrl: string, 
         )
         .replace(
           '{cb_2}', //click id
-          query.click_id,
+          view_code,
         )
-        .replace('{cb_3}', '')
+        .replace('{cb_3}', query.click_id)
         .replace('{cb_4}', '')
         .replace('{cb_5}', '');
 
