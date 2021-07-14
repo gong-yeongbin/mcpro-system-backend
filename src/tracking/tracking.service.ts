@@ -116,6 +116,7 @@ function convertTrackerTrackingUrl(tk_code: string, trackerTrackingUrl: string, 
           device_id,
         )
         .replace('{m_publisher}', view_code) //view code
+        .replace('{m_sub_publisher}', '') //view code
         .replace(
           '{cb_1}', //campaign code
           query.token,
