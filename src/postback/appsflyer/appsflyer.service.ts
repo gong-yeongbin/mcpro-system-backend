@@ -84,6 +84,7 @@ export class AppsflyerService {
 
     if (postBackEventEntity.sendPostback) {
       const convertedPostbackInstallUrlTemplate = mediaEntity.mediaPostbackInstallUrlTemplate
+        .replace('{clickid}', clickid)
         .replace('{click_id}', clickid)
         .replace('{device_id}', idfa ? idfa : idfv)
         .replace('{android_device_id}', idfa)
@@ -183,6 +184,7 @@ export class AppsflyerService {
 
       if (postBackEventEntity.sendPostback) {
         const convertedPostbackEventUrlTemplate = mediaEntity.mediaPostbackEventUrlTemplate
+          .replace('{clickid}', clickid)
           .replace('{click_id}', clickid)
           .replace('{event_name}', event_name)
           .replace('{event_value}', event_revenue)
@@ -190,7 +192,8 @@ export class AppsflyerService {
           .replace('{android_device_id}', idfa)
           .replace('{ios_device_id}', idfv)
           .replace('{install_timestamp}', install_time)
-          .replace('{event_timestamp}', event_time);
+          .replace('{event_timestamp}', event_time)
+          .replace('{timestamp}', event_time);
 
         await this.httpService
           .get(convertedPostbackEventUrlTemplate)

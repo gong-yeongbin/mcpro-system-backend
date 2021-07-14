@@ -160,6 +160,7 @@ export class AdbrixremasterService {
 
     if (postBackEventEntity.sendPostback) {
       const convertedPostbackInstallUrlTemplate = mediaEntity.mediaPostbackInstallUrlTemplate
+        .replace('{clickid}', cb_3)
         .replace('{click_id}', cb_3)
         .replace('{device_id}', adid ? adid : idfv)
         .replace('{android_device_id}', adid)
@@ -314,14 +315,17 @@ export class AdbrixremasterService {
 
       if (postBackEventEntity.sendPostback) {
         const convertedPostbackEventUrlTemplate = mediaEntity.mediaPostbackEventUrlTemplate
+          .replace('{clickid}', cb_3)
           .replace('{click_id}', cb_3)
+          .replace('{event-name}', event_name)
           .replace('{event_name}', event_name)
           // .replace('{event_value}', event_revenue)
           .replace('{device_id}', adid ? adid : idfv)
           .replace('{android_device_id}', adid)
           .replace('{ios_device_id}', idfv)
           .replace('{install_timestamp}', attr_event_datetime)
-          .replace('{event_timestamp}', event_timestamp);
+          .replace('{event_timestamp}', event_timestamp)
+          .replace('{timestamp}', event_timestamp);
 
         await this.httpService
           .get(convertedPostbackEventUrlTemplate)
