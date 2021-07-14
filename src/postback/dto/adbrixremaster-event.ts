@@ -1,3 +1,5 @@
+import * as moment from 'moment-timezone';
+
 export class AdbrixremasterEvent {
   private _a_key: string;
   private _a_cookie: string;
@@ -56,7 +58,7 @@ export class AdbrixremasterEvent {
     this._m_publisher = query.m_publisher;
     this._m_sub_publisher = query.m_sub_publisher;
     this._attr_adid = query.attr_adid;
-    this._attr_event_datetime = query.attr_event_datetime;
+    this._attr_event_datetime = moment.utc(query.attr_event_datetime.replace('+', ' ')).tz('Asia/Seoul').format('YYYY-MM-DD HH:mm:ss');
     this._attr_event_timestamp = query.attr_event_timestamp;
     this._attr_seconds_gap = query.attr_seconds_gap;
     this._adid = query.adid;
@@ -80,7 +82,7 @@ export class AdbrixremasterEvent {
     this._installer = query.installer;
     this._app_version = query.app_version;
     this._event_name = query.event_name;
-    this._event_datetime = query.event_datetime;
+    this._event_datetime = moment.utc(query.event_datetime.replace('+', ' ')).tz('Asia/Seoul').format('YYYY-MM-DD HH:mm:ss');
     this._event_timestamp = query.event_timestamp;
     this._event_timestamp_d = query.event_timestamp_d;
     this._param_json = query.param_json;

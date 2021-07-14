@@ -1,3 +1,5 @@
+import * as moment from 'moment-timezone';
+
 export class AdbrixremasterInstall {
   private _a_key: string;
   private _a_cookie: string;
@@ -77,7 +79,7 @@ export class AdbrixremasterInstall {
     this._app_version = query.app_version;
     this._attr_type = query.attr_type;
     this._event_name = query.event_name;
-    this._event_datetime = query.event_datetime;
+    this._event_datetime = moment.utc(query.event_datetime.replace('+', ' ')).tz('Asia/Seoul').format('YYYY-MM-DD HH:mm:ss');
     this._deeplink_path = query.deeplink_path;
     this._market_install_btn_clicked = query.market_install_btn_clicked;
     this._app_install_start = query.app_install_start;
