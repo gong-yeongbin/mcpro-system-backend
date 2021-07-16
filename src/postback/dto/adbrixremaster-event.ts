@@ -150,7 +150,7 @@ export class AdbrixremasterEvent {
       event_datetime: this._event_datetime,
       event_timestamp: this._event_timestamp,
       event_timestamp_d: this._event_timestamp_d,
-      param_json: JSON.stringify(this._param_json),
+      param_json: this._param_json ? JSON.stringify(this._param_json) : '',
       cb_1: this._cb_1,
       cb_2: this._cb_2,
       cb_3: this._cb_3,
