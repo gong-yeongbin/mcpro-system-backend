@@ -237,7 +237,6 @@ export class AdbrixremasterService {
       currency,
       price,
     } = new AdbrixremasterEvent(req.query).build();
-    console.log('🚀 ~ file: adbrixremaster.service.ts ~ line 240 ~ AdbrixremasterService ~ postBackEventAdbrixRemaster ~ param_json', param_json);
 
     const campaignEntity: Campaign = await this.campaignRepository.findOne({
       where: { cp_token: cb_1 },
