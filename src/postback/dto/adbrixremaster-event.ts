@@ -45,6 +45,9 @@ export class AdbrixremasterEvent {
   private _cb_3: string;
   private _cb_4: string;
   private _cb_5: string;
+  private _product_id: string;
+  private _currency: string;
+  private _price: number;
 
   constructor(query: any) {
     this._a_key = query.a_key;
@@ -85,12 +88,26 @@ export class AdbrixremasterEvent {
     this._event_datetime = moment.utc(query.event_datetime.replace('+', ' ')).tz('Asia/Seoul').format('YYYY-MM-DD HH:mm:ss');
     this._event_timestamp = query.event_timestamp;
     this._event_timestamp_d = query.event_timestamp_d;
-    this._param_json = query.param_json;
     this._cb_1 = query.cb_1;
     this._cb_2 = query.cb_2;
     this._cb_3 = query.cb_3;
     this._cb_4 = query.cb_4;
     this._cb_5 = query.cb_5;
+    this._param_json = JSON.parse(query.param_json);
+
+    if (this._param_json['abx:item.abx:sales']) {
+      this._product_id = this._param_json['abx:item.abx:product_id'];
+      this._price = +this._param_json['abx:item.abx:sales'];
+      this._currency = this._param_json['abx:item.abx:currency'];
+    } else if (this._param_json['abx:items']) {
+      this._price = 0;
+
+      for (const item of this._param_json['abx:items']) {
+        this._price += +item['abx:sales'];
+        this._product_id = item['abx:product_id'];
+        this._currency = item['abx:currency'];
+      }
+    }
   }
 
   build() {
@@ -133,12 +150,15 @@ export class AdbrixremasterEvent {
       event_datetime: this._event_datetime,
       event_timestamp: this._event_timestamp,
       event_timestamp_d: this._event_timestamp_d,
-      param_json: this._param_json,
+      param_json: JSON.stringify(this._param_json),
       cb_1: this._cb_1,
       cb_2: this._cb_2,
       cb_3: this._cb_3,
       cb_4: this._cb_4,
       cb_5: this._cb_5,
+      product_id: this._product_id,
+      currency: this._currency,
+      price: this._price,
     };
   }
 }

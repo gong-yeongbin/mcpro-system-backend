@@ -141,6 +141,15 @@ export default class PostBackEventAdbrixremaster {
   @Column({ name: 'cb_5', type: 'nvarchar', nullable: true })
   cb_5: string;
 
+  @Column({ name: 'product_id', type: 'nvarchar', nullable: true })
+  product_id: string;
+
+  @Column({ name: 'currency', type: 'nvarchar', nullable: true })
+  currency: string;
+
+  @Column({ name: 'price', type: 'int', nullable: true })
+  price: number;
+
   @Column({ name: 'originalUrl', type: 'text', nullable: true })
   originalUrl: string;
 

@@ -184,7 +184,8 @@ export class AdbrixremasterService {
   }
 
   async postBackEventAdbrixRemaster(req: any) {
-    const originalUrl: string = decodeUnicode(`${req.protocol}://${req.get('host')}${req.originalUrl}`);
+    const originalUrl: string = decodeUnicode(`${req.protocol}://${req.get('host')}${req.url}`);
+
     console.log(`[ adbrixremaster ---> mecrosspro ] event : ${originalUrl}`);
 
     const {
@@ -232,6 +233,9 @@ export class AdbrixremasterService {
       cb_3,
       cb_4,
       cb_5,
+      product_id,
+      currency,
+      price,
     } = new AdbrixremasterEvent(req.query).build();
 
     const campaignEntity: Campaign = await this.campaignRepository.findOne({
@@ -306,6 +310,9 @@ export class AdbrixremasterService {
     postBackEventAdbrixremaster.cb_3 = cb_3;
     postBackEventAdbrixremaster.cb_4 = cb_4;
     postBackEventAdbrixremaster.cb_5 = cb_5;
+    postBackEventAdbrixremaster.product_id = product_id;
+    postBackEventAdbrixremaster.currency = currency;
+    postBackEventAdbrixremaster.price = price;
     postBackEventAdbrixremaster.originalUrl = originalUrl;
     postBackEventAdbrixremaster.campaign = campaignEntity;
 
