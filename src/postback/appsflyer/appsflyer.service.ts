@@ -84,11 +84,10 @@ export class AppsflyerService {
 
     if (postBackEventEntity.sendPostback) {
       const convertedPostbackInstallUrlTemplate = mediaEntity.mediaPostbackInstallUrlTemplate
-        .replace('{clickid}', clickid)
         .replace('{click_id}', clickid)
-        .replace('{device_id}', idfa ? idfa : idfv)
+        .replace('{device_id}', idfa)
         .replace('{android_device_id}', idfa)
-        .replace('{ios_device_id}', idfv)
+        .replace('{ios_device_id}', '')
         .replace('{install_timestamp}', install_time)
         .replace('{payout}', '');
 
@@ -185,14 +184,12 @@ export class AppsflyerService {
 
       if (postBackEventEntity.sendPostback) {
         const convertedPostbackEventUrlTemplate = mediaEntity.mediaPostbackEventUrlTemplate
-          .replace('{clickid}', clickid)
           .replace('{click_id}', clickid)
           .replace('{event_name}', event_name)
           .replace('{event_value}', event_revenue)
-          .replace('{event-value}', '')
-          .replace('{device_id}', idfa ? idfa : idfv)
+          .replace('{device_id}', idfa)
           .replace('{android_device_id}', idfa)
-          .replace('{ios_device_id}', idfv)
+          .replace('{ios_device_id}', '')
           .replace('{install_timestamp}', install_time)
           .replace('{event_timestamp}', event_time)
           .replace('{timestamp}', event_time);
