@@ -6,7 +6,7 @@ import { Repository } from 'typeorm';
 import * as moment from 'moment-timezone';
 import { AdbrixremasterInstall } from '../dto/adbrixremaster-install';
 import { AdbrixremasterEvent } from '../dto/adbrixremaster-event';
-import { PostBackInstallAdbrixremaster, PostBackEventAdbrixremaster, Campaign, Media, PostBackDaily, PostBackEvent } from '../../entities/Entity';
+import { PostBackInstallAdbrixremaster, PostBackEventAdbrixremaster, Campaign, Media, PostBackDaily, PostBackEvent, Advertising } from '../../entities/Entity';
 
 @Injectable()
 export class AdbrixremasterService {
@@ -79,11 +79,12 @@ export class AdbrixremasterService {
 
     const campaignEntity: Campaign = await this.campaignRepository.findOne({
       where: { cp_token: cb_1 },
-      relations: ['media'],
+      relations: ['media', 'advertising'],
     });
 
     if (!campaignEntity) throw new NotFoundException('not found campaign');
 
+    const advertisingEntity: Advertising = campaignEntity.advertising;
     const mediaEntity: Media = campaignEntity.media;
 
     const postBackEventEntity: PostBackEvent = await this.postBackEventRepository.findOne({
@@ -161,9 +162,9 @@ export class AdbrixremasterService {
     if (postBackEventEntity.sendPostback) {
       const convertedPostbackInstallUrlTemplate = mediaEntity.mediaPostbackInstallUrlTemplate
         .replace('{click_id}', cb_3)
-        .replace('{device_id}', adid ? adid : idfv)
-        .replace('{android_device_id}', a_fp.toLowerCase().indexOf('ios') == -1 ? adid : '')
-        .replace('{ios_device_id}', a_fp.toLowerCase().indexOf('ios') != -1 ? adid : '')
+        .replace('{device_id}', adid)
+        .replace('{android_device_id}', advertisingEntity.platform.toLowerCase() == 'aos' ? adid : '')
+        .replace('{ios_device_id}', advertisingEntity.platform.toLowerCase() == 'ios' ? adid : '')
         .replace('{install_timestamp}', event_datetime)
         .replace('{payout}', '');
 
@@ -239,11 +240,12 @@ export class AdbrixremasterService {
 
     const campaignEntity: Campaign = await this.campaignRepository.findOne({
       where: { cp_token: cb_1 },
-      relations: ['media'],
+      relations: ['media', 'advertising'],
     });
 
     if (!campaignEntity) throw new NotFoundException('not found campaign');
 
+    const advertisingEntity: Advertising = campaignEntity.advertising;
     const mediaEntity: Media = campaignEntity.media;
 
     const postBackEventEntity: PostBackEvent = await this.postBackEventRepository.findOne({
@@ -318,7 +320,7 @@ export class AdbrixremasterService {
     const postBackEventAdbrixremasterEntity: PostBackEventAdbrixremaster = await this.postBackEventAdbrixremasterRepository.save(postBackEventAdbrixremaster);
 
     if (postBackEventEntity) {
-      await this.commonService.dailyPostBackCountUp(postBackDailyEntity, postBackEventEntity);
+      await this.commonService.dailyPostBackCountUp(postBackDailyEntity, postBackEventEntity, price || null);
 
       if (postBackEventEntity.sendPostback) {
         const convertedPostbackEventUrlTemplate = mediaEntity.mediaPostbackEventUrlTemplate
@@ -326,8 +328,8 @@ export class AdbrixremasterService {
           .replace('{event_name}', event_name)
           .replace('{event_value}', '')
           .replace('{device_id}', adid ? adid : idfv)
-          .replace('{android_device_id}', a_fp.toLowerCase().indexOf('ios') == -1 ? adid : '')
-          .replace('{ios_device_id}', a_fp.toLowerCase().indexOf('ios') != -1 ? adid : '')
+          .replace('{android_device_id}', advertisingEntity.platform.toLowerCase() == 'aos' ? adid : '')
+          .replace('{ios_device_id}', advertisingEntity.platform.toLowerCase() == 'ios' ? adid : '')
           .replace('{install_timestamp}', attr_event_datetime)
           .replace('{event_timestamp}', event_timestamp)
           .replace('{timestamp}', event_timestamp);

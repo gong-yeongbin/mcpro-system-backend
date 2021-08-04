@@ -6,7 +6,7 @@ import { decodeUnicode } from 'src/util';
 import { AppsflyerInstall } from '../dto/appsflyer-install';
 import { AppsflyerEvent } from '../dto/appsflyer-event';
 import { CommonService } from 'src/common/common.service';
-import { PostBackDaily, Campaign, Media, PostBackEvent, PostBackEventAppsflyer, PostBackInstallAppsflyer } from '../../entities/Entity';
+import { PostBackDaily, Campaign, Media, PostBackEvent, PostBackEventAppsflyer, PostBackInstallAppsflyer, Advertising } from '../../entities/Entity';
 
 @Injectable()
 export class AppsflyerService {
@@ -36,11 +36,12 @@ export class AppsflyerService {
 
     const campaignEntity: Campaign = await this.campaignRepository.findOne({
       where: { cp_token: af_c_id },
-      relations: ['media'],
+      relations: ['media', 'advertising'],
     });
 
     if (!campaignEntity) throw new NotFoundException('not found campaign');
 
+    const advertisingEntity: Advertising = campaignEntity.advertising;
     const mediaEntity: Media = campaignEntity.media;
 
     const postBackEventEntity: PostBackEvent = await this.postBackEventRepository.findOne({
@@ -86,8 +87,8 @@ export class AppsflyerService {
       const convertedPostbackInstallUrlTemplate = mediaEntity.mediaPostbackInstallUrlTemplate
         .replace('{click_id}', clickid)
         .replace('{device_id}', idfa)
-        .replace('{android_device_id}', idfa)
-        .replace('{ios_device_id}', '')
+        .replace('{android_device_id}', advertisingEntity.platform.toLowerCase() == 'aos' ? idfa : '')
+        .replace('{ios_device_id}', advertisingEntity.platform.toLowerCase() == 'ios' ? idfa : '')
         .replace('{install_timestamp}', install_time)
         .replace('{payout}', '');
 
@@ -132,11 +133,12 @@ export class AppsflyerService {
 
     const campaignEntity: Campaign = await this.campaignRepository.findOne({
       where: { cp_token: af_c_id },
-      relations: ['media'],
+      relations: ['media', 'advertising'],
     });
 
     if (!campaignEntity) throw new NotFoundException('not found campaign');
 
+    const advertisingEntity: Advertising = campaignEntity.advertising;
     const mediaEntity: Media = campaignEntity.media;
 
     const postBackEventEntity: PostBackEvent = await this.postBackEventRepository.findOne({
@@ -188,8 +190,8 @@ export class AppsflyerService {
           .replace('{event_name}', event_name)
           .replace('{event_value}', event_revenue)
           .replace('{device_id}', idfa)
-          .replace('{android_device_id}', idfa)
-          .replace('{ios_device_id}', '')
+          .replace('{android_device_id}', advertisingEntity.platform.toLowerCase() == 'aos' ? idfa : '')
+          .replace('{ios_device_id}', advertisingEntity.platform.toLowerCase() == 'ios' ? idfa : '')
           .replace('{install_timestamp}', install_time)
           .replace('{event_timestamp}', event_time)
           .replace('{timestamp}', event_time);

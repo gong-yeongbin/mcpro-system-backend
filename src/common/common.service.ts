@@ -69,7 +69,7 @@ export class CommonService {
     return postBackDailyEntity;
   }
 
-  async dailyPostBackCountUp(postBackDailyEntity: PostBackDaily, postBackEventEntity: PostBackEvent): Promise<PostBackDaily> {
+  async dailyPostBackCountUp(postBackDailyEntity: PostBackDaily, postBackEventEntity: PostBackEvent, price?: number): Promise<PostBackDaily> {
     switch (postBackEventEntity.adminPostback) {
       case 'install':
         postBackDailyEntity.install = +postBackDailyEntity.install + 1;
@@ -82,6 +82,7 @@ export class CommonService {
         break;
       case 'buy':
         postBackDailyEntity.buy = +postBackDailyEntity.buy + 1;
+        postBackDailyEntity.price = +postBackDailyEntity.price + price;
         break;
       case 'etc1':
         postBackDailyEntity.etc1 = +postBackDailyEntity.etc1 + 1;
