@@ -45,8 +45,10 @@ export class AdbrixremasterInstall {
   private _cb_3: string;
   private _cb_4: string;
   private _cb_5: string;
+  private _a_server_datetime: string;
 
   constructor(query: any) {
+    console.log(query);
     this._a_key = query.a_key;
     this._a_cookie = query.a_cookie;
     this._a_ip = query.a_ip;
@@ -91,6 +93,7 @@ export class AdbrixremasterInstall {
     this._cb_3 = query.cb_3;
     this._cb_4 = query.cb_4;
     this._cb_5 = query.cb_5;
+    this._a_server_datetime = moment.utc(query.a_server_datetime.replace('+', ' ')).tz('Asia/Seoul').format('YYYY-MM-DD HH:mm:ss');
   }
 
   build() {
@@ -139,6 +142,7 @@ export class AdbrixremasterInstall {
       cb_3: this._cb_3,
       cb_4: this._cb_4,
       cb_5: this._cb_5,
+      a_server_datetime: this._a_server_datetime,
     };
   }
 }

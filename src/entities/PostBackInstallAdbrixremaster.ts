@@ -108,6 +108,9 @@ export default class PostBackInstallAdbrixremaster {
   @Column({ name: 'event_datetime', type: 'nvarchar', nullable: true })
   event_datetime: string;
 
+  @Column({ name: 'a_server_datetime', type: 'nvarchar', nullable: true })
+  a_server_datetime: string;
+
   @Column({ name: 'deeplink_path', type: 'nvarchar', nullable: true })
   deeplink_path: string;
 

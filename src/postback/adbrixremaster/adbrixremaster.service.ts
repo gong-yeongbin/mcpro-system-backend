@@ -70,6 +70,7 @@ export class AdbrixremasterService {
       app_install_completed,
       app_first_open,
       seconds_gap,
+      a_server_datetime,
       cb_1,
       cb_2,
       cb_3,
@@ -154,6 +155,7 @@ export class AdbrixremasterService {
     postBackInstallAdbrixremaster.cb_5 = cb_5;
     postBackInstallAdbrixremaster.originalUrl = originalUrl;
     postBackInstallAdbrixremaster.campaign = campaignEntity;
+    postBackInstallAdbrixremaster.a_server_datetime = a_server_datetime;
 
     const postBackInstallAdbrixremasterEntity: PostBackInstallAdbrixremaster = await this.postBackInstallAdbrixremasterRepository.save(
       postBackInstallAdbrixremaster,
