@@ -140,7 +140,7 @@ export class AdbrixremasterService {
   async postBackEventAdbrixRemaster(req: any) {
     const originalUrl: string = decodeUnicode(`${req.protocol}://${req.get('host')}${req.url}`);
 
-    console.log(`[ adbrixremaster ---> mecrosspro ] event : ${originalUrl}`);
+    // console.log(`[ adbrixremaster ---> mecrosspro ] event : ${originalUrl}`);
 
     const postBackEventAdbrixremaster: PostBackEventAdbrixremaster = this.postBackEventAdbrixremasterRepository.create({
       view_code: req.query.cb_2,
@@ -192,13 +192,13 @@ export class AdbrixremasterService {
       originalUrl: originalUrl,
     });
 
-    if (req.query.param_json['abx:item.abx:sales']) {
+    if (postBackEventAdbrixremaster.param_json['abx:item.abx:sales']) {
       postBackEventAdbrixremaster.product_id = req.query.param_json['abx:item.abx:product_id'];
       postBackEventAdbrixremaster.price = +req.query.param_json['abx:item.abx:sales'];
       postBackEventAdbrixremaster.currency = req.query.param_json['abx:item.abx:currency'];
-    } else if (req.query.param_json['abx:items']) {
+    } else if (postBackEventAdbrixremaster.param_json['abx:items']) {
       postBackEventAdbrixremaster.price = 0;
-      for (const item of req.query.param_json['abx:items']) {
+      for (const item of postBackEventAdbrixremaster.param_json['abx:items']) {
         postBackEventAdbrixremaster.price += +item['abx:sales'];
         postBackEventAdbrixremaster.product_id = item['abx:product_id'];
         postBackEventAdbrixremaster.currency = item['abx:currency'];
