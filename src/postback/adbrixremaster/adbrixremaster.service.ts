@@ -86,8 +86,6 @@ export class AdbrixremasterService {
 
     if (!campaignEntity) throw new NotFoundException('not found campaign');
 
-    postBackInstallAdbrixremaster.campaign = campaignEntity;
-
     const advertisingEntity: Advertising = campaignEntity.advertising;
     const mediaEntity: Media = campaignEntity.media;
 
@@ -140,7 +138,7 @@ export class AdbrixremasterService {
   async postBackEventAdbrixRemaster(req: any) {
     const originalUrl: string = decodeUnicode(`${req.protocol}://${req.get('host')}${req.url}`);
 
-    // console.log(`[ adbrixremaster ---> mecrosspro ] event : ${originalUrl}`);
+    console.log(`[ adbrixremaster ---> mecrosspro ] event : ${originalUrl}`);
 
     const postBackEventAdbrixremaster: PostBackEventAdbrixremaster = this.postBackEventAdbrixremasterRepository.create({
       view_code: req.query.cb_2,
@@ -212,8 +210,6 @@ export class AdbrixremasterService {
 
     if (!campaignEntity) throw new NotFoundException('not found campaign');
 
-    postBackEventAdbrixremaster.campaign = campaignEntity;
-
     const advertisingEntity: Advertising = campaignEntity.advertising;
     const mediaEntity: Media = campaignEntity.media;
 
@@ -235,10 +231,10 @@ export class AdbrixremasterService {
     if (!postBackDailyEntity)
       postBackDailyEntity = await this.commonService.createPostBackDaily(postBackEventAdbrixremaster.cb_2, postBackEventAdbrixremaster.cb_1);
 
-    const postBackEventAdbrixremasterEntity: PostBackEventAdbrixremaster = await this.postBackEventAdbrixremasterRepository.save(postBackEventAdbrixremaster);
-
     if (postBackEventEntity) {
       await this.commonService.dailyPostBackCountUp(postBackDailyEntity, postBackEventEntity, postBackEventAdbrixremaster.price || null);
+
+      await this.postBackEventAdbrixremasterRepository.save(postBackEventAdbrixremaster);
 
       if (postBackEventEntity.sendPostback) {
         const convertedPostbackEventUrlTemplate = mediaEntity.mediaPostbackEventUrlTemplate
@@ -257,8 +253,9 @@ export class AdbrixremasterService {
           .toPromise()
           .then(async () => {
             console.log(`[ mecrosspro ---> media ] event : ${convertedPostbackEventUrlTemplate}`);
-            postBackEventAdbrixremasterEntity.send_time = moment.utc().tz('Asia/Seoul').format('YYYY-MM-DD HH:mm:ss');
-            await this.postBackEventAdbrixremasterRepository.save(postBackEventAdbrixremasterEntity);
+
+            postBackEventAdbrixremaster.send_time = moment.utc().tz('Asia/Seoul').format('YYYY-MM-DD HH:mm:ss');
+            await this.postBackEventAdbrixremasterRepository.save(postBackEventAdbrixremaster);
           })
           .catch();
       }
