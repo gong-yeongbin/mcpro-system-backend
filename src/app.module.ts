@@ -27,7 +27,7 @@ import { CommonModule } from './common/common.module';
       username: process.env.MYSQL_USERNAME,
       password: process.env.MYSQL_PASSWORD,
       database: process.env.MYSQL_DATABASE,
-      synchronize: false,
+      synchronize: Boolean(process.env.MYSQL_SYNCHRONIZE),
       entities: [__dirname + '/**/*{.ts,.js}'],
       connectTimeout: 5000,
     }),

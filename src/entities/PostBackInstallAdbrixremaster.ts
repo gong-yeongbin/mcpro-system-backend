@@ -9,6 +9,9 @@ export default class PostBackInstallAdbrixremaster {
   @Column({ name: 'view_code', type: 'nvarchar' })
   view_code: string;
 
+  @Column({ name: 'token', type: 'nvarchar' })
+  token: string;
+
   @Column({ name: 'a_key', type: 'nvarchar', nullable: true })
   a_key: string;
 

@@ -1,14 +1,4 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-  Unique,
-  UpdateDateColumn,
-  OneToMany,
-  JoinColumn,
-} from 'typeorm';
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn, OneToMany, JoinColumn } from 'typeorm';
 import {
   Advertising,
   Media,
@@ -109,9 +99,6 @@ export default class Campaign {
   @OneToMany(() => PostBackEventAdbrixremaster, (postBackEventAdbrixremaster) => postBackEventAdbrixremaster.campaign)
   postBackEventAdbrixremaster: PostBackEventAdbrixremaster[];
 
-  @OneToMany(
-    () => PostBackInstallAdbrixremaster,
-    (postBackInstallAdbrixremaster) => postBackInstallAdbrixremaster.campaign
-  )
+  @OneToMany(() => PostBackInstallAdbrixremaster, (postBackInstallAdbrixremaster) => postBackInstallAdbrixremaster.campaign)
   postBackInstallAdbrixremaster: PostBackInstallAdbrixremaster[];
 }

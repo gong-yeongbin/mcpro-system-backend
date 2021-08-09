@@ -48,7 +48,6 @@ export class AdbrixremasterInstall {
   private _a_server_datetime: string;
 
   constructor(query: any) {
-    console.log(query);
     this._a_key = query.a_key;
     this._a_cookie = query.a_cookie;
     this._a_ip = query.a_ip;

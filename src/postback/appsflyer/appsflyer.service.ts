@@ -66,6 +66,7 @@ export class AppsflyerService {
     const postBackInstallAppsflyer: PostBackInstallAppsflyer = new PostBackInstallAppsflyer();
 
     postBackInstallAppsflyer.view_code = af_siteid;
+    postBackInstallAppsflyer.token = af_c_id;
     postBackInstallAppsflyer.clickid = clickid;
     postBackInstallAppsflyer.af_siteid = af_siteid;
     postBackInstallAppsflyer.af_c_id = af_c_id;
@@ -161,6 +162,7 @@ export class AppsflyerService {
     const postBackEventAppsflyer: PostBackEventAppsflyer = new PostBackEventAppsflyer();
 
     postBackEventAppsflyer.view_code = af_siteid;
+    postBackEventAppsflyer.token = af_c_id;
     postBackEventAppsflyer.clickid = clickid;
     postBackEventAppsflyer.af_siteid = af_siteid;
     postBackEventAppsflyer.af_c_id = af_c_id;

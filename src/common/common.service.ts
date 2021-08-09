@@ -100,7 +100,6 @@ export class CommonService {
         postBackDailyEntity.etc5 = +postBackDailyEntity.etc5 + 1;
         break;
     }
-
     return await this.postBackDailyRepository.save(postBackDailyEntity);
   }
 

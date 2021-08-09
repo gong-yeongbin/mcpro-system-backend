@@ -9,6 +9,9 @@ export default class PostBackEventAppsflyer {
   @Column({ name: 'view_code', type: 'nvarchar' })
   view_code: string;
 
+  @Column({ name: 'token', type: 'nvarchar' })
+  token: string;
+
   @Column({ name: 'clickid', type: 'nvarchar' })
   clickid: string;
 
