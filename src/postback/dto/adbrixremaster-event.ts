@@ -93,7 +93,7 @@ export class AdbrixremasterEvent {
     this._cb_3 = query.cb_3;
     this._cb_4 = query.cb_4;
     this._cb_5 = query.cb_5;
-    this._param_json = query.param_json ? JSON.parse(query.param_json) : '';
+    this._param_json = query.param_json && query.param_json != 'null' ? JSON.parse(query.param_json) : '';
 
     if (this._param_json['abx:item.abx:sales']) {
       this._product_id = this._param_json['abx:item.abx:product_id'];
