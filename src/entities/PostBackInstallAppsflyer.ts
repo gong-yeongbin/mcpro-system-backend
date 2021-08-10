@@ -9,7 +9,7 @@ export default class PostBackInstallAppsflyer {
   @Column({ name: 'view_code', type: 'nvarchar' })
   view_code: string;
 
-  @Column({ name: 'token', type: 'nvarchar' })
+  @Column({ name: 'token', type: 'nvarchar', nullable: true })
   token: string;
 
   @Column({ name: 'clickid', type: 'nvarchar' })
