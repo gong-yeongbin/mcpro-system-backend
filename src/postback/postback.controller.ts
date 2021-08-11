@@ -17,13 +17,11 @@ export class PostbackController {
   }
 
   @Get('/adbrix-remaster/install')
-  @Redirect('', 200)
   postbackInstall(@Req() req: any) {
     return this.adbrixremasterService.postBackInstallAdbrixRemaster(req);
   }
 
   @Get('/adbrix-remaster/event')
-  @Redirect('', 200)
   postbackEvent(@Req() req: any) {
     return this.adbrixremasterService.postBackEventAdbrixRemaster(req);
   }

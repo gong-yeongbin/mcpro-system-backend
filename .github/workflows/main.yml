@@ -27,14 +27,13 @@ jobs:
         run: |
           cp package.json dist/
           zip -r dist.zip ./dist
-
       - name: Beanstalk Deploy for app
         uses: einaregilsson/beanstalk-deploy@v16
         with:
           aws_access_key: ${{secrets.AWS_ACCESS_KEY_ID}}
           aws_secret_key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
           application_name: 'mecrosspro-system'
-          environment_name: 'Mecrossprosystem-env-test'
+          environment_name: 'Mecrossprosystem-env'
           region: ap-northeast-2
-          version_label: 'test-${{ github.run_number }}'
+          version_label: 'mecrosspro-system-${{ github.run_number }}'
           deployment_package: dist.zip
