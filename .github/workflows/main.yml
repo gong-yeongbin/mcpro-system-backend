@@ -25,8 +25,7 @@ jobs:
 
       - name: Make zip file
         run: |
-          cp package.json dist/
-          zip -r dist.zip ./dist
+          zip -r dist.zip ./*
 
       - name: Beanstalk Deploy for app
         uses: einaregilsson/beanstalk-deploy@v14
