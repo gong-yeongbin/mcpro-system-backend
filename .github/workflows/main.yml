@@ -19,7 +19,7 @@ jobs:
 
       - name: Make zip file
         run: |
-          zip -r dist.zip ./* -x 'node_modules/*'
+          zip -r dist.zip ./*
 
       - name: Beanstalk Deploy for app
         uses: einaregilsson/beanstalk-deploy@v14
