@@ -17,15 +17,9 @@ jobs:
         with:
           node-version: '12.x'
 
-      - name: Install Dependencies
-        run: npm install
-
-      - name: Build
-        run: npm run build
-
       - name: Make zip file
         run: |
-          zip -r dist.zip ./* -x --exclude="node_modules" "dist"
+          zip -r dist.zip ./*
 
       - name: Beanstalk Deploy for app
         uses: einaregilsson/beanstalk-deploy@v14
