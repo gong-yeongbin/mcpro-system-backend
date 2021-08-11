@@ -15,7 +15,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v1
         with:
-          node-version: '12.x'
+          node-version: ['12.x', '14.x']
 
       - name: Install Dependencies
         run: npm install
@@ -34,7 +34,7 @@ jobs:
           aws_access_key: ${{secrets.AWS_ACCESS_KEY_ID}}
           aws_secret_key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
           application_name: 'mecrosspro-system'
-          environment_name: 'Mecrossprosystem-env'
+          environment_name: 'Mecrossprosystem-env-dev'
           region: ap-northeast-2
-          version_label: 'mecrosspro-system-${{ github.run_number }}'
+          version_label: 'mecrosspro-system-dev-${{ github.run_number }}'
           deployment_package: dist.zip
