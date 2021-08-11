@@ -1,4 +1,4 @@
-name: mecrosspro-system
+name: mecrosspro-system-develop
 
 on:
   push:
@@ -29,5 +29,5 @@ jobs:
           application_name: 'mecrosspro-system'
           environment_name: 'Mecrossprosystem-env-dev'
           region: ap-northeast-2
-          version_label: 'mecrosspro-system-${{ github.run_number }}'
+          version_label: 'mecrosspro-system-develop-${{ github.run_number }}'
           deployment_package: dist.zip
