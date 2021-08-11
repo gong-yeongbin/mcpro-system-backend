@@ -19,7 +19,7 @@ jobs:
 
       - name: Make zip file
         run: |
-          zip -r dist.zip ./*
+          zip -r dist.zip ./* .ebextensions/*
 
       - name: Beanstalk Deploy for app
         uses: einaregilsson/beanstalk-deploy@v14
