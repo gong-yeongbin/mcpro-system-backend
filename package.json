@@ -11,7 +11,7 @@
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "npm install && npm run build && npm run start:prod",
     "start:dev": "nest start --watch",
-    "start:prod": "pm2 start dist/main.js -i max && pm2 list",
+    "start:prod": "pm2 start dist/main.js -i max",
     "start:debug": "nest start --debug --watch",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
