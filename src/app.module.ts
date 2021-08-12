@@ -8,6 +8,7 @@ import { ConfigModule } from '@nestjs/config';
 import { RedisModule } from 'nestjs-redis';
 import { RedisLockModule } from 'nestjs-simple-redis-lock';
 import { CommonModule } from './common/common.module';
+import { AppClusterService } from './app-cluster/app-cluster.service';
 
 @Module({
   imports: [
@@ -36,7 +37,7 @@ import { CommonModule } from './common/common.module';
     CommonModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, AppClusterService],
   exports: [ConfigModule],
 })
 export class AppModule {}

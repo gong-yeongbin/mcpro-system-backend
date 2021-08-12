@@ -1,5 +1,6 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { AppClusterService } from './app-cluster/app-cluster.service';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -18,4 +19,5 @@ async function bootstrap() {
 
   await app.listen(process.env.PORT || 3000);
 }
-bootstrap();
+// bootstrap();
+AppClusterService.clusterize(bootstrap);
