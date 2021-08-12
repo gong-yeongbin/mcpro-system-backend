@@ -17,9 +17,12 @@ jobs:
         with:
           node-version: '12.x'
 
+      - name: Build
+        run: npm run build
+
       - name: Make zip file
         run: |
-          zip -r dist.zip .dist/* .ebextensions/* ./package.json
+          zip -r dist.zip .dist/* ./package.json
       - name: Beanstalk Deploy for app
         uses: einaregilsson/beanstalk-deploy@v14
         with:
