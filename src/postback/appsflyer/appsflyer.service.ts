@@ -27,7 +27,7 @@ export class AppsflyerService {
 
   // appsflyer postback install
   async postBackInstallAppsflyer(req: any) {
-    const originalUrl: string = decodeUnicode(`${req.protocol}://${req.get('host')}${req.originalUrl}`);
+    const originalUrl: string = decodeUnicode(`${req.protocol}://${req.headers.host}${req.url}`);
 
     console.log(`[ appsflyer ---> mecrosspro ] install : ${originalUrl}`);
 
@@ -110,7 +110,7 @@ export class AppsflyerService {
 
   // appsflyer postback event
   async postBackEventAppsflyer(req: any) {
-    const originalUrl: string = decodeUnicode(`${req.protocol}://${req.get('host')}${req.originalUrl}`);
+    const originalUrl: string = decodeUnicode(`${req.protocol}://${req.headers.host}${req.url}`);
 
     console.log(`[ appsflyer ---> mecrosspro ] event : ${originalUrl}`);
 

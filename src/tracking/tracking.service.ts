@@ -7,6 +7,7 @@ import * as moment from 'moment';
 import { RedisService } from 'nestjs-redis';
 import { RedisLockService } from 'nestjs-simple-redis-lock';
 import { decodeUnicode } from 'src/util';
+import { Request } from 'express';
 
 @Injectable()
 export class TrackingService {
@@ -18,7 +19,7 @@ export class TrackingService {
   ) {}
 
   async tracking(request: any): Promise<string> {
-    const originalUrl: string = decodeUnicode(`${request.protocol}://${request.get('host')}${request.originalUrl}`);
+    const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
 
     const cp_token: string = ['', undefined, '{token}'].includes(request.query.token) ? '' : request.query.token;
     const pub_id: string = ['', undefined, '{pub_id}'].includes(request.query.pub_id) ? '' : request.query.pub_id;
