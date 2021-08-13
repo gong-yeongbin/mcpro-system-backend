@@ -24,7 +24,7 @@ export class AdbrixremasterService {
   ) {}
 
   async postBackInstallAdbrixRemaster(req: any) {
-    const originalUrl: string = decodeUnicode(`${req.protocol}://${req.get('host')}${req.originalUrl}`);
+    const originalUrl: string = decodeUnicode(`${req.protocol}://${req.headers.host}${req.url}`);
     console.log(`[ adbrixremaster ---> mecrosspro ] install : ${originalUrl}`);
 
     const postBackInstallAdbrixremaster: PostBackInstallAdbrixremaster = this.postBackInstallAdbrixremasterRepository.create({
@@ -116,7 +116,7 @@ export class AdbrixremasterService {
   }
 
   async postBackEventAdbrixRemaster(req: any) {
-    const originalUrl: string = decodeUnicode(`${req.protocol}://${req.get('host')}${req.url}`);
+    const originalUrl: string = decodeUnicode(`${req.protocol}://${req.headers.host}${req.url}`);
     console.log(`[ adbrixremaster ---> mecrosspro ] event : ${originalUrl}`);
     const postBackEventAdbrixremaster: PostBackEventAdbrixremaster = this.postBackEventAdbrixremasterRepository.create({
       view_code: req.query.cb_2,
