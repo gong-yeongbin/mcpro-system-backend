@@ -3,11 +3,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Campaign } from '../entities/Entity';
 import { Repository } from 'typeorm';
 import { v4 } from 'uuid';
-import * as moment from 'moment';
 import { RedisService } from 'nestjs-redis';
-import { RedisLockService } from 'nestjs-simple-redis-lock';
+import * as moment from 'moment';
 import { decodeUnicode } from 'src/util';
-import { Request } from 'express';
 
 @Injectable()
 export class TrackingService {
@@ -15,7 +13,6 @@ export class TrackingService {
     @InjectRepository(Campaign)
     private readonly campaignRepository: Repository<Campaign>,
     private readonly redisService: RedisService,
-    private readonly lockService: RedisLockService,
   ) {}
 
   async tracking(request: any): Promise<string> {
@@ -38,8 +35,6 @@ export class TrackingService {
     if (!campaignEntity) throw new NotFoundException();
 
     try {
-      await this.lockService.lock(moment().format('YYYYMMDD'), 2 * 60 * 1000, 50, 50);
-
       const redis: any = this.redisService.getClient();
 
       const click_count: number = await redis.hget(
@@ -69,7 +64,6 @@ export class TrackingService {
 
       return convertedTrackingUrl;
     } finally {
-      this.lockService.unlock(moment().format('YYYYMMDD'));
     }
   }
 }
