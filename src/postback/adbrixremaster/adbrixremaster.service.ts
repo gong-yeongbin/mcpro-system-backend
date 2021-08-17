@@ -168,15 +168,13 @@ export class AdbrixremasterService {
       originalUrl: originalUrl,
     });
 
-    const jsonData: any = JSON.parse(postBackEventAdbrixremaster.param_json);
-
-    if (jsonData['abx:item.abx:sales']) {
-      postBackEventAdbrixremaster.product_id = jsonData['abx:item.abx:product_id'];
-      postBackEventAdbrixremaster.price = +jsonData['abx:item.abx:sales'];
-      postBackEventAdbrixremaster.currency = jsonData['abx:item.abx:currency'];
-    } else if (jsonData['abx:items']) {
+    if (postBackEventAdbrixremaster.param_json['abx:item.abx:sales']) {
+      postBackEventAdbrixremaster.product_id = postBackEventAdbrixremaster.param_json['abx:item.abx:product_id'];
+      postBackEventAdbrixremaster.price = +postBackEventAdbrixremaster.param_json['abx:item.abx:sales'];
+      postBackEventAdbrixremaster.currency = postBackEventAdbrixremaster.param_json['abx:item.abx:currency'];
+    } else if (postBackEventAdbrixremaster.param_json['abx:items']) {
       postBackEventAdbrixremaster.price = 0;
-      for (const item of jsonData['abx:items']) {
+      for (const item of postBackEventAdbrixremaster.param_json['abx:items']) {
         postBackEventAdbrixremaster.price += +item['abx:sales'];
         postBackEventAdbrixremaster.product_id = item['abx:product_id'];
         postBackEventAdbrixremaster.currency = item['abx:currency'];
