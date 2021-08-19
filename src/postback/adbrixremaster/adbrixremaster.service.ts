@@ -197,7 +197,7 @@ export class AdbrixremasterService {
     const postBackDailyEntity: PostBackDaily = await this.commonService.isValidationPostbackDaily(postBackEventAdbrixremaster.view_code);
 
     if (postBackDailyEntity && postBackEventEntity) {
-      await this.commonService.dailyPostBackCountUp(postBackDailyEntity, postBackEventEntity, postBackEventAdbrixremaster.price | 0);
+      await this.commonService.dailyPostBackCountUp(postBackDailyEntity, postBackEventEntity, postBackEventAdbrixremaster.price);
 
       if (postBackEventEntity.sendPostback) {
         const click_id: string = postBackEventAdbrixremaster.cb_3;
