@@ -77,7 +77,11 @@ export class AdbrixremasterService {
       a_server_datetime: moment.utc(req.query.a_server_datetime.replace('+', ' ')).tz('Asia/Seoul').format('YYYY-MM-DD HH:mm:ss'),
     });
 
-    const postBackDailyEntity: PostBackDaily = await this.commonService.isValidationPostbackDaily(postBackInstallAdbrixremaster.view_code);
+    const postBackDailyEntity: PostBackDaily = await this.commonService.isValidationPostbackDaily(
+      postBackInstallAdbrixremaster.view_code,
+      postBackInstallAdbrixremaster.token,
+    );
+
     postBackDailyEntity.install++;
     await this.postBackDailyRepository.save(postBackDailyEntity);
 
@@ -194,7 +198,10 @@ export class AdbrixremasterService {
       where: { campaign: campaignEntity, trackerPostback: postBackEventAdbrixremaster.event_name },
     });
 
-    const postBackDailyEntity: PostBackDaily = await this.commonService.isValidationPostbackDaily(postBackEventAdbrixremaster.view_code);
+    const postBackDailyEntity: PostBackDaily = await this.commonService.isValidationPostbackDaily(
+      postBackEventAdbrixremaster.view_code,
+      postBackEventAdbrixremaster.token,
+    );
 
     if (postBackDailyEntity && postBackEventEntity) {
       await this.commonService.dailyPostBackCountUp(postBackDailyEntity, postBackEventEntity, postBackEventAdbrixremaster.price);

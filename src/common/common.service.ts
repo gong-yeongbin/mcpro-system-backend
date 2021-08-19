@@ -149,31 +149,63 @@ export class CommonService {
     return isSendtime ? isSendtime : '';
   }
 
-  async isValidationPostbackDaily(viewCode: string): Promise<PostBackDaily> {
+  async isValidationPostbackDaily(view_code: string, cp_token: string): Promise<PostBackDaily> {
     let postBackDailyEntity: PostBackDaily;
-    postBackDailyEntity = await this.postBackDailyRepository.findOne({
-      where: { view_code: viewCode },
-      relations: ['campaign'],
-      order: { created_at: 'DESC' },
-    });
 
-    const today: string = moment.utc().tz('Asia/Seoul').format('YYYY-MM-DD');
-    const createdAt: string = moment.utc(postBackDailyEntity.created_at).tz('Asia/Seoul').format('YYYY-MM-DD');
+    postBackDailyEntity = await this.postBackDailyRepository
+      .createQueryBuilder('postBackDaily')
+      .leftJoinAndSelect('postBackDaily.campaign', 'campaign')
+      .where('Date(postBackDaily.created_at) =:date', { date: moment.utc().tz('Asia/Seoul').format('YYYY-MM-DD') })
+      .andWhere('postBackDaily.view_code =:view_code', { view_code: view_code })
+      .getOne();
 
-    if (today !== createdAt) {
-      const cp_token: string = postBackDailyEntity.cp_token;
-      const view_code: string = postBackDailyEntity.view_code;
-      const pub_id: string = postBackDailyEntity.pub_id;
-      const sub_id: string = postBackDailyEntity.sub_id;
-      const campaignEntity: Campaign = postBackDailyEntity.campaign;
+    if (!postBackDailyEntity) {
+      try {
+        await this.lockService.lock(moment().format('YYYYMMDD'), 1 * 60 * 1000, 10, 30);
 
-      postBackDailyEntity = await this.postBackDailyRepository.save({
-        cp_token: cp_token,
-        view_code: view_code,
-        pub_id: pub_id,
-        sub_id: sub_id,
-        campaign: campaignEntity,
-      });
+        const redis: any = this.redisService.getClient();
+
+        let cursor: number;
+        cursor = 0;
+        do {
+          const data: any = await redis.hscan('view_code', cursor, 'MATCH', `${cp_token}/*`, 'COUNT', 20000);
+
+          cursor = data[0];
+          const keys: Array<string> = data[1];
+          for (let i = 0; i < keys.length; i++) {
+            const isViewCode: string = await redis.hget('view_code', keys[i]);
+
+            if (view_code === isViewCode) {
+              const splitData: Array<string> = keys[i].split('/');
+              const pub_id: string = splitData[1];
+              const sub_id: string = splitData[2];
+              const media_idx: string = splitData[3];
+
+              const campaignEntity: Campaign = await this.campaignRepository.findOne({
+                where: {
+                  cp_token: cp_token,
+                  media: { idx: media_idx },
+                },
+                relations: ['media'],
+              });
+
+              if (!campaignEntity) throw new NotFoundException();
+
+              const postBackDaily = this.postBackDailyRepository.create({
+                cp_token: cp_token,
+                pub_id: pub_id,
+                sub_id: sub_id,
+                view_code: view_code,
+                campaign: campaignEntity,
+              });
+
+              postBackDailyEntity = await this.postBackDailyRepository.save(postBackDaily);
+            }
+          }
+        } while (cursor != 0);
+      } finally {
+        this.lockService.unlock(moment().format('YYYYMMDD'));
+      }
     }
 
     return postBackDailyEntity;

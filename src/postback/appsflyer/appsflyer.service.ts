@@ -49,7 +49,10 @@ export class AppsflyerService {
       originalUrl: originalUrl,
     });
 
-    const postBackDailyEntity: PostBackDaily = await this.commonService.isValidationPostbackDaily(postBackInstallAppsflyer.view_code);
+    const postBackDailyEntity: PostBackDaily = await this.commonService.isValidationPostbackDaily(
+      postBackInstallAppsflyer.view_code,
+      postBackInstallAppsflyer.token,
+    );
     postBackDailyEntity.install++;
     await this.postBackDailyRepository.save(postBackDailyEntity);
 
@@ -122,7 +125,10 @@ export class AppsflyerService {
       where: { campaign: campaignEntity, trackerPostback: postBackEventAppsflyer.event_name },
     });
 
-    const postBackDailyEntity: PostBackDaily = await this.commonService.isValidationPostbackDaily(postBackEventAppsflyer.view_code);
+    const postBackDailyEntity: PostBackDaily = await this.commonService.isValidationPostbackDaily(
+      postBackEventAppsflyer.view_code,
+      postBackEventAppsflyer.token,
+    );
 
     if (postBackEventEntity) {
       await this.commonService.dailyPostBackCountUp(postBackDailyEntity, postBackEventEntity, +postBackEventAppsflyer.event_revenue);
