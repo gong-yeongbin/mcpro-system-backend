@@ -1,4 +1,4 @@
-import { HttpService, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CommonService } from 'src/common/common.service';
 import { decodeUnicode } from 'src/util';
@@ -9,7 +9,6 @@ import { PostBackInstallAdbrixremaster, PostBackEventAdbrixremaster, Campaign, M
 @Injectable()
 export class AdbrixremasterService {
   constructor(
-    private httpService: HttpService,
     private readonly commonService: CommonService,
     @InjectRepository(Campaign)
     private readonly campaignRepository: Repository<Campaign>,
@@ -78,40 +77,38 @@ export class AdbrixremasterService {
       a_server_datetime: moment.utc(req.query.a_server_datetime.replace('+', ' ')).tz('Asia/Seoul').format('YYYY-MM-DD HH:mm:ss'),
     });
 
-    await this.postBackInstallAdbrixremasterRepository.save(postBackInstallAdbrixremaster);
+    const postBackDailyEntity: PostBackDaily = await this.commonService.isValidationPostbackDaily(postBackInstallAdbrixremaster.view_code);
+    postBackDailyEntity.install++;
+    await this.postBackDailyRepository.save(postBackDailyEntity);
 
     const campaignEntity: Campaign = await this.campaignRepository.findOne({
       where: { cp_token: postBackInstallAdbrixremaster.cb_1 },
       relations: ['media', 'advertising'],
     });
 
-    if (!campaignEntity) throw new NotFoundException('not found campaign');
+    if (!campaignEntity) throw new NotFoundException();
 
-    const advertisingEntity: Advertising = campaignEntity.advertising;
-    const mediaEntity: Media = campaignEntity.media;
     const postBackEventEntity: PostBackEvent = await this.postBackEventRepository.findOne({
       where: { campaign: campaignEntity, trackerPostback: 'install' },
     });
 
     if (postBackEventEntity.sendPostback) {
-      const convertedPostbackInstallUrlTemplate = mediaEntity.mediaPostbackInstallUrlTemplate
-        .replace('{click_id}', postBackInstallAdbrixremaster.cb_3)
-        .replace('{device_id}', postBackInstallAdbrixremaster.adid)
-        .replace('{android_device_id}', advertisingEntity.platform.toLowerCase() == 'aos' ? postBackInstallAdbrixremaster.adid : '')
-        .replace('{ios_device_id}', advertisingEntity.platform.toLowerCase() == 'ios' ? postBackInstallAdbrixremaster.adid : '')
-        .replace('{install_timestamp}', postBackInstallAdbrixremaster.event_datetime)
-        .replace('{payout}', '');
+      const click_id: string = postBackInstallAdbrixremaster.cb_3;
+      const adid: string = postBackInstallAdbrixremaster.adid;
+      const event_datetime: string = postBackInstallAdbrixremaster.event_datetime;
 
-      await this.httpService
-        .get(convertedPostbackInstallUrlTemplate)
-        .toPromise()
-        .then(async () => {
-          console.log(`[ mecrosspro ---> media ] install : ${convertedPostbackInstallUrlTemplate}`);
-          postBackInstallAdbrixremaster.send_time = moment.utc().tz('Asia/Seoul').format('YYYY-MM-DD HH:mm:ss');
-          await this.postBackInstallAdbrixremasterRepository.save(postBackInstallAdbrixremaster);
-        })
-        .catch();
+      const url: string = await this.commonService.convertedPostbackInstallUrl({
+        click_id: click_id,
+        adid: adid,
+        event_datetime: event_datetime,
+        campaignEntity: campaignEntity,
+      });
+
+      postBackInstallAdbrixremaster.send_time = await this.commonService.httpServiceHandler(url);
     }
+
+    await this.postBackInstallAdbrixremasterRepository.save(postBackInstallAdbrixremaster);
+
     return;
   }
 
@@ -167,6 +164,7 @@ export class AdbrixremasterService {
       cb_5: req.query.cb_5,
       param_json: req.query.param_json,
       originalUrl: originalUrl,
+      price: 0,
     });
 
     if (postBackEventAdbrixremaster.param_json != 'null' && postBackEventAdbrixremaster.param_json != '') {
@@ -177,7 +175,6 @@ export class AdbrixremasterService {
         postBackEventAdbrixremaster.price = +jsonData['abx:item.abx:sales'];
         postBackEventAdbrixremaster.currency = jsonData['abx:item.abx:currency'];
       } else if (jsonData['abx:items']) {
-        postBackEventAdbrixremaster.price = 0;
         for (const item of jsonData['abx:items']) {
           postBackEventAdbrixremaster.price += +item['abx:sales'];
           postBackEventAdbrixremaster.product_id = item['abx:product_id'];
@@ -191,57 +188,41 @@ export class AdbrixremasterService {
       relations: ['media', 'advertising'],
     });
 
-    if (!campaignEntity) throw new NotFoundException('not found campaign');
+    if (!campaignEntity) throw new NotFoundException();
 
-    const advertisingEntity: Advertising = campaignEntity.advertising;
-    const mediaEntity: Media = campaignEntity.media;
     const postBackEventEntity: PostBackEvent = await this.postBackEventRepository.findOne({
       where: { campaign: campaignEntity, trackerPostback: postBackEventAdbrixremaster.event_name },
     });
 
-    let postBackDailyEntity: PostBackDaily = await this.postBackDailyRepository
-      .createQueryBuilder('postBackDaily')
-      .where('postBackDaily.view_code =:view_code', {
-        view_code: postBackEventAdbrixremaster.cb_2,
-      })
-      .andWhere('postBackDaily.cp_token =:cp_token', { cp_token: postBackEventAdbrixremaster.cb_1 })
-      .andWhere('Date(postBackDaily.created_at) =:date ', {
-        date: moment().tz('Asia/Seoul').format('YYYYMMDD'),
-      })
-      .getOne();
+    const postBackDailyEntity: PostBackDaily = await this.commonService.isValidationPostbackDaily(postBackEventAdbrixremaster.view_code);
 
-    if (!postBackDailyEntity)
-      postBackDailyEntity = await this.commonService.createPostBackDaily(postBackEventAdbrixremaster.cb_2, postBackEventAdbrixremaster.cb_1);
-
-    if (postBackEventEntity) {
-      await this.commonService.dailyPostBackCountUp(postBackDailyEntity, postBackEventEntity, postBackEventAdbrixremaster.price || null);
-      await this.postBackEventAdbrixremasterRepository.save(postBackEventAdbrixremaster);
+    if (postBackDailyEntity && postBackEventEntity) {
+      await this.commonService.dailyPostBackCountUp(postBackDailyEntity, postBackEventEntity, postBackEventAdbrixremaster.price | 0);
 
       if (postBackEventEntity.sendPostback) {
-        const convertedPostbackEventUrlTemplate = mediaEntity.mediaPostbackEventUrlTemplate
-          .replace('{click_id}', postBackEventAdbrixremaster.cb_3)
-          .replace('{event_name}', postBackEventAdbrixremaster.event_name)
-          .replace('{event_value}', '')
-          .replace('{device_id}', postBackEventAdbrixremaster.adid ? postBackEventAdbrixremaster.adid : postBackEventAdbrixremaster.idfv)
-          .replace('{android_device_id}', advertisingEntity.platform.toLowerCase() == 'aos' ? postBackEventAdbrixremaster.adid : '')
-          .replace('{ios_device_id}', advertisingEntity.platform.toLowerCase() == 'ios' ? postBackEventAdbrixremaster.adid : '')
-          .replace('{install_timestamp}', postBackEventAdbrixremaster.attr_event_datetime)
-          .replace('{event_timestamp}', postBackEventAdbrixremaster.event_timestamp)
-          .replace('{timestamp}', postBackEventAdbrixremaster.event_timestamp);
+        const click_id: string = postBackEventAdbrixremaster.cb_3;
+        const adid: string = postBackEventAdbrixremaster.adid;
+        const event_name: string = postBackEventAdbrixremaster.event_name;
+        const install_datetime: string = postBackEventAdbrixremaster.attr_event_datetime;
+        const event_datetime: string = postBackEventAdbrixremaster.event_timestamp;
 
-        await this.httpService
-          .get(convertedPostbackEventUrlTemplate)
-          .toPromise()
-          .then(async () => {
-            console.log(`[ mecrosspro ---> media ] event : ${convertedPostbackEventUrlTemplate}`);
-            postBackEventAdbrixremaster.send_time = moment.utc().tz('Asia/Seoul').format('YYYY-MM-DD HH:mm:ss');
-            await this.postBackEventAdbrixremasterRepository.save(postBackEventAdbrixremaster);
-          })
-          .catch();
+        const url: string = await this.commonService.convertedPostbackEventUrl({
+          click_id: click_id,
+          adid: adid,
+          event_name: event_name,
+          event_datetime: event_datetime,
+          install_datetime: install_datetime,
+          campaignEntity: campaignEntity,
+        });
+
+        postBackEventAdbrixremaster.send_time = await this.commonService.httpServiceHandler(url);
       }
+
+      await this.postBackEventAdbrixremasterRepository.save(postBackEventAdbrixremaster);
     } else {
       await this.commonService.postBackUnregisteredEvent(postBackDailyEntity, postBackEventAdbrixremaster.event_name);
     }
+
     return;
   }
 }

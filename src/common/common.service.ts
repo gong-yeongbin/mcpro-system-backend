@@ -4,11 +4,21 @@ import { RedisService } from 'nestjs-redis';
 import { RedisLockService } from 'nestjs-simple-redis-lock';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as moment from 'moment-timezone';
-import { Campaign, PostBackDaily, PostBackUnregisteredEvent, PostBackEvent } from '../entities/Entity';
+import {
+  Campaign,
+  PostBackDaily,
+  PostBackUnregisteredEvent,
+  PostBackEvent,
+  PostBackInstallAdbrixremaster,
+  PostBackEventAdbrixremaster,
+} from '../entities/Entity';
+import { HttpService } from '@nestjs/common';
+import { create } from 'domain';
 
 @Injectable()
 export class CommonService {
   constructor(
+    private httpService: HttpService,
     private readonly redisService: RedisService,
     private readonly lockService: RedisLockService,
     @InjectRepository(Campaign)
@@ -122,5 +132,93 @@ export class CommonService {
 
       return await this.postBackUnregisteredEventRepository.save(postBackUnregisteredEvent);
     }
+  }
+
+  async httpServiceHandler(url: string): Promise<string> {
+    let isSendtime: string;
+
+    await this.httpService
+      .get(url)
+      .toPromise()
+      .then(async () => {
+        console.log(`[ mecrosspro ---> media ] install : ${url}`);
+        isSendtime = moment.utc().tz('Asia/Seoul').format('YYYY-MM-DD HH:mm:ss');
+      })
+      .catch();
+
+    return isSendtime ? isSendtime : '';
+  }
+
+  async isValidationPostbackDaily(viewCode: string): Promise<PostBackDaily> {
+    let postBackDailyEntity: PostBackDaily;
+    postBackDailyEntity = await this.postBackDailyRepository.findOne({
+      where: { view_code: viewCode },
+      relations: ['campaign'],
+      order: { created_at: 'DESC' },
+    });
+
+    const today: string = moment.utc().tz('Asia/Seoul').format('YYYY-MM-DD');
+    const createdAt: string = moment.utc(postBackDailyEntity.created_at).tz('Asia/Seoul').format('YYYY-MM-DD');
+
+    if (today !== createdAt) {
+      const cp_token: string = postBackDailyEntity.cp_token;
+      const view_code: string = postBackDailyEntity.view_code;
+      const pub_id: string = postBackDailyEntity.pub_id;
+      const sub_id: string = postBackDailyEntity.sub_id;
+      const campaignEntity: Campaign = postBackDailyEntity.campaign;
+
+      postBackDailyEntity = await this.postBackDailyRepository.save({
+        cp_token: cp_token,
+        view_code: view_code,
+        pub_id: pub_id,
+        sub_id: sub_id,
+        campaign: campaignEntity,
+      });
+    }
+
+    return postBackDailyEntity;
+  }
+
+  async convertedPostbackInstallUrl(data: { click_id: string; adid: string; event_datetime: string; campaignEntity: Campaign }): Promise<string> {
+    const mediaPostbackInstallUrlTemplate: string = data.campaignEntity.media.mediaPostbackInstallUrlTemplate;
+    const platform: string = data.campaignEntity.advertising.platform;
+    const click_id: string = data.click_id;
+    const adid: string = data.adid;
+    const event_datetime: string = data.event_datetime;
+
+    return mediaPostbackInstallUrlTemplate
+      .replace('{click_id}', click_id)
+      .replace('{device_id}', adid)
+      .replace('{android_device_id}', platform.toLowerCase() == 'aos' ? adid : '')
+      .replace('{ios_device_id}', platform.toLowerCase() == 'ios' ? adid : '')
+      .replace('{install_timestamp}', event_datetime)
+      .replace('{payout}', '');
+  }
+
+  async convertedPostbackEventUrl(data: {
+    click_id: string;
+    adid: string;
+    event_name: string;
+    event_datetime: string;
+    install_datetime: string;
+    campaignEntity: Campaign;
+  }): Promise<string> {
+    const mediaPostbackInstallUrlTemplate: string = data.campaignEntity.media.mediaPostbackInstallUrlTemplate;
+    const platform: string = data.campaignEntity.advertising.platform;
+    const click_id: string = data.click_id;
+    const adid: string = data.adid;
+    const event_name: string = data.event_name;
+    const event_datetime: string = data.event_datetime;
+    const install_datetime: string = data.install_datetime;
+
+    return mediaPostbackInstallUrlTemplate
+      .replace('{click_id}', click_id)
+      .replace('{event_name}', event_name)
+      .replace('{event_value}', '')
+      .replace('{device_id}', adid)
+      .replace('{android_device_id}', platform.toLowerCase() == 'aos' ? adid : '')
+      .replace('{ios_device_id}', platform.toLowerCase() == 'ios' ? adid : '')
+      .replace('{install_timestamp}', install_datetime)
+      .replace('{event_timestamp}', event_datetime);
   }
 }

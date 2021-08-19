@@ -9,19 +9,12 @@ import { RedisModule } from 'nestjs-redis';
 import { RedisLockModule } from 'nestjs-simple-redis-lock';
 import { CommonModule } from './common/common.module';
 import { AppClusterService } from './app-cluster/app-cluster.service';
-import { BullModule } from '@nestjs/bull';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       envFilePath: ['.env.dev'],
       isGlobal: true,
-    }),
-    BullModule.forRoot({
-      redis: {
-        host: process.env.REDIS_HOST,
-        port: +process.env.REDIS_PORT,
-      },
     }),
     RedisModule.register({
       host: process.env.REDIS_HOST,

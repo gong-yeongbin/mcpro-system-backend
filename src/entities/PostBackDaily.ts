@@ -1,13 +1,4 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-  OneToMany,
-  JoinColumn,
-} from 'typeorm';
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn, OneToMany, JoinColumn } from 'typeorm';
 import { Campaign, PostBackUnregisteredEvent } from './Entity';
 
 export interface PostBackDailyMetaData {
