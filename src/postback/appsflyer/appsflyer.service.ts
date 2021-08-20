@@ -51,6 +51,8 @@ export class AppsflyerService {
       postBackInstallAppsflyer.token,
     );
 
+    if (!postBackDailyEntity) throw new NotFoundException();
+
     postBackDailyEntity.install++;
     await this.postBackDailyRepository.save(postBackDailyEntity);
 
@@ -82,6 +84,7 @@ export class AppsflyerService {
       });
 
       postBackInstallAppsflyer.send_time = await this.commonService.httpServiceHandler(url);
+      postBackInstallAppsflyer.send_url = url;
     }
 
     await this.postBackInstallAppsflyerRepository.save(postBackInstallAppsflyer);
@@ -155,6 +158,7 @@ export class AppsflyerService {
         });
 
         postBackEventAppsflyer.send_time = await this.commonService.httpServiceHandler(url);
+        postBackEventAppsflyer.send_url = url;
       }
 
       await this.postbackEventAppsflyerRepository.save(postBackEventAppsflyer);

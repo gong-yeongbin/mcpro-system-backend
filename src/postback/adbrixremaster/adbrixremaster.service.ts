@@ -84,6 +84,8 @@ export class AdbrixremasterService {
       postBackInstallAdbrixremaster.token,
     );
 
+    if (!postBackDailyEntity) throw new NotFoundException();
+
     postBackDailyEntity.install++;
     await this.postBackDailyRepository.save(postBackDailyEntity);
 
@@ -115,6 +117,7 @@ export class AdbrixremasterService {
       });
 
       postBackInstallAdbrixremaster.send_time = await this.commonService.httpServiceHandler(url);
+      postBackInstallAdbrixremaster.send_url = url;
     }
 
     await this.postBackInstallAdbrixremasterRepository.save(postBackInstallAdbrixremaster);
@@ -230,6 +233,7 @@ export class AdbrixremasterService {
         });
 
         postBackEventAdbrixremaster.send_time = await this.commonService.httpServiceHandler(url);
+        postBackEventAdbrixremaster.send_url = url;
       }
 
       await this.postBackEventAdbrixremasterRepository.save(postBackEventAdbrixremaster);

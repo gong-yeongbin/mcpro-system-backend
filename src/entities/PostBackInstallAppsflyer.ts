@@ -54,6 +54,9 @@ export default class PostBackInstallAppsflyer {
   @Column({ name: 'send_time', type: 'nvarchar', nullable: true })
   send_time: string;
 
+  @Column({ name: 'send_url', type: 'text', nullable: true })
+  send_url: string;
+
   @CreateDateColumn({ name: 'created_at' })
   created_at: Date;
 
