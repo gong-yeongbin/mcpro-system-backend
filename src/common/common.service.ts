@@ -195,7 +195,7 @@ export class CommonService {
     campaignEntity: Campaign;
     postBackDailyEntity: PostBackDaily;
   }): Promise<string> {
-    const mediaPostbackInstallUrlTemplate: string = data.campaignEntity.media.mediaPostbackInstallUrlTemplate;
+    const mediaPostbackInstallUrlTemplate: string = data.campaignEntity.media.mediaPostbackEventUrlTemplate;
     const platform: string = data.campaignEntity.advertising.platform;
     const click_id: string = data.click_id;
     const adid: string = data.adid;
