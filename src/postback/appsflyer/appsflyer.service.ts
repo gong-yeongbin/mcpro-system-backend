@@ -50,6 +50,7 @@ export class AppsflyerService {
       postBackInstallAppsflyer.view_code,
       postBackInstallAppsflyer.token,
     );
+
     postBackDailyEntity.install++;
     await this.postBackDailyRepository.save(postBackDailyEntity);
 
