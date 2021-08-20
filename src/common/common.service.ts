@@ -3,17 +3,9 @@ import { Repository } from 'typeorm';
 import { RedisService } from 'nestjs-redis';
 import { RedisLockService } from 'nestjs-simple-redis-lock';
 import { InjectRepository } from '@nestjs/typeorm';
-import * as moment from 'moment-timezone';
-import {
-  Campaign,
-  PostBackDaily,
-  PostBackUnregisteredEvent,
-  PostBackEvent,
-  PostBackInstallAdbrixremaster,
-  PostBackEventAdbrixremaster,
-} from '../entities/Entity';
+import * as moment from 'moment';
+import { Campaign, PostBackDaily, PostBackUnregisteredEvent, PostBackEvent } from '../entities/Entity';
 import { HttpService } from '@nestjs/common';
-import { create } from 'domain';
 
 @Injectable()
 export class CommonService {
@@ -28,56 +20,6 @@ export class CommonService {
     @InjectRepository(PostBackUnregisteredEvent)
     private readonly postBackUnregisteredEventRepository: Repository<PostBackUnregisteredEvent>,
   ) {}
-
-  async createPostBackDaily(view_code: string, cp_token: string): Promise<PostBackDaily> {
-    let postBackDailyEntity: PostBackDaily;
-    try {
-      await this.lockService.lock(moment().format('YYYYMMDD'), 2 * 60 * 1000, 50, 50);
-
-      const redis: any = this.redisService.getClient();
-
-      let cursor: number;
-      cursor = 0;
-      do {
-        const data: any = await redis.hscan('view_code', cursor, 'MATCH', `${cp_token}/*`, 'COUNT', 20000);
-
-        cursor = data[0];
-        const keys: Array<string> = data[1];
-        for (let i = 0; i < keys.length; i++) {
-          const isViewCode: string = await redis.hget('view_code', keys[i]);
-
-          if (view_code === isViewCode) {
-            const splitData: Array<string> = keys[i].split('/');
-            const pub_id: string = splitData[1];
-            const sub_id: string = splitData[2];
-            const media_idx: string = splitData[3];
-
-            const campaignEntity: Campaign = await this.campaignRepository.findOne({
-              where: {
-                cp_token: cp_token,
-                media: { idx: media_idx },
-              },
-              relations: ['media'],
-            });
-
-            if (!campaignEntity) throw new NotFoundException();
-
-            const postBackDaily: PostBackDaily = new PostBackDaily();
-            postBackDaily.cp_token = cp_token;
-            postBackDaily.pub_id = pub_id;
-            postBackDaily.sub_id = sub_id;
-            postBackDaily.view_code = view_code;
-            postBackDaily.campaign = campaignEntity;
-
-            postBackDailyEntity = await this.postBackDailyRepository.save(postBackDaily);
-          }
-        }
-      } while (cursor != 0);
-    } finally {
-      this.lockService.unlock(moment().format('YYYYMMDD'));
-    }
-    return postBackDailyEntity;
-  }
 
   async dailyPostBackCountUp(postBackDailyEntity: PostBackDaily, postBackEventEntity: PostBackEvent, price?: number): Promise<PostBackDaily> {
     switch (postBackEventEntity.adminPostback) {
@@ -211,12 +153,24 @@ export class CommonService {
     return postBackDailyEntity;
   }
 
-  async convertedPostbackInstallUrl(data: { click_id: string; adid: string; event_datetime: string; campaignEntity: Campaign }): Promise<string> {
+  async convertedPostbackInstallUrl(data: {
+    uuid: string;
+    click_id: string;
+    adid: string;
+    event_datetime: string;
+    click_datetime: string;
+    campaignEntity: Campaign;
+    postBackDailyEntity: PostBackDaily;
+  }): Promise<string> {
     const mediaPostbackInstallUrlTemplate: string = data.campaignEntity.media.mediaPostbackInstallUrlTemplate;
     const platform: string = data.campaignEntity.advertising.platform;
     const click_id: string = data.click_id;
     const adid: string = data.adid;
     const event_datetime: string = data.event_datetime;
+    const click_datetime: string = data.click_datetime;
+    const pub_id: string = data.postBackDailyEntity.pub_id;
+    const sub_id: string = data.postBackDailyEntity.sub_id;
+    const uuid: string = data.uuid;
 
     return mediaPostbackInstallUrlTemplate
       .replace('{click_id}', click_id)
@@ -224,16 +178,22 @@ export class CommonService {
       .replace('{android_device_id}', platform.toLowerCase() == 'aos' ? adid : '')
       .replace('{ios_device_id}', platform.toLowerCase() == 'ios' ? adid : '')
       .replace('{install_timestamp}', event_datetime)
-      .replace('{payout}', '');
+      .replace('{click_datetime', click_datetime)
+      .replace('{pub_id}', pub_id)
+      .replace('{sub_id}', sub_id)
+      .replace('{payout}', '')
+      .replace('{uuid}', uuid);
   }
 
   async convertedPostbackEventUrl(data: {
+    uuid: string;
     click_id: string;
     adid: string;
     event_name: string;
     event_datetime: string;
     install_datetime: string;
     campaignEntity: Campaign;
+    postBackDailyEntity: PostBackDaily;
   }): Promise<string> {
     const mediaPostbackInstallUrlTemplate: string = data.campaignEntity.media.mediaPostbackInstallUrlTemplate;
     const platform: string = data.campaignEntity.advertising.platform;
@@ -242,6 +202,9 @@ export class CommonService {
     const event_name: string = data.event_name;
     const event_datetime: string = data.event_datetime;
     const install_datetime: string = data.install_datetime;
+    const pub_id: string = data.postBackDailyEntity.pub_id;
+    const sub_id: string = data.postBackDailyEntity.sub_id;
+    const uuid: string = data.uuid;
 
     return mediaPostbackInstallUrlTemplate
       .replace('{click_id}', click_id)
@@ -251,6 +214,9 @@ export class CommonService {
       .replace('{android_device_id}', platform.toLowerCase() == 'aos' ? adid : '')
       .replace('{ios_device_id}', platform.toLowerCase() == 'ios' ? adid : '')
       .replace('{install_timestamp}', install_datetime)
-      .replace('{event_timestamp}', event_datetime);
+      .replace('{event_timestamp}', event_datetime)
+      .replace('{pub_id}', pub_id)
+      .replace('{sub_id}', sub_id)
+      .replace('{uuid}', uuid);
   }
 }

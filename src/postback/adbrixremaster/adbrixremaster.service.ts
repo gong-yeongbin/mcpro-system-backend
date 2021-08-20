@@ -4,7 +4,7 @@ import { CommonService } from 'src/common/common.service';
 import { decodeUnicode } from 'src/util';
 import { Repository } from 'typeorm';
 import * as moment from 'moment-timezone';
-import { PostBackInstallAdbrixremaster, PostBackEventAdbrixremaster, Campaign, Media, PostBackDaily, PostBackEvent, Advertising } from '../../entities/Entity';
+import { PostBackInstallAdbrixremaster, PostBackEventAdbrixremaster, Campaign, PostBackDaily, PostBackEvent } from '../../entities/Entity';
 
 @Injectable()
 export class AdbrixremasterService {
@@ -26,6 +26,7 @@ export class AdbrixremasterService {
     const originalUrl: string = decodeUnicode(`${req.protocol}://${req.headers.host}${req.url}`);
     console.log(`[ adbrixremaster ---> mecrosspro ] install : ${originalUrl}`);
 
+    const uuid: string = ['', undefined, '{uuid}'].includes(req.query.uuid) ? '' : req.query.uuid;
     const postBackInstallAdbrixremaster: PostBackInstallAdbrixremaster = this.postBackInstallAdbrixremasterRepository.create({
       view_code: req.query.cb_2,
       token: req.query.cb_1,
@@ -100,12 +101,16 @@ export class AdbrixremasterService {
       const click_id: string = postBackInstallAdbrixremaster.cb_3;
       const adid: string = postBackInstallAdbrixremaster.adid;
       const event_datetime: string = postBackInstallAdbrixremaster.event_datetime;
+      const click_datetime: string = postBackInstallAdbrixremaster.a_server_datetime;
 
       const url: string = await this.commonService.convertedPostbackInstallUrl({
+        uuid: uuid,
         click_id: click_id,
         adid: adid,
         event_datetime: event_datetime,
+        click_datetime: click_datetime,
         campaignEntity: campaignEntity,
+        postBackDailyEntity: postBackDailyEntity,
       });
 
       postBackInstallAdbrixremaster.send_time = await this.commonService.httpServiceHandler(url);
@@ -120,6 +125,7 @@ export class AdbrixremasterService {
     const originalUrl: string = decodeUnicode(`${req.protocol}://${req.headers.host}${req.url}`);
     console.log(`[ adbrixremaster ---> mecrosspro ] event : ${originalUrl}`);
 
+    const uuid: string = ['', undefined, '{uuid}'].includes(req.query.uuid) ? '' : req.query.uuid;
     const postBackEventAdbrixremaster: PostBackEventAdbrixremaster = this.postBackEventAdbrixremasterRepository.create({
       view_code: req.query.cb_2,
       token: req.query.cb_1,
@@ -214,12 +220,14 @@ export class AdbrixremasterService {
         const event_datetime: string = postBackEventAdbrixremaster.event_timestamp;
 
         const url: string = await this.commonService.convertedPostbackEventUrl({
+          uuid: uuid,
           click_id: click_id,
           adid: adid,
           event_name: event_name,
           event_datetime: event_datetime,
           install_datetime: install_datetime,
           campaignEntity: campaignEntity,
+          postBackDailyEntity: postBackDailyEntity,
         });
 
         postBackEventAdbrixremaster.send_time = await this.commonService.httpServiceHandler(url);

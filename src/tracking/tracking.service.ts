@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Campaign } from '../entities/Entity';
 import { Repository } from 'typeorm';
-import { v4 } from 'uuid';
 import { RedisService } from 'nestjs-redis';
+import { Campaign } from '../entities/Entity';
+import { v4 } from 'uuid';
 import * as moment from 'moment';
 import { decodeUnicode } from 'src/util';
 
@@ -17,16 +17,15 @@ export class TrackingService {
 
   async tracking(request: any): Promise<string> {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
-
-    const cp_token: string = ['', undefined, '{token}'].includes(request.query.token) ? '' : request.query.token;
-    const pub_id: string = ['', undefined, '{pub_id}'].includes(request.query.pub_id) ? '' : request.query.pub_id;
-    const sub_id: string = ['', undefined, '{sub_id}'].includes(request.query.sub_id) ? '' : request.query.sub_id;
-
     console.log(`[ media ---> mecrosspro ] ${originalUrl}`);
+
+    const token: string = ['', undefined, '{token}'].includes(request.query.token) ? '' : request.query.token;
+    const pubId: string = ['', undefined, '{pub_id}'].includes(request.query.pub_id) ? '' : request.query.pub_id;
+    const subId: string = ['', undefined, '{sub_id}'].includes(request.query.sub_id) ? '' : request.query.sub_id;
 
     const campaignEntity: Campaign = await this.campaignRepository.findOne({
       where: {
-        cp_token: cp_token,
+        cp_token: token,
         status: true,
       },
       relations: ['media', 'advertising', 'advertising.tracker'],
@@ -34,70 +33,46 @@ export class TrackingService {
 
     if (!campaignEntity) throw new NotFoundException();
 
-    try {
-      const redis: any = this.redisService.getClient();
+    const todayDate: string = moment().tz('Asia/Seoul').format('YYYYMMDD');
+    const redisKey: string = `${token}/${pubId}/${subId}/${campaignEntity.media.idx}` as string;
 
-      const click_count: number = await redis.hget(
-        `${moment().tz('Asia/Seoul').format('YYYYMMDD')}`,
-        `${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`,
-      );
+    const redis: any = this.redisService.getClient();
 
-      if (!click_count) {
-        await redis.hset(`${moment().tz('Asia/Seoul').format('YYYYMMDD')}`, `${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`, 1);
-      } else {
-        await redis.hincrby(`${moment().tz('Asia/Seoul').format('YYYYMMDD')}`, `${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`, 1);
-      }
+    const isClickValidation: number = await redis.hget(todayDate, redisKey);
 
-      let view_code: string = await redis.hget('view_code', `${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`);
+    !isClickValidation ? await redis.hset(todayDate, redisKey, 1) : await redis.hincrby(todayDate, redisKey, 1);
 
-      if (!view_code) {
-        view_code = v4().replace(/-/g, '');
-        await redis.hset('view_code', `${cp_token}/${pub_id}/${sub_id}/${campaignEntity.media.idx}`, view_code);
-      }
+    let viewCode: string = await redis.hget('view_code', redisKey);
 
-      const convertedTrackingUrl: string = convertTrackerTrackingUrl(
-        campaignEntity.advertising.tracker.tk_code,
-        campaignEntity.trackerTrackingUrl,
-        request.query,
-        view_code,
-      );
-
-      return convertedTrackingUrl;
-    } finally {
+    if (!viewCode) {
+      viewCode = v4().replace(/-/g, '');
+      await redis.hset('view_code', redisKey, viewCode);
     }
+
+    return await convertTrackerTrackingUrl(campaignEntity, request.query, viewCode);
   }
 }
 
-function convertTrackerTrackingUrl(tk_code: string, trackerTrackingUrl: string, query: any, view_code: string) {
-  const android_device_id = query.adid === '{adid}' ? '' : query.adid;
-  const ios_device_id = query.idfa === '{idfa}' ? '' : query.idfa;
-  const device_id: string = android_device_id ? android_device_id : ios_device_id;
+async function convertTrackerTrackingUrl(campaign: Campaign, query: any, viewCode: string): Promise<string> {
+  const token: string = ['', undefined, '{token}'].includes(query.token) ? '' : query.token;
+  const uuid: string = ['', undefined, '{uuid}'].includes(query.uuid) ? '' : query.uuid;
+  const adid: string = ['', undefined, '{adid}'].includes(query.adid) ? '' : query.adid; // android device id
+  const idfa: string = ['', undefined, '{idfa}'].includes(query.idfa) ? '' : query.idfa; // ios device id
+  const clickId: string = ['', undefined, '{click_id}'].includes(query.click_id) ? '' : query.click_id;
+  const tracker: string = campaign.advertising.tracker.tk_code;
+  const trackerTrackingUrl: string = campaign.trackerTrackingUrl;
+  const deviceId: string = adid ? adid : idfa;
 
   let convertedTrackerTrackingUrl: string = null;
 
-  switch (tk_code) {
+  switch (tracker) {
     case 'appsflyer':
       convertedTrackerTrackingUrl = trackerTrackingUrl
-        .replace(
-          '{clickid}', //click id
-          query.click_id,
-        )
-        .replace(
-          '{af_siteid}', //view code
-          view_code,
-        )
-        .replace(
-          '{af_c_id}', //campaign token
-          query.token,
-        )
-        .replace(
-          '{advertising_id}', //android device id
-          android_device_id,
-        )
-        .replace(
-          '{idfa}', //ios device id
-          ios_device_id,
-        )
+        .replace('{clickid}', clickId) //click id
+        .replace('{af_siteid}', viewCode) //view code
+        .replace('{af_c_id}', token) //campaign token
+        .replace('{advertising_id}', adid) //android device id
+        .replace('{idfa}', idfa) //ios device id
         .replace('{af_adset_id}', '')
         .replace('{af_ad_id}', '')
         .replace('{af_ip}', '') //device ip
@@ -106,26 +81,17 @@ function convertTrackerTrackingUrl(tk_code: string, trackerTrackingUrl: string, 
       break;
     case 'adbrixremaster':
       convertedTrackerTrackingUrl = trackerTrackingUrl
-        .replace(
-          '{m_adid}', //device id
-          device_id,
-        )
-        .replace('{m_publisher}', view_code) //view code
+        .replace('{m_adid}', deviceId) //device id
+        .replace('{m_publisher}', viewCode) //view code
         .replace('{m_sub_publisher}', '') //view code
-        .replace(
-          '{cb_1}', //campaign code
-          query.token,
-        )
-        .replace(
-          '{cb_2}', //click id
-          view_code,
-        )
-        .replace('{cb_3}', query.click_id)
+        .replace('{cb_1}', token) //campaign code
+        .replace('{cb_2}', viewCode) //view code
+        .replace('{cb_3}', clickId) //click id
         .replace('{cb_4}', '')
         .replace('{cb_5}', '');
 
       break;
   }
 
-  return convertedTrackerTrackingUrl;
+  return !uuid ? convertedTrackerTrackingUrl : convertedTrackerTrackingUrl + `&uuid=${uuid}`;
 }

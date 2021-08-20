@@ -1,17 +1,13 @@
-import { HttpService, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import * as moment from 'moment-timezone';
 import { decodeUnicode } from 'src/util';
-import { AppsflyerInstall } from '../dto/appsflyer-install';
-import { AppsflyerEvent } from '../dto/appsflyer-event';
 import { CommonService } from 'src/common/common.service';
-import { PostBackDaily, Campaign, Media, PostBackEvent, PostBackEventAppsflyer, PostBackInstallAppsflyer, Advertising } from '../../entities/Entity';
+import { PostBackDaily, Campaign, PostBackEvent, PostBackEventAppsflyer, PostBackInstallAppsflyer } from '../../entities/Entity';
 
 @Injectable()
 export class AppsflyerService {
   constructor(
-    private httpService: HttpService,
     private readonly commonService: CommonService,
     @InjectRepository(Campaign)
     private readonly campaignRepository: Repository<Campaign>,
@@ -31,6 +27,7 @@ export class AppsflyerService {
 
     console.log(`[ appsflyer ---> mecrosspro ] install : ${originalUrl}`);
 
+    const uuid: string = ['', undefined, '{uuid}'].includes(req.query.uuid) ? '' : req.query.uuid;
     const postBackInstallAppsflyer: PostBackInstallAppsflyer = this.postBackInstallAppsflyerRepository.create({
       view_code: req.query.af_siteid,
       token: req.query.af_c_id,
@@ -71,12 +68,16 @@ export class AppsflyerService {
       const click_id: string = postBackInstallAppsflyer.clickid;
       const adid: string = postBackInstallAppsflyer.idfa;
       const event_datetime: string = postBackInstallAppsflyer.install_time;
+      const click_datetime: string = postBackInstallAppsflyer.click_time;
 
       const url: string = await this.commonService.convertedPostbackInstallUrl({
+        uuid: uuid,
         click_id: click_id,
         adid: adid,
         event_datetime: event_datetime,
+        click_datetime: click_datetime,
         campaignEntity: campaignEntity,
+        postBackDailyEntity: postBackDailyEntity,
       });
 
       postBackInstallAppsflyer.send_time = await this.commonService.httpServiceHandler(url);
@@ -93,6 +94,7 @@ export class AppsflyerService {
 
     console.log(`[ appsflyer ---> mecrosspro ] event : ${originalUrl}`);
 
+    const uuid: string = ['', undefined, '{uuid}'].includes(req.query.uuid) ? '' : req.query.uuid;
     const postBackEventAppsflyer: PostBackEventAppsflyer = this.postbackEventAppsflyerRepository.create({
       view_code: req.query.af_siteid,
       token: req.query.af_c_id,
@@ -141,12 +143,14 @@ export class AppsflyerService {
         const event_datetime: string = postBackEventAppsflyer.event_time;
 
         const url: string = await this.commonService.convertedPostbackEventUrl({
+          uuid: uuid,
           click_id: click_id,
           adid: adid,
           event_name: event_name,
           event_datetime: event_datetime,
           install_datetime: install_datetime,
           campaignEntity: campaignEntity,
+          postBackDailyEntity: postBackDailyEntity,
         });
 
         postBackEventAppsflyer.send_time = await this.commonService.httpServiceHandler(url);
