@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CommonService } from 'src/common/common.service';
 import { decodeUnicode } from 'src/util';
-import { Repository } from 'typeorm';
+import { getManager, Repository } from 'typeorm';
 import * as moment from 'moment-timezone';
 import { PostBackInstallAdbrixremaster, PostBackEventAdbrixremaster, Campaign, PostBackDaily, PostBackEvent } from '../../entities/Entity';
 
@@ -86,8 +86,11 @@ export class AdbrixremasterService {
 
     if (!postBackDailyEntity) throw new NotFoundException();
 
-    postBackDailyEntity.install++;
-    await this.postBackDailyRepository.save(postBackDailyEntity);
+    await getManager().transaction(async (transactionalEntityManager) => {
+      postBackDailyEntity.install++;
+      await transactionalEntityManager.getRepository(PostBackDaily).save(postBackDailyEntity);
+      // await this.postBackDailyRepository.save(postBackDailyEntity);
+    });
 
     const campaignEntity: Campaign = await this.campaignRepository.findOne({
       where: { cp_token: postBackInstallAdbrixremaster.cb_1 },
@@ -212,7 +215,42 @@ export class AdbrixremasterService {
     );
 
     if (postBackDailyEntity && postBackEventEntity) {
-      await this.commonService.dailyPostBackCountUp(postBackDailyEntity, postBackEventEntity, postBackEventAdbrixremaster.price);
+      await getManager().transaction(async (transactionalEntityManager) => {
+        switch (postBackEventEntity.adminPostback) {
+          case 'install':
+            postBackDailyEntity.install = +postBackDailyEntity.install + 1;
+            break;
+          case 'signup':
+            postBackDailyEntity.signup = +postBackDailyEntity.signup + 1;
+            break;
+          case 'retention':
+            postBackDailyEntity.retention = +postBackDailyEntity.retention + 1;
+            break;
+          case 'buy':
+            postBackDailyEntity.buy = +postBackDailyEntity.buy + 1;
+            postBackDailyEntity.price = +postBackDailyEntity.price + postBackEventAdbrixremaster.price;
+            break;
+          case 'etc1':
+            postBackDailyEntity.etc1 = +postBackDailyEntity.etc1 + 1;
+            break;
+          case 'etc2':
+            postBackDailyEntity.etc2 = +postBackDailyEntity.etc2 + 1;
+            break;
+          case 'etc3':
+            postBackDailyEntity.etc3 = +postBackDailyEntity.etc3 + 1;
+            break;
+          case 'etc4':
+            postBackDailyEntity.etc4 = +postBackDailyEntity.etc4 + 1;
+            break;
+          case 'etc5':
+            postBackDailyEntity.etc5 = +postBackDailyEntity.etc5 + 1;
+            break;
+        }
+
+        await transactionalEntityManager.getRepository(PostBackDaily).save(postBackDailyEntity);
+      });
+      // await this.postBackDailyRepository.save(postBackDailyEntity);
+      // await this.commonService.dailyPostBackCountUp(postBackDailyEntity, postBackEventEntity, postBackEventAdbrixremaster.price);
 
       if (postBackEventEntity.sendPostback) {
         const click_id: string = postBackEventAdbrixremaster.cb_3;
