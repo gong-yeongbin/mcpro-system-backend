@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { getManager, Repository } from 'typeorm';
 import { RedisService } from 'nestjs-redis';
 import { RedisLockService } from 'nestjs-simple-redis-lock';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -20,6 +20,70 @@ export class CommonService {
     @InjectRepository(PostBackUnregisteredEvent)
     private readonly postBackUnregisteredEventRepository: Repository<PostBackUnregisteredEvent>,
   ) {}
+
+  async installCount(postBackDaily: PostBackDaily): Promise<void> {
+    await getManager().transaction(async (transactionalEntityManager) => {
+      postBackDaily.install = +postBackDaily.install + 1;
+      await transactionalEntityManager.getRepository(PostBackDaily).save(postBackDaily);
+    });
+  }
+
+  async signupCount(postBackDaily: PostBackDaily, price: number): Promise<void> {
+    await getManager().transaction(async (transactionalEntityManager) => {
+      postBackDaily.signup = +postBackDaily.signup + 1;
+      await transactionalEntityManager.getRepository(PostBackDaily).save(postBackDaily);
+    });
+  }
+
+  async retentionCount(postBackDaily: PostBackDaily, price: number): Promise<void> {
+    await getManager().transaction(async (transactionalEntityManager) => {
+      postBackDaily.retention = +postBackDaily.retention + 1;
+      await transactionalEntityManager.getRepository(PostBackDaily).save(postBackDaily);
+    });
+  }
+
+  async buyCount(postBackDaily: PostBackDaily, price: number): Promise<void> {
+    await getManager().transaction(async (transactionalEntityManager) => {
+      postBackDaily.buy = +postBackDaily.buy + 1;
+      postBackDaily.price = +postBackDaily.price + price;
+      await transactionalEntityManager.getRepository(PostBackDaily).save(postBackDaily);
+    });
+  }
+
+  async etc1Count(postBackDaily: PostBackDaily, price: number): Promise<void> {
+    await getManager().transaction(async (transactionalEntityManager) => {
+      postBackDaily.etc1 = +postBackDaily.etc1 + 1;
+      await transactionalEntityManager.getRepository(PostBackDaily).save(postBackDaily);
+    });
+  }
+
+  async etc2Count(postBackDaily: PostBackDaily, price: number): Promise<void> {
+    await getManager().transaction(async (transactionalEntityManager) => {
+      postBackDaily.etc2 = +postBackDaily.etc2 + 1;
+      await transactionalEntityManager.getRepository(PostBackDaily).save(postBackDaily);
+    });
+  }
+
+  async etc3Count(postBackDaily: PostBackDaily, price: number): Promise<void> {
+    await getManager().transaction(async (transactionalEntityManager) => {
+      postBackDaily.etc3 = +postBackDaily.etc3 + 1;
+      await transactionalEntityManager.getRepository(PostBackDaily).save(postBackDaily);
+    });
+  }
+
+  async etc4Count(postBackDaily: PostBackDaily, price: number): Promise<void> {
+    await getManager().transaction(async (transactionalEntityManager) => {
+      postBackDaily.etc4 = +postBackDaily.etc4 + 1;
+      await transactionalEntityManager.getRepository(PostBackDaily).save(postBackDaily);
+    });
+  }
+
+  async etc5Count(postBackDaily: PostBackDaily, price: number): Promise<void> {
+    await getManager().transaction(async (transactionalEntityManager) => {
+      postBackDaily.etc5 = +postBackDaily.etc5 + 1;
+      await transactionalEntityManager.getRepository(PostBackDaily).save(postBackDaily);
+    });
+  }
 
   async dailyPostBackCountUp(postBackDailyEntity: PostBackDaily, postBackEventEntity: PostBackEvent, price?: number): Promise<PostBackDaily> {
     switch (postBackEventEntity.adminPostback) {
