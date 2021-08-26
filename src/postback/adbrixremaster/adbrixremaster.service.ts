@@ -231,7 +231,6 @@ export class AdbrixremasterService {
     } else {
       await this.commonService.postBackUnregisteredEvent(postBackDailyEntity, postBackEventAdbrixremaster.event_name);
     }
-
     const cases = {
       signup: this.commonService.signupCount,
       retention: this.commonService.retentionCount,
