@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { HttpModule, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TrackingModule } from './tracking/tracking.module';
@@ -7,8 +7,18 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { RedisModule } from 'nestjs-redis';
 import { RedisLockModule } from 'nestjs-simple-redis-lock';
-import { CommonModule } from './common/common.module';
 import { AppClusterService } from './app-cluster/app-cluster.service';
+import { BullModule } from '@nestjs/bull';
+import { AppQueueService } from './app-queue/app-queue.service';
+import { CommonService } from './common/common.service';
+import {
+  Campaign,
+  PostBackDaily,
+  PostBackEvent,
+  PostBackEventAdbrixremaster,
+  PostBackInstallAdbrixremaster,
+  PostBackUnregisteredEvent,
+} from './entities/Entity';
 
 @Module({
   imports: [
@@ -16,11 +26,21 @@ import { AppClusterService } from './app-cluster/app-cluster.service';
       envFilePath: ['.env.dev'],
       isGlobal: true,
     }),
+    BullModule.forRoot({
+      redis: {
+        host: process.env.REDIS_HOST,
+        port: +process.env.REDIS_PORT,
+      },
+    }),
     RedisModule.register({
       host: process.env.REDIS_HOST,
       port: +process.env.REDIS_PORT,
     }),
     RedisLockModule.register({}),
+    HttpModule.register({
+      timeout: 5000,
+      maxRedirects: 3,
+    }),
     TypeOrmModule.forRoot({
       type: process.env.MYSQL_TYPE as 'mysql',
       host: process.env.MYSQL_HOST,
@@ -32,12 +52,20 @@ import { AppClusterService } from './app-cluster/app-cluster.service';
       entities: [__dirname + '/**/*{.ts,.js}'],
       connectTimeout: 5000,
     }),
+    TypeOrmModule.forFeature([
+      Campaign,
+      PostBackDaily,
+      PostBackEvent,
+      PostBackUnregisteredEvent,
+      PostBackInstallAdbrixremaster,
+      PostBackEventAdbrixremaster,
+      PostBackDaily,
+    ]),
     TrackingModule,
     PostbackModule,
-    CommonModule,
   ],
   controllers: [AppController],
-  providers: [AppService, AppClusterService],
+  providers: [AppService, AppClusterService, AppQueueService, CommonService],
   exports: [ConfigModule],
 })
 export class AppModule {}
