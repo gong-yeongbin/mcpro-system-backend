@@ -12,6 +12,15 @@ export default class PostBackEventAppsflyer {
   @Column({ name: 'token', type: 'nvarchar', nullable: true })
   token: string;
 
+  @Column({ name: 'media', type: 'nvarchar', nullable: true })
+  media: string;
+
+  @Column({ name: 'pub_id', type: 'nvarchar', nullable: true })
+  pubId: string;
+
+  @Column({ name: 'sub_id', type: 'nvarchar', nullable: true })
+  subId: string;
+
   @Column({ name: 'clickid', type: 'nvarchar' })
   clickid: string;
 
