@@ -8,8 +8,6 @@ import { ConfigModule } from '@nestjs/config';
 import { RedisModule } from 'nestjs-redis';
 import { RedisLockModule } from 'nestjs-simple-redis-lock';
 import { AppClusterService } from './app-cluster/app-cluster.service';
-import { BullModule } from '@nestjs/bull';
-import { AppQueueService } from './app-queue/app-queue.service';
 import { CommonService } from './common/common.service';
 import {
   Campaign,
@@ -25,12 +23,6 @@ import {
     ConfigModule.forRoot({
       envFilePath: ['.env.dev'],
       isGlobal: true,
-    }),
-    BullModule.forRoot({
-      redis: {
-        host: process.env.REDIS_HOST,
-        port: +process.env.REDIS_PORT,
-      },
     }),
     RedisModule.register({
       host: process.env.REDIS_HOST,
@@ -65,7 +57,7 @@ import {
     PostbackModule,
   ],
   controllers: [AppController],
-  providers: [AppService, AppClusterService, AppQueueService, CommonService],
+  providers: [AppService, AppClusterService, CommonService],
   exports: [ConfigModule],
 })
 export class AppModule {}

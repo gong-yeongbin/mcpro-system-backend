@@ -1,23 +1,19 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CommonService } from 'src/common/common.service';
 import { decodeUnicode } from 'src/util';
 import { Repository } from 'typeorm';
 import * as moment from 'moment-timezone';
-import { PostBackInstallAdbrixremaster, PostBackEventAdbrixremaster, Campaign, PostBackDaily, PostBackEvent } from '../../entities/Entity';
-import { InjectQueue } from '@nestjs/bull';
-import { Queue } from 'bull';
+import { PostBackInstallAdbrixremaster, PostBackEventAdbrixremaster, PostBackDaily, Campaign, PostBackEvent } from '../../entities/Entity';
+import { CommonService } from 'src/common/common.service';
 
 @Injectable()
 export class AdbrixremasterService {
   constructor(
-    @InjectQueue('postback')
-    private postbackQueue: Queue,
     private readonly commonService: CommonService,
     @InjectRepository(Campaign)
     private readonly campaignRepository: Repository<Campaign>,
     @InjectRepository(PostBackEvent)
-    private readonly postBackEventRepository: Repository<PostBackEvent>,
+    private readonly postbackEventRepository: Repository<PostBackEvent>,
     @InjectRepository(PostBackInstallAdbrixremaster)
     private readonly postBackInstallAdbrixremasterRepository: Repository<PostBackInstallAdbrixremaster>,
     @InjectRepository(PostBackEventAdbrixremaster)
@@ -81,21 +77,48 @@ export class AdbrixremasterService {
       a_server_datetime: moment.utc(request.query.a_server_datetime.replace('+', ' ')).tz('Asia/Seoul').format('YYYY-MM-DD HH:mm:ss'),
     });
 
-    await this.postbackQueue.add(
-      'install-postback',
-      {
-        tracker: 'adbrixremaster',
-        postback: postBackInstallAdbrixremaster,
-        token: postBackInstallAdbrixremaster.token,
-        viewCode: postBackInstallAdbrixremaster.view_code,
-        clickId: postBackInstallAdbrixremaster.cb_3,
-        adid: postBackInstallAdbrixremaster.adid,
-        event_datetime: postBackInstallAdbrixremaster.event_datetime,
-        click_datetime: postBackInstallAdbrixremaster.a_server_datetime,
+    const token: string = postBackInstallAdbrixremaster.token;
+    const viewCode: string = postBackInstallAdbrixremaster.view_code;
+    const clickId: string = postBackInstallAdbrixremaster.cb_3;
+    const adid: string = postBackInstallAdbrixremaster.adid;
+    const event_datetime: string = postBackInstallAdbrixremaster.event_datetime;
+    const click_datetime: string = postBackInstallAdbrixremaster.a_server_datetime;
+
+    const postBackDailyEntity: PostBackDaily = await this.commonService.isValidationPostbackDaily(viewCode, token);
+
+    if (!postBackDailyEntity) throw new NotFoundException();
+
+    const campaignEntity: Campaign = await this.campaignRepository.findOne({
+      where: { cp_token: token },
+      relations: ['media', 'advertising'],
+    });
+
+    if (!campaignEntity) throw new NotFoundException();
+
+    postBackInstallAdbrixremaster.pubId = postBackDailyEntity.pub_id;
+    postBackInstallAdbrixremaster.subId = postBackDailyEntity.sub_id;
+    postBackInstallAdbrixremaster.media = campaignEntity.media.md_name;
+
+    const postBackEventEntity: PostBackEvent = await this.postbackEventRepository.findOne({
+      where: { campaign: campaignEntity, trackerPostback: 'install' },
+    });
+
+    if (postBackEventEntity.sendPostback) {
+      const url: string = await this.commonService.convertedPostbackInstallUrl({
         uuid: uuid,
-      },
-      { removeOnComplete: true },
-    );
+        click_id: clickId,
+        adid: adid,
+        event_datetime: event_datetime,
+        click_datetime: click_datetime,
+        campaignEntity: campaignEntity,
+        postBackDailyEntity: postBackDailyEntity,
+      });
+
+      postBackInstallAdbrixremaster.send_time = await this.commonService.httpServiceHandler(url);
+      postBackInstallAdbrixremaster.send_url = url;
+    }
+
+    await this.postBackInstallAdbrixremasterRepository.save(postBackInstallAdbrixremaster);
 
     return;
   }
@@ -105,6 +128,7 @@ export class AdbrixremasterService {
     console.log(`[ adbrixremaster ---> mecrosspro ] event : ${originalUrl}`);
 
     const uuid: string = ['', undefined, '{uuid}'].includes(request.query.uuid) ? '' : request.query.uuid;
+
     const postBackEventAdbrixremaster: PostBackEventAdbrixremaster = this.postBackEventAdbrixremasterRepository.create({
       view_code: request.query.cb_2,
       token: request.query.cb_1,
@@ -156,6 +180,14 @@ export class AdbrixremasterService {
       price: 0,
     });
 
+    const token: string = postBackEventAdbrixremaster.token;
+    const viewCode: string = postBackEventAdbrixremaster.view_code;
+    const clickId: string = postBackEventAdbrixremaster.cb_3;
+    const adid: string = postBackEventAdbrixremaster.adid;
+    const event_name: string = postBackEventAdbrixremaster.event_name;
+    const event_datetime: string = postBackEventAdbrixremaster.event_datetime;
+    const install_datetime: string = postBackEventAdbrixremaster.attr_event_datetime;
+
     if (postBackEventAdbrixremaster.param_json != 'null' && postBackEventAdbrixremaster.param_json != '') {
       const jsonData: any = JSON.parse(postBackEventAdbrixremaster.param_json);
 
@@ -170,78 +202,47 @@ export class AdbrixremasterService {
       }
     }
 
-    await this.postbackQueue.add(
-      'event-postback',
-      {
-        tracker: 'adbrixremaster',
-        postback: postBackEventAdbrixremaster,
-        token: postBackEventAdbrixremaster.token,
-        viewCode: postBackEventAdbrixremaster.view_code,
-        clickId: postBackEventAdbrixremaster.cb_3,
-        adid: postBackEventAdbrixremaster.adid,
-        event_name: postBackEventAdbrixremaster.event_name,
-        event_datetime: postBackEventAdbrixremaster.event_datetime,
-        install_datetime: postBackEventAdbrixremaster.attr_event_datetime,
-        revenue: postBackEventAdbrixremaster.price,
+    const postBackDailyEntity: PostBackDaily = await this.commonService.isValidationPostbackDaily(viewCode, token);
+
+    if (!postBackDailyEntity) throw new NotFoundException();
+
+    const campaignEntity: Campaign = await this.campaignRepository.findOne({
+      where: { cp_token: token },
+      relations: ['media', 'advertising'],
+    });
+
+    if (!campaignEntity) throw new NotFoundException();
+
+    postBackEventAdbrixremaster.pubId = postBackDailyEntity.pub_id;
+    postBackEventAdbrixremaster.subId = postBackDailyEntity.sub_id;
+    postBackEventAdbrixremaster.media = campaignEntity.media.md_name;
+
+    const postBackEventEntity: PostBackEvent = await this.postbackEventRepository.findOne({
+      where: { campaign: campaignEntity, trackerPostback: event_name },
+    });
+
+    if (!postBackEventEntity) {
+      await this.commonService.postBackUnregisteredEvent(postBackDailyEntity, event_name);
+      throw new NotFoundException();
+    }
+
+    if (postBackEventEntity.sendPostback) {
+      const url: string = await this.commonService.convertedPostbackEventUrl({
         uuid: uuid,
-      },
-      { removeOnComplete: true },
-    );
+        click_id: clickId,
+        adid: adid,
+        event_name: event_name,
+        event_datetime: event_datetime,
+        install_datetime: install_datetime,
+        campaignEntity: campaignEntity,
+        postBackDailyEntity: postBackDailyEntity,
+      });
 
-    // const postBackDailyEntity: PostBackDaily = await this.commonService.isValidationPostbackDaily(
-    //   postBackEventAdbrixremaster.view_code,
-    //   postBackEventAdbrixremaster.token,
-    // );
+      postBackEventAdbrixremaster.send_time = await this.commonService.httpServiceHandler(url);
+      postBackEventAdbrixremaster.send_url = url;
+    }
 
-    // if (!postBackDailyEntity) throw new NotFoundException();
-
-    // const campaignEntity: Campaign = await this.campaignRepository.findOne({
-    //   where: { cp_token: postBackEventAdbrixremaster.token },
-    //   relations: ['media', 'advertising'],
-    // });
-
-    // if (!campaignEntity) throw new NotFoundException();
-
-    // const postBackEventEntity: PostBackEvent = await this.postBackEventRepository.findOne({
-    //   where: { campaign: campaignEntity, trackerPostback: postBackEventAdbrixremaster.event_name },
-    // });
-
-    // if (postBackEventEntity && postBackEventEntity.sendPostback) {
-    //   const click_id: string = postBackEventAdbrixremaster.cb_3;
-    //   const adid: string = postBackEventAdbrixremaster.adid;
-    //   const event_name: string = postBackEventAdbrixremaster.event_name;
-    //   const install_datetime: string = postBackEventAdbrixremaster.attr_event_datetime;
-    //   const event_datetime: string = postBackEventAdbrixremaster.event_timestamp;
-
-    //   const url: string = await this.commonService.convertedPostbackEventUrl({
-    //     uuid: uuid,
-    //     click_id: click_id,
-    //     adid: adid,
-    //     event_name: event_name,
-    //     event_datetime: event_datetime,
-    //     install_datetime: install_datetime,
-    //     campaignEntity: campaignEntity,
-    //     postBackDailyEntity: postBackDailyEntity,
-    //   });
-
-    //   postBackEventAdbrixremaster.send_time = await this.commonService.httpServiceHandler(url);
-    //   postBackEventAdbrixremaster.send_url = url;
-    // } else {
-    //   await this.commonService.postBackUnregisteredEvent(postBackDailyEntity, postBackEventAdbrixremaster.event_name);
-    // }
-    // const cases = {
-    //   signup: this.commonService.signupCount,
-    //   retention: this.commonService.retentionCount,
-    //   buy: this.commonService.buyCount,
-    //   etc1: this.commonService.etc1Count,
-    //   etc2: this.commonService.etc2Count,
-    //   etc3: this.commonService.etc3Count,
-    //   etc4: this.commonService.etc4Count,
-    //   etc5: this.commonService.etc5Count,
-    // };
-
-    // await this.postBackEventAdbrixremasterRepository.save(postBackEventAdbrixremaster);
-    // await cases[postBackEventEntity.adminPostback](postBackDailyEntity, postBackEventAdbrixremaster.price);
+    await this.postBackEventAdbrixremasterRepository.save(postBackEventAdbrixremaster);
 
     return;
   }

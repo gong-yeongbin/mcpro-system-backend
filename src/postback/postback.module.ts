@@ -15,7 +15,6 @@ import {
   PostBackUnregisteredEvent,
   PostBackDaily,
 } from '../entities/Entity';
-import { BullModule } from '@nestjs/bull';
 
 @Module({
   imports: [
@@ -29,9 +28,6 @@ import { BullModule } from '@nestjs/bull';
       PostBackInstallAdbrixremaster,
       PostBackEventAdbrixremaster,
     ]),
-    BullModule.registerQueue({
-      name: 'postback',
-    }),
     RedisLockModule.register({}),
     HttpModule.register({
       timeout: 5000,
