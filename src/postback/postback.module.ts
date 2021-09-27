@@ -1,34 +1,32 @@
 import { HttpModule, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PostbackController } from './postback.controller';
-import { RedisLockModule } from 'nestjs-simple-redis-lock';
 import { AdbrixremasterService } from './adbrixremaster/adbrixremaster.service';
 import { AppsflyerService } from './appsflyer/appsflyer.service';
 import { CommonService } from 'src/common/common.service';
 import {
-  PostBackInstallAppsflyer,
-  PostBackEventAppsflyer,
+  PostbackInstallAppsflyer,
+  PostbackEventAppsflyer,
   Campaign,
-  PostBackInstallAdbrixremaster,
-  PostBackEventAdbrixremaster,
-  PostBackEvent,
-  PostBackUnregisteredEvent,
-  PostBackDaily,
+  PostbackInstallAdbrixremaster,
+  PostbackEventAdbrixremaster,
+  PostbackRegisteredEvent,
+  PostbackUnregisteredEvent,
+  PostbackDaily,
 } from '../entities/Entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       Campaign,
-      PostBackDaily,
-      PostBackEvent,
-      PostBackUnregisteredEvent,
-      PostBackEventAppsflyer,
-      PostBackInstallAppsflyer,
-      PostBackInstallAdbrixremaster,
-      PostBackEventAdbrixremaster,
+      PostbackDaily,
+      PostbackRegisteredEvent,
+      PostbackUnregisteredEvent,
+      PostbackEventAppsflyer,
+      PostbackInstallAppsflyer,
+      PostbackInstallAdbrixremaster,
+      PostbackEventAdbrixremaster,
     ]),
-    RedisLockModule.register({}),
     HttpModule.register({
       timeout: 5000,
       maxRedirects: 3,

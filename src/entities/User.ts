@@ -1,26 +1,32 @@
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { UserLog } from './Entity';
 
-@Entity('user')
+@Entity('user', { schema: 'mcpro' })
 export default class User {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
-  idx: number;
+  public idx: number;
 
-  @Column({ type: 'nvarchar', name: 'id' })
-  id: string;
+  @Column('varchar', { name: 'id', length: 255 })
+  public id: string;
 
-  @Column({ type: 'nvarchar', name: 'password' })
-  password: string;
+  @Column('varchar', { name: 'password', length: 255 })
+  public password: string;
 
-  @Column({ type: 'nvarchar', name: 'type' })
-  type: string;
+  @Column('varchar', { name: 'type', length: 255 })
+  public type: string;
 
-  @CreateDateColumn({ name: 'created_at' })
-  created_at: Date;
+  @Column('datetime', {
+    name: 'created_at',
+    default: () => "'CURRENT_TIMESTAMP(6)'",
+  })
+  public createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
-  updated_at: Date;
+  @Column('datetime', {
+    name: 'updated_at',
+    default: () => "'CURRENT_TIMESTAMP(6)'",
+  })
+  public updatedAt: Date;
 
   @OneToMany(() => UserLog, (userLog) => userLog.user)
-  user_log: UserLog;
+  public userLog: UserLog[];
 }

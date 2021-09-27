@@ -7,22 +7,22 @@ export class PostbackController {
   constructor(private readonly appsfyerService: AppsflyerService, private readonly adbrixremasterService: AdbrixremasterService) {}
 
   @Get('/appsflyer/install')
-  postBackInstallAppsflyer(@Req() req: any) {
-    return this.appsfyerService.postBackInstallAppsflyer(req);
+  postbackInstallAppsflyer(@Req() req: any) {
+    return this.appsfyerService.postbackInstallAppsflyer(req);
   }
 
   @Get('/appsflyer/event')
-  postBackEventAppsflyer(@Req() req: any) {
-    return this.appsfyerService.postBackEventAppsflyer(req);
+  postbackEventAppsflyer(@Req() req: any) {
+    return this.appsfyerService.postbackEventAppsflyer(req);
   }
 
   @Get('/adbrix-remaster/install')
   postbackInstall(@Req() req: any) {
-    return this.adbrixremasterService.postBackInstallAdbrixRemaster(req);
+    return this.adbrixremasterService.postbackInstallAdbrixRemaster(req);
   }
 
   @Get('/adbrix-remaster/event')
   postbackEvent(@Req() req: any) {
-    return this.adbrixremasterService.postBackEventAdbrixRemaster(req);
+    return this.adbrixremasterService.postbackEventAdbrixRemaster(req);
   }
 }

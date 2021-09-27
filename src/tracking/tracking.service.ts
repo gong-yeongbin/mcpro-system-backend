@@ -25,7 +25,7 @@ export class TrackingService {
 
     const campaignEntity: Campaign = await this.campaignRepository.findOne({
       where: {
-        cp_token: token,
+        token: token,
         status: true,
       },
       relations: ['media', 'advertising', 'advertising.tracker'],
@@ -59,7 +59,7 @@ async function convertTrackerTrackingUrl(campaign: Campaign, query: any, viewCod
   const adid: string = ['', undefined, '{adid}'].includes(query.adid) ? '' : query.adid; // android device id
   const idfa: string = ['', undefined, '{idfa}'].includes(query.idfa) ? '' : query.idfa; // ios device id
   const clickId: string = ['', undefined, '{click_id}'].includes(query.click_id) ? '' : query.click_id;
-  const tracker: string = campaign.advertising.tracker.tk_code;
+  const tracker: string = campaign.advertising.tracker.name;
   const trackerTrackingUrl: string = campaign.trackerTrackingUrl;
   const deviceId: string = adid ? adid : idfa;
 

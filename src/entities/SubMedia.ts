@@ -1,38 +1,34 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
-import { Campaign } from './Entity';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity('submedia')
-export default class SubMedia {
+@Entity('submedia', { schema: 'mcpro' })
+export default class Submedia {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
-  idx: number;
+  public idx: number;
 
-  @Column({ type: 'nvarchar', name: 'view_code' })
-  view_code: string;
+  @Column('varchar', { name: 'token', length: 255 })
+  public token: string;
 
-  @Column({ type: 'nvarchar', name: 'pub_id' })
-  pub_id: string;
+  @Column('varchar', { name: 'pub_id', length: 255 })
+  public pubId: string;
 
-  @Column({ type: 'nvarchar', name: 'sub_id', nullable: true })
-  sub_id: string;
+  @Column('varchar', { name: 'sub_id', nullable: true, length: 255 })
+  public subId: string | null;
 
-  @Column({ type: 'bigint', name: 'count' })
-  count: number;
+  @Column('varchar', { name: 'media', length: 255 })
+  public media: string;
 
-  @ManyToOne(() => Campaign, (campaign) => campaign.subMedia)
-  @JoinColumn({ name: 'campain' })
-  campaign: Campaign;
+  @Column('varchar', { name: 'view_code', length: 255 })
+  public viewCode: string;
 
-  @CreateDateColumn({ name: 'created_at' })
-  created_at: Date;
+  @Column('datetime', {
+    name: 'created_at',
+    default: () => "'CURRENT_TIMESTAMP(6)'",
+  })
+  public createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
-  updated_at: Date;
+  @Column('datetime', {
+    name: 'updated_at',
+    default: () => "'CURRENT_TIMESTAMP(6)'",
+  })
+  public updatedAt: Date;
 }

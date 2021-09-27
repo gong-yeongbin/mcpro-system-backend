@@ -1,5 +1,5 @@
-import { Injectable, Res } from '@nestjs/common';
-import { Controller, Get, Redirect, Req } from '@nestjs/common';
+import { Res } from '@nestjs/common';
+import { Controller, Get, Req } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { TrackingService } from './tracking.service';
 

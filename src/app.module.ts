@@ -6,16 +6,15 @@ import { PostbackModule } from './postback/postback.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { RedisModule } from 'nestjs-redis';
-import { RedisLockModule } from 'nestjs-simple-redis-lock';
 import { AppClusterService } from './app-cluster/app-cluster.service';
 import { CommonService } from './common/common.service';
 import {
   Campaign,
-  PostBackDaily,
-  PostBackEvent,
-  PostBackEventAdbrixremaster,
-  PostBackInstallAdbrixremaster,
-  PostBackUnregisteredEvent,
+  PostbackDaily,
+  PostbackRegisteredEvent,
+  PostbackEventAdbrixremaster,
+  PostbackInstallAdbrixremaster,
+  PostbackUnregisteredEvent,
 } from './entities/Entity';
 
 @Module({
@@ -28,7 +27,6 @@ import {
       host: process.env.REDIS_HOST,
       port: +process.env.REDIS_PORT,
     }),
-    RedisLockModule.register({}),
     HttpModule.register({
       timeout: 5000,
       maxRedirects: 3,
@@ -40,18 +38,18 @@ import {
       username: process.env.MYSQL_USERNAME,
       password: process.env.MYSQL_PASSWORD,
       database: process.env.MYSQL_DATABASE,
-      synchronize: Boolean(process.env.MYSQL_SYNCHRONIZE),
+      synchronize: false,
       entities: [__dirname + '/**/*{.ts,.js}'],
       connectTimeout: 5000,
     }),
     TypeOrmModule.forFeature([
       Campaign,
-      PostBackDaily,
-      PostBackEvent,
-      PostBackUnregisteredEvent,
-      PostBackInstallAdbrixremaster,
-      PostBackEventAdbrixremaster,
-      PostBackDaily,
+      PostbackDaily,
+      PostbackRegisteredEvent,
+      PostbackUnregisteredEvent,
+      PostbackInstallAdbrixremaster,
+      PostbackEventAdbrixremaster,
+      PostbackDaily,
     ]),
     TrackingModule,
     PostbackModule,

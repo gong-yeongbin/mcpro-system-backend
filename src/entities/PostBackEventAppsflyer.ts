@@ -1,84 +1,86 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { Campaign } from './Entity';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity('postback_event_appsflyer')
-export default class PostBackEventAppsflyer {
-  @PrimaryGeneratedColumn({ name: 'idx', type: 'bigint' })
-  idx: number;
+@Entity('postback_event_appsflyer', { schema: 'mcpro' })
+export default class PostbackEventAppsflyer {
+  @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
+  public idx: number;
 
-  @Column({ name: 'view_code', type: 'nvarchar' })
-  view_code: string;
+  @Column('varchar', { name: 'clickid', length: 255 })
+  public clickid: string;
 
-  @Column({ name: 'token', type: 'nvarchar', nullable: true })
-  token: string;
+  @Column('varchar', { name: 'af_siteid', length: 255 })
+  public afSiteid: string;
 
-  @Column({ name: 'media', type: 'nvarchar', nullable: true })
-  media: string;
+  @Column('varchar', { name: 'af_c_id', length: 255 })
+  public afCId: string;
 
-  @Column({ name: 'pub_id', type: 'nvarchar', nullable: true })
-  pubId: string;
+  @Column('varchar', { name: 'advertising_id', nullable: true, length: 255 })
+  public advertisingId: string | null;
 
-  @Column({ name: 'sub_id', type: 'nvarchar', nullable: true })
-  subId: string;
+  @Column('varchar', { name: 'idfa', nullable: true, length: 255 })
+  public idfa: string | null;
 
-  @Column({ name: 'clickid', type: 'nvarchar' })
-  clickid: string;
+  @Column('varchar', { name: 'idfv', nullable: true, length: 255 })
+  public idfv: string | null;
 
-  @Column({ name: 'af_siteid', type: 'nvarchar' })
-  af_siteid: string;
+  @Column('varchar', { name: 'install_time', nullable: true, length: 255 })
+  public installTime: string | null;
 
-  @Column({ name: 'af_c_id', type: 'nvarchar' })
-  af_c_id: string;
+  @Column('varchar', { name: 'country_code', nullable: true, length: 255 })
+  public countryCode: string | null;
 
-  @Column({ name: 'advertising_id', type: 'nvarchar', nullable: true })
-  advertising_id: string;
+  @Column('varchar', { name: 'language', nullable: true, length: 255 })
+  public language: string | null;
 
-  @Column({ name: 'idfa', type: 'nvarchar', nullable: true })
-  idfa: string;
+  @Column('varchar', { name: 'event_name', nullable: true, length: 255 })
+  public eventName: string | null;
 
-  @Column({ name: 'idfv', type: 'nvarchar', nullable: true })
-  idfv: string;
+  @Column('varchar', {
+    name: 'event_revenue_currency',
+    nullable: true,
+    length: 255,
+  })
+  public eventRevenueCurrency: string | null;
 
-  @Column({ name: 'install_time', type: 'nvarchar', nullable: true })
-  install_time: string;
+  @Column('varchar', { name: 'event_revenue', nullable: true, length: 255 })
+  public eventRevenue: string | null;
 
-  @Column({ name: 'country_code', type: 'nvarchar', nullable: true })
-  country_code: string;
+  @Column('varchar', { name: 'event_time', nullable: true, length: 255 })
+  public eventTime: string | null;
 
-  @Column({ name: 'language', type: 'nvarchar', nullable: true })
-  language: string;
+  @Column('varchar', { name: 'device_carrier', nullable: true, length: 255 })
+  public deviceCarrier: string | null;
 
-  @Column({ name: 'event_name', type: 'nvarchar', nullable: true })
-  event_name: string;
+  @Column('varchar', { name: 'device_ip', nullable: true, length: 255 })
+  public deviceIp: string | null;
 
-  @Column({ name: 'event_revenue_currency', type: 'nvarchar', nullable: true })
-  event_revenue_currency: string;
+  @Column('text', { name: 'originalUrl', nullable: true })
+  public originalUrl: string | null;
 
-  @Column({ name: 'event_revenue', type: 'nvarchar', nullable: true })
-  event_revenue: string;
+  @Column('datetime', {
+    name: 'created_at',
+    default: () => "'CURRENT_TIMESTAMP(6)'",
+  })
+  public createdAt: Date;
 
-  @Column({ name: 'event_time', type: 'nvarchar', nullable: true })
-  event_time: string;
+  @Column('varchar', { name: 'view_code', length: 255 })
+  public viewCode: string;
 
-  @Column({ name: 'device_carrier', type: 'nvarchar', nullable: true })
-  device_carrier: string;
+  @Column('varchar', { name: 'send_time', nullable: true, length: 255 })
+  public sendTime: string | null;
 
-  @Column({ name: 'device_ip', type: 'nvarchar', nullable: true })
-  device_ip: string;
+  @Column('varchar', { name: 'token', nullable: true, length: 255 })
+  public token: string | null;
 
-  @Column({ name: 'originalUrl', type: 'text', nullable: true })
-  originalUrl: string;
+  @Column('text', { name: 'send_url', nullable: true })
+  public sendUrl: string | null;
 
-  @Column({ name: 'send_time', type: 'nvarchar', nullable: true })
-  send_time: string;
+  @Column('varchar', { name: 'pub_id', nullable: true, length: 255 })
+  public pubId: string | null;
 
-  @Column({ name: 'send_url', type: 'text', nullable: true })
-  send_url: string;
+  @Column('varchar', { name: 'sub_id', nullable: true, length: 255 })
+  public subId: string | null;
 
-  @CreateDateColumn({ name: 'created_at' })
-  created_at: Date;
-
-  @ManyToOne(() => Campaign, (campaign) => campaign.postBackEventAppsflyer)
-  @JoinColumn({ name: 'campaign' })
-  campaign: Campaign;
+  @Column('varchar', { name: 'media', nullable: true, length: 255 })
+  public media: string | null;
 }

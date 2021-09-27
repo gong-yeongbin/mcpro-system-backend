@@ -1,41 +1,42 @@
-import {
-  Column,
-  Entity,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
-  JoinColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Campaign } from './Entity';
 
-@Entity('reservation')
+@Entity('reservation', { schema: 'mcpro' })
 export default class Reservation {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
-  idx: number;
+  public idx: number;
 
-  @Column({ type: 'nvarchar', name: 'oldCampaignName' })
-  oldCampaignName: string;
+  @Column('varchar', { name: 'oldCampaignName', length: 255 })
+  public oldCampaignName: string;
 
-  @Column({ type: 'nvarchar', name: 'newCampaignName' })
-  newCampaignName: string;
+  @Column('varchar', { name: 'newCampaignName', length: 255 })
+  public newCampaignName: string;
 
-  @Column({ type: 'text', name: 'oldTrackerTrackingUrl' })
-  oldTrackerTrackingUrl: string;
+  @Column('tinyint', { name: 'status', default: () => "'0'" })
+  public status: boolean;
 
-  @Column({ type: 'text', name: 'newTrackerTrackingUrl' })
-  newTrackerTrackingUrl: string;
+  @Column('datetime', {
+    name: 'reserved_at',
+    default: () => "'CURRENT_TIMESTAMP(6)'",
+  })
+  public reservedAt: Date;
 
-  @Column({ type: 'boolean', name: 'status', default: false })
-  status: boolean;
+  @Column('datetime', {
+    name: 'updated_at',
+    default: () => "'CURRENT_TIMESTAMP(6)'",
+  })
+  public updatedAt: Date;
 
-  @CreateDateColumn({ name: 'reserved_at' })
-  reserved_at: Date;
+  @Column('text', { name: 'oldTrackerTrackingUrl' })
+  public oldTrackerTrackingUrl: string;
 
-  @UpdateDateColumn({ name: 'updated_at' })
-  updated_at: Date;
+  @Column('text', { name: 'newTrackerTrackingUrl' })
+  public newTrackerTrackingUrl: string;
 
-  @ManyToOne(() => Campaign, (campaign) => campaign.reservation)
-  @JoinColumn({ name: 'campaign' })
-  campaign: Campaign;
+  @ManyToOne(() => Campaign, (campaign) => campaign.reservations, {
+    onDelete: 'NO ACTION',
+    onUpdate: 'NO ACTION',
+  })
+  @JoinColumn([{ name: 'campaign', referencedColumnName: 'idx' }])
+  public campaign: Campaign;
 }

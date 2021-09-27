@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { decodeUnicode } from 'src/util';
 import { Repository } from 'typeorm';
 import * as moment from 'moment-timezone';
-import { PostBackInstallAdbrixremaster, PostBackEventAdbrixremaster, PostBackDaily, Campaign, PostBackEvent } from '../../entities/Entity';
+import { PostbackInstallAdbrixremaster, PostbackEventAdbrixremaster, PostbackDaily, Campaign, PostbackRegisteredEvent } from '../../entities/Entity';
 import { CommonService } from 'src/common/common.service';
 
 @Injectable()
@@ -12,227 +12,236 @@ export class AdbrixremasterService {
     private readonly commonService: CommonService,
     @InjectRepository(Campaign)
     private readonly campaignRepository: Repository<Campaign>,
-    @InjectRepository(PostBackEvent)
-    private readonly postbackEventRepository: Repository<PostBackEvent>,
-    @InjectRepository(PostBackInstallAdbrixremaster)
-    private readonly postBackInstallAdbrixremasterRepository: Repository<PostBackInstallAdbrixremaster>,
-    @InjectRepository(PostBackEventAdbrixremaster)
-    private readonly postBackEventAdbrixremasterRepository: Repository<PostBackEventAdbrixremaster>,
+    @InjectRepository(PostbackRegisteredEvent)
+    private readonly postbackEventRepository: Repository<PostbackRegisteredEvent>,
+    @InjectRepository(PostbackInstallAdbrixremaster)
+    private readonly postbackInstallAdbrixremasterRepository: Repository<PostbackInstallAdbrixremaster>,
+    @InjectRepository(PostbackEventAdbrixremaster)
+    private readonly postbackEventAdbrixremasterRepository: Repository<PostbackEventAdbrixremaster>,
   ) {}
 
-  async postBackInstallAdbrixRemaster(request: any) {
+  async postbackInstallAdbrixRemaster(request: any) {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
     console.log(`[ adbrixremaster ---> mecrosspro ] install : ${originalUrl}`);
 
     const uuid: string = ['', undefined, '{uuid}'].includes(request.query.uuid) ? '' : request.query.uuid;
 
-    const postBackInstallAdbrixremaster: PostBackInstallAdbrixremaster = this.postBackInstallAdbrixremasterRepository.create({
-      view_code: request.query.cb_2,
+    const postbackInstallAdbrixremaster: PostbackInstallAdbrixremaster = this.postbackInstallAdbrixremasterRepository.create({
+      viewCode: request.query.cb_2,
       token: request.query.cb_1,
-      a_key: request.query.a_key,
-      a_cookie: request.query.a_cookie,
-      a_ip: request.query.a_ip,
-      a_fp: request.query.a_fp,
-      a_country: request.query.a_country,
-      a_city: request.query.a_city,
-      a_region: request.query.a_region,
-      a_appkey: request.query.a_appkey,
-      m_publisher: request.query.m_publisher,
-      m_sub_publisher: request.query.m_sub_publisher,
+      aKey: request.query.a_key,
+      aCookie: request.query.a_cookie,
+      aIp: request.query.a_ip,
+      aFp: request.query.a_fp,
+      aCountry: request.query.a_country,
+      aCity: request.query.a_city,
+      aRegion: request.query.a_region,
+      aAppkey: request.query.a_appkey,
+      mPublisher: request.query.m_publisher,
+      mSubPublisher: request.query.m_sub_publisher,
       adid: request.query.adid,
       idfv: request.query.idfv,
-      ad_id_opt_out: request.query.ad_id_opt_out,
-      device_os_version: request.query.device_os_version,
-      device_model: request.query.device_model,
-      device_vendor: request.query.device_vendor,
-      device_resolution: request.query.device_resolution,
-      device_portrait: request.query.device_portrait,
-      device_platform: request.query.device_platform,
-      device_network: request.query.device_network,
-      device_wifi: request.query.device_wifi,
-      device_carrier: request.query.device_carrier,
-      device_language: request.query.device_language,
-      device_country: request.query.device_country,
-      device_build_id: request.query.device_build_id,
-      package_name: request.query.package_name,
+      adIdOptOut: request.query.ad_id_opt_out,
+      deviceOsVersion: request.query.device_os_version,
+      deviceModel: request.query.device_model,
+      deviceVendor: request.query.device_vendor,
+      deviceResolution: request.query.device_resolution,
+      devicePortrait: request.query.device_portrait,
+      devicePlatform: request.query.device_platform,
+      deviceNetwork: request.query.device_network,
+      deviceWifi: request.query.device_wifi,
+      deviceCarrier: request.query.device_carrier,
+      deviceLanguage: request.query.device_language,
+      deviceCountry: request.query.device_country,
+      deviceBuildId: request.query.device_build_id,
+      packageName: request.query.package_name,
       appkey: request.query.appkey,
-      sdk_version: request.query.sdk_version,
+      sdkVersion: request.query.sdk_version,
       installer: request.query.installer,
-      app_version: request.query.app_version,
-      attr_type: request.query.attr_type,
-      event_name: request.query.event_name,
-      event_datetime: moment.utc(request.query.event_datetime.replace('+', ' ')).tz('Asia/Seoul').format('YYYY-MM-DD HH:mm:ss'),
-      deeplink_path: request.query.deeplink_path,
-      market_install_btn_clicked: request.query.market_install_btn_clicked,
-      app_install_start: request.query.app_install_start,
-      app_install_completed: request.query.app_install_completed,
-      app_first_open: request.query.app_first_open,
-      seconds_gap: request.query.seconds_gap,
+      appVersion: request.query.app_version,
+      attrType: request.query.attr_type,
+      eventName: request.query.event_name,
+      eventDatetime: moment.utc(request.query.event_datetime.replace('+', ' ')).tz('Asia/Seoul').format('YYYY-MM-DD HH:mm:ss'),
+      deeplinkPath: request.query.deeplink_path,
+      marketInstallBtnClicked: request.query.market_install_btn_clicked,
+      appInstallStart: request.query.app_install_start,
+      appInstallCompleted: request.query.app_install_completed,
+      appFirstOpen: request.query.app_first_open,
+      secondsGap: request.query.seconds_gap,
       cb_1: request.query.cb_1,
       cb_2: request.query.cb_2,
       cb_3: request.query.cb_3,
       cb_4: request.query.cb_4,
       cb_5: request.query.cb_5,
       originalUrl: originalUrl,
-      a_server_datetime: moment.utc(request.query.a_server_datetime.replace('+', ' ')).tz('Asia/Seoul').format('YYYY-MM-DD HH:mm:ss'),
+      aServerDatetime: moment.utc(request.query.a_server_datetime.replace('+', ' ')).tz('Asia/Seoul').format('YYYY-MM-DD HH:mm:ss'),
     });
 
-    const token: string = postBackInstallAdbrixremaster.token;
-    const viewCode: string = postBackInstallAdbrixremaster.view_code;
+    const isValidationPostback: PostbackInstallAdbrixremaster = await this.postbackInstallAdbrixremasterRepository
+      .createQueryBuilder('postbackInstallAdbrixremaster')
+      .where('Date(postbackInstallAdbrixremaster.createdAt) =:date', { date: moment().tz('Asia/Seoul').format('YYYY-MM-DD') })
+      .andWhere('postbackInstallAdbrixremaster.adid =:adid', { adid: postbackInstallAdbrixremaster.adid })
+      .andWhere('postbackInstallAdbrixremaster.idfv =:idfv', { idfv: postbackInstallAdbrixremaster.idfv })
+      .getOne();
 
-    const postBackDailyEntity: PostBackDaily = await this.commonService.isValidationPostbackDaily(viewCode, token);
+    if (isValidationPostback) return;
 
-    if (!postBackDailyEntity) throw new NotFoundException();
+    const token: string = postbackInstallAdbrixremaster.token;
+    const viewCode: string = postbackInstallAdbrixremaster.viewCode;
+
+    const postbackDailyEntity: PostbackDaily = await this.commonService.isValidationPostbackDaily(viewCode, token);
+
+    if (!postbackDailyEntity) throw new NotFoundException();
 
     const campaignEntity: Campaign = await this.campaignRepository.findOne({
-      where: { cp_token: token },
+      where: { token: token },
       relations: ['media', 'advertising'],
     });
 
     if (!campaignEntity) throw new NotFoundException();
 
-    const postBackEventEntity: PostBackEvent = await this.postbackEventRepository.findOne({
-      where: { campaign: campaignEntity, trackerPostback: 'install' },
+    const postbackEventEntity: PostbackRegisteredEvent = await this.postbackEventRepository.findOne({
+      where: { token: token, tracker: 'install' },
     });
 
-    if (postBackEventEntity.sendPostback) {
+    if (postbackEventEntity.status) {
       const url: string = await this.commonService.convertedPostbackInstallUrl({
         uuid: uuid,
-        click_id: postBackInstallAdbrixremaster.cb_3,
-        adid: postBackInstallAdbrixremaster.adid,
-        event_datetime: postBackInstallAdbrixremaster.event_datetime,
-        click_datetime: postBackInstallAdbrixremaster.a_server_datetime,
+        click_id: postbackInstallAdbrixremaster.cb_3,
+        adid: postbackInstallAdbrixremaster.adid,
+        event_datetime: postbackInstallAdbrixremaster.eventDatetime,
+        click_datetime: postbackInstallAdbrixremaster.aServerDatetime,
         campaignEntity: campaignEntity,
-        postBackDailyEntity: postBackDailyEntity,
+        postbackDailyEntity: postbackDailyEntity,
       });
 
-      postBackInstallAdbrixremaster.send_time = await this.commonService.httpServiceHandler(url);
-      postBackInstallAdbrixremaster.send_url = url;
+      postbackInstallAdbrixremaster.sendTime = await this.commonService.httpServiceHandler(url);
+      postbackInstallAdbrixremaster.sendUrl = url;
     }
 
-    postBackInstallAdbrixremaster.pubId = postBackDailyEntity.pub_id;
-    postBackInstallAdbrixremaster.subId = postBackDailyEntity.sub_id;
-    postBackInstallAdbrixremaster.media = campaignEntity.media.md_name;
+    postbackInstallAdbrixremaster.pubId = postbackDailyEntity.pubId;
+    postbackInstallAdbrixremaster.subId = postbackDailyEntity.subId;
+    postbackInstallAdbrixremaster.media = campaignEntity.media.name;
 
-    await this.postBackInstallAdbrixremasterRepository.save(postBackInstallAdbrixremaster);
+    await this.postbackInstallAdbrixremasterRepository.save(postbackInstallAdbrixremaster);
 
     return;
   }
 
-  async postBackEventAdbrixRemaster(request: any) {
+  async postbackEventAdbrixRemaster(request: any) {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
     console.log(`[ adbrixremaster ---> mecrosspro ] event : ${originalUrl}`);
 
     const uuid: string = ['', undefined, '{uuid}'].includes(request.query.uuid) ? '' : request.query.uuid;
 
-    const postBackEventAdbrixremaster: PostBackEventAdbrixremaster = this.postBackEventAdbrixremasterRepository.create({
-      view_code: request.query.cb_2,
+    const postbackEventAdbrixremaster: PostbackEventAdbrixremaster = this.postbackEventAdbrixremasterRepository.create({
+      viewCode: request.query.cb_2,
       token: request.query.cb_1,
-      a_key: request.query.a_key,
-      a_cookie: request.query.a_cookie,
-      a_ip: request.query.a_ip,
-      a_fp: request.query.a_fp,
-      a_country: request.query.a_country,
-      a_city: request.query.a_city,
-      a_region: request.query.a_region,
-      a_appkey: request.query.a_appkey,
-      m_publisher: request.query.m_publisher,
-      m_sub_publisher: request.query.m_sub_publisher,
-      attr_adid: request.query.attr_adid,
-      attr_event_datetime: moment.utc(request.query.attr_event_datetime.replace('+', ' ')).tz('Asia/Seoul').format('YYYY-MM-DD HH:mm:ss'),
-      attr_event_timestamp: request.query.attr_event_timestamp,
-      attr_seconds_gap: request.query.attr_seconds_gap,
+      aKey: request.query.a_key,
+      aCookie: request.query.a_cookie,
+      aIp: request.query.a_ip,
+      aFp: request.query.a_fp,
+      aCountry: request.query.a_country,
+      aCity: request.query.a_city,
+      aRegion: request.query.a_region,
+      aAppkey: request.query.a_appkey,
+      mPublisher: request.query.m_publisher,
+      mSubPublisher: request.query.m_sub_publisher,
+      attrAdid: request.query.attr_adid,
+      attrEventDatetime: moment.utc(request.query.attr_event_datetime.replace('+', ' ')).tz('Asia/Seoul').format('YYYY-MM-DD HH:mm:ss'),
+      attrEventTimestamp: request.query.attr_event_timestamp,
+      attrSecondsGap: request.query.attr_seconds_gap,
       adid: request.query.adid,
       idfv: request.query.idfv,
-      ad_id_opt_out: request.query.ad_id_opt_out,
-      device_os_version: request.query.device_os_version,
-      device_model: request.query.device_model,
-      device_vendor: request.query.device_vendor,
-      device_resolution: request.query.device_resolution,
-      device_portrait: request.query.device_portrait,
-      device_platform: request.query.device_platform,
-      device_network: request.query.device_network,
-      device_wifi: request.query.device_wifi,
-      device_carrier: request.query.device_carrier,
-      device_language: request.query.device_language,
-      device_country: request.query.device_country,
-      device_build_id: request.query.device_build_id,
-      package_name: request.query.package_name,
+      adIdOptOut: request.query.ad_id_opt_out,
+      deviceOsVersion: request.query.device_os_version,
+      deviceModel: request.query.device_model,
+      deviceVendor: request.query.device_vendor,
+      deviceResolution: request.query.device_resolution,
+      devicePortrait: request.query.device_portrait,
+      devicePlatform: request.query.device_platform,
+      deviceNetwork: request.query.device_network,
+      deviceWifi: request.query.device_wifi,
+      deviceCarrier: request.query.device_carrier,
+      deviceLanguage: request.query.device_language,
+      deviceCountry: request.query.device_country,
+      deviceBuildId: request.query.device_build_id,
+      packageName: request.query.package_name,
       appkey: request.query.appkey,
-      sdk_version: request.query.sdk_version,
+      sdkVersion: request.query.sdk_version,
       installer: request.query.installer,
-      app_version: request.query.app_version,
-      event_name: request.query.event_name,
-      event_datetime: moment.utc(request.query.event_datetime.replace('+', ' ')).tz('Asia/Seoul').format('YYYY-MM-DD HH:mm:ss'),
-      event_timestamp: request.query.event_timestamp,
-      event_timestamp_d: request.query.event_timestamp_d,
+      appVersion: request.query.app_version,
+      eventName: request.query.event_name,
+      eventDatetime: moment.utc(request.query.event_datetime.replace('+', ' ')).tz('Asia/Seoul').format('YYYY-MM-DD HH:mm:ss'),
+      eventTimestamp: request.query.event_timestamp,
+      eventTimestampD: request.query.event_timestamp_d,
       cb_1: request.query.cb_1,
       cb_2: request.query.cb_2,
       cb_3: request.query.cb_3,
       cb_4: request.query.cb_4,
       cb_5: request.query.cb_5,
-      param_json: request.query.param_json,
+      paramJson: request.query.param_json,
       originalUrl: originalUrl,
-      price: 0,
+      revenue: 0,
     });
 
-    const token: string = postBackEventAdbrixremaster.token;
-    const viewCode: string = postBackEventAdbrixremaster.view_code;
+    const token: string = postbackEventAdbrixremaster.token;
+    const viewCode: string = postbackEventAdbrixremaster.viewCode;
 
-    if (postBackEventAdbrixremaster.param_json != 'null' && postBackEventAdbrixremaster.param_json != '') {
-      const jsonData: any = JSON.parse(postBackEventAdbrixremaster.param_json);
+    if (postbackEventAdbrixremaster.paramJson != 'null' && postbackEventAdbrixremaster.paramJson != '') {
+      const jsonData: any = JSON.parse(postbackEventAdbrixremaster.paramJson);
 
       if (jsonData['abx:item.abx:sales']) {
-        postBackEventAdbrixremaster.price = +jsonData['abx:item.abx:sales'];
-        postBackEventAdbrixremaster.currency = jsonData['abx:item.abx:currency'];
+        postbackEventAdbrixremaster.revenue = +jsonData['abx:item.abx:sales'];
+        postbackEventAdbrixremaster.currency = jsonData['abx:item.abx:currency'];
       } else if (jsonData['abx:items']) {
         for (const item of jsonData['abx:items']) {
-          postBackEventAdbrixremaster.price += +item['abx:sales'];
-          postBackEventAdbrixremaster.currency = item['abx:currency'];
+          postbackEventAdbrixremaster.revenue += +item['abx:sales'];
+          postbackEventAdbrixremaster.currency = item['abx:currency'];
         }
       }
     }
 
-    const postBackDailyEntity: PostBackDaily = await this.commonService.isValidationPostbackDaily(viewCode, token);
+    const postbackDailyEntity: PostbackDaily = await this.commonService.isValidationPostbackDaily(viewCode, token);
 
-    if (!postBackDailyEntity) throw new NotFoundException();
+    if (!postbackDailyEntity) throw new NotFoundException();
 
     const campaignEntity: Campaign = await this.campaignRepository.findOne({
-      where: { cp_token: token },
+      where: { token: token },
       relations: ['media', 'advertising'],
     });
 
     if (!campaignEntity) throw new NotFoundException();
 
-    const postBackEventEntity: PostBackEvent = await this.postbackEventRepository.findOne({
-      where: { campaign: campaignEntity, trackerPostback: postBackEventAdbrixremaster.event_name },
+    const postbackEventEntity: PostbackRegisteredEvent = await this.postbackEventRepository.findOne({
+      where: { token: token, tracker: postbackEventAdbrixremaster.eventName },
     });
 
-    if (!postBackEventEntity) {
-      await this.commonService.postBackUnregisteredEvent(postBackDailyEntity, postBackEventAdbrixremaster.event_name);
+    if (!postbackEventEntity) {
+      await this.commonService.postbackUnregisteredEvent(postbackDailyEntity, postbackEventAdbrixremaster.eventName);
     }
 
-    if (postBackEventEntity && postBackEventEntity.sendPostback) {
+    if (postbackEventEntity && postbackEventEntity.status) {
       const url: string = await this.commonService.convertedPostbackEventUrl({
         uuid: uuid,
-        click_id: postBackEventAdbrixremaster.cb_3,
-        adid: postBackEventAdbrixremaster.adid,
-        event_name: postBackEventAdbrixremaster.event_name,
-        event_datetime: postBackEventAdbrixremaster.event_datetime,
-        install_datetime: postBackEventAdbrixremaster.attr_event_datetime,
+        click_id: postbackEventAdbrixremaster.cb_3,
+        adid: postbackEventAdbrixremaster.adid,
+        event_name: postbackEventAdbrixremaster.eventName,
+        event_datetime: postbackEventAdbrixremaster.eventDatetime,
+        install_datetime: postbackEventAdbrixremaster.attrEventDatetime,
         campaignEntity: campaignEntity,
-        postBackDailyEntity: postBackDailyEntity,
+        postbackDailyEntity: postbackDailyEntity,
       });
 
-      postBackEventAdbrixremaster.send_time = await this.commonService.httpServiceHandler(url);
-      postBackEventAdbrixremaster.send_url = url;
+      postbackEventAdbrixremaster.sendTime = await this.commonService.httpServiceHandler(url);
+      postbackEventAdbrixremaster.sendUrl = url;
     }
 
-    postBackEventAdbrixremaster.pubId = postBackDailyEntity.pub_id;
-    postBackEventAdbrixremaster.subId = postBackDailyEntity.sub_id;
-    postBackEventAdbrixremaster.media = campaignEntity.media.md_name;
+    postbackEventAdbrixremaster.pubId = postbackDailyEntity.pubId;
+    postbackEventAdbrixremaster.subId = postbackDailyEntity.subId;
+    postbackEventAdbrixremaster.media = campaignEntity.media.name;
 
-    await this.postBackEventAdbrixremasterRepository.save(postBackEventAdbrixremaster);
+    await this.postbackEventAdbrixremasterRepository.save(postbackEventAdbrixremaster);
 
     return;
   }

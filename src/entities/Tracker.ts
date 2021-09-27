@@ -1,62 +1,41 @@
-import {
-  Column,
-  Entity,
-  Unique,
-  CreateDateColumn,
-  UpdateDateColumn,
-  OneToMany,
-  JoinColumn,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Advertising } from './Entity';
 
-@Entity('tracker')
-@Unique(['tk_code'])
+@Entity('tracker', { schema: 'mcpro' })
 export default class Tracker {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
-  idx: number;
+  public idx: number;
 
-  @Column({ type: 'nvarchar', name: 'tk_code' })
-  tk_code: string;
+  @Column('varchar', { name: 'name', nullable: true, length: 255 })
+  public name: string | null;
 
-  @Column({ type: 'nvarchar', name: 'tk_name' })
-  tk_name: string;
+  @Column('varchar', { name: 'type', length: 255, default: () => "'tracker'" })
+  public type: string;
 
-  @Column({
-    type: 'nvarchar',
-    name: 'type',
+  @Column('text', { name: 'trackerTrackingUrlTemplate' })
+  public trackerTrackingUrlTemplate: string;
 
-    default: 'tracker',
+  @Column('text', { name: 'mecrossPostbackInstallUrlTemplate' })
+  public mecrossPostbackInstallUrlTemplate: string;
+
+  @Column('text', { name: 'mecrossPostbackEventUrlTemplate' })
+  public mecrossPostbackEventUrlTemplate: string;
+
+  @Column('tinyint', { name: 'status', default: () => "'1'" })
+  public status: number;
+
+  @Column('datetime', {
+    name: 'created_At',
+    default: () => "'CURRENT_TIMESTAMP(6)'",
   })
-  type: string;
+  public createdAt: Date;
 
-  @Column({ type: 'boolean', name: 'status', default: true })
-  status: boolean;
-
-  @Column({ type: 'text', name: 'trackerTrackingUrlTemplate' })
-  trackerTrackingUrlTemplate: string;
-
-  @Column({
-    type: 'text',
-    name: 'mecrossPostbackInstallUrlTemplate',
+  @Column('datetime', {
+    name: 'updated_At',
+    default: () => "'CURRENT_TIMESTAMP(6)'",
   })
-  mecrossPostbackInstallUrlTemplate: string;
+  public updatedAt: Date;
 
-  @Column({
-    type: 'text',
-    name: 'mecrossPostbackEventUrlTemplate',
-  })
-  mecrossPostbackEventUrlTemplate: string;
-
-  @CreateDateColumn({ name: 'created_At' })
-  created_At: Date;
-
-  @UpdateDateColumn({ name: 'updated_At' })
-  updated_At: Date;
-
-  @OneToMany(() => Advertising, (advertising) => advertising.tracker, {
-    cascade: true,
-  })
-  @JoinColumn()
-  advertising: Advertising[];
+  @OneToMany(() => Advertising, (advertising) => advertising.tracker)
+  public advertising: Advertising[];
 }

@@ -1,32 +1,30 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
-  Column,
-  ManyToOne,
-  JoinColumn,
-} from 'typeorm';
-import { PostBackDaily } from './Entity';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { PostbackDaily } from './Entity';
 
-@Entity('postback_unregistered_event')
-export default class PostBackUnregisteredEvent {
+@Entity('postback_unregistered_event', { schema: 'mcpro' })
+export default class PostbackUnregisteredEvent {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
-  idx: number;
+  public idx: number;
 
-  @Column({ type: 'nvarchar', name: 'event_name' })
-  event_name: string;
+  @Column('varchar', { name: 'event_name', length: 255 })
+  public eventName: string;
 
-  @Column({ type: 'bigint', name: 'event_count', default: 1 })
-  event_count: number;
+  @Column('bigint', { name: 'event_count', default: () => "'1'" })
+  public eventCount: string;
 
-  @CreateDateColumn({ name: 'created_at' })
-  created_at: Date;
+  @Column('datetime', {
+    name: 'created_at',
+    default: () => "'CURRENT_TIMESTAMP(6)'",
+  })
+  public createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
-  updated_at: Date;
+  @Column('datetime', {
+    name: 'updated_at',
+    default: () => "'CURRENT_TIMESTAMP(6)'",
+  })
+  public updatedAt: Date;
 
-  @ManyToOne(() => PostBackDaily, (postBackDaily) => postBackDaily.postBackUnregisteredEvent)
-  @JoinColumn({ name: 'postBackDaily' })
-  postBackDaily: PostBackDaily;
+  @ManyToOne(() => PostbackDaily, (postbackDaily) => postbackDaily.postbackUnregisteredEvent, { onDelete: 'NO ACTION', onUpdate: 'NO ACTION' })
+  @JoinColumn([{ name: 'postBackDaily', referencedColumnName: 'idx' }])
+  public postbackDaily: PostbackDaily;
 }

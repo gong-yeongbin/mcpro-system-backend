@@ -1,26 +1,32 @@
-import { Column, Entity, OneToMany, CreateDateColumn, UpdateDateColumn, Unique, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, Index, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Advertising } from './Entity';
 
-@Entity('advertiser')
-@Unique(['ar_code', 'ar_name'])
+@Index('IDX_e72a5d292995a75f0f251b7a7d', ['name'], { unique: true })
+@Entity('advertiser', { schema: 'mcpro' })
 export default class Advertiser {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
-  idx: number;
+  public idx: number;
 
-  @Column({ type: 'nvarchar', name: 'ar_code' })
-  ar_code: string;
-
-  @Column({ type: 'nvarchar', name: 'ar_name' })
-  ar_name: string;
-
-  @CreateDateColumn({ name: 'created_at' })
-  created_at: Date;
-
-  @UpdateDateColumn({ name: 'updated_at' })
-  updated_at: Date;
-
-  @OneToMany(() => Advertising, (advertising) => advertising.advertiser, {
-    cascade: true,
+  @Column('varchar', {
+    name: 'name',
+    nullable: true,
+    unique: true,
+    length: 255,
   })
-  advertising: Advertising[];
+  public name: string | null;
+
+  @Column('datetime', {
+    name: 'created_at',
+    default: () => "'CURRENT_TIMESTAMP(6)'",
+  })
+  public createdAt: Date;
+
+  @Column('datetime', {
+    name: 'updated_at',
+    default: () => "'CURRENT_TIMESTAMP(6)'",
+  })
+  public updatedAt: Date;
+
+  @OneToMany(() => Advertising, (advertising) => advertising.advertiser)
+  public advertising: Advertising[];
 }

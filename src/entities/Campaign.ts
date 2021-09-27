@@ -1,104 +1,78 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn, OneToMany, JoinColumn } from 'typeorm';
-import {
-  Advertising,
-  Media,
-  PostBackEvent,
-  Reservation,
-  PostBackDaily,
-  SubMedia,
-  PostBackEventAppsflyer,
-  PostBackInstallAppsflyer,
-  PostBackInstallAdbrixremaster,
-  PostBackEventAdbrixremaster,
-} from './Entity';
+import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Advertising, Media, Reservation } from './Entity';
+import PostbackCampaignDaily from './PostbackCampaignDaily';
+import PostbackRegisteredEvent from './PostbackRegisteredEvent';
 
-@Entity('campaign')
-@Unique(['cp_code', 'cp_token'])
+@Index('IDX_1ab622056fec78ded2dccbf2ce', ['token'], { unique: true })
+@Entity('campaign', { schema: 'mcpro' })
 export default class Campaign {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
-  idx: number;
+  public idx: number;
 
-  @Column({ type: 'nvarchar', name: 'cp_token' })
-  cp_token: string;
-
-  @Column({ type: 'nvarchar', name: 'appkey' })
-  appkey: string;
-
-  @Column({
-    type: 'nvarchar',
-    name: 'cp_code',
+  @Column('varchar', {
+    name: 'token',
     nullable: true,
+    unique: true,
+    length: 255,
   })
-  cp_code: string;
+  public token: string | null;
 
-  @Column({ type: 'nvarchar', name: 'cp_name' })
-  cp_name: string;
+  @Column('varchar', { name: 'appkey', length: 255 })
+  public appkey: string;
 
-  @Column({ type: 'nvarchar', name: 'type' })
-  type: string;
+  @Column('varchar', { name: 'name', nullable: true, length: 255 })
+  public name: string | null;
 
-  @Column({ type: 'text', name: 'trackerTrackingUrl' })
-  trackerTrackingUrl: string;
+  @Column('varchar', { name: 'type', length: 255 })
+  public type: string;
 
-  @Column({ type: 'text', name: 'mecrossTrackingUrl' })
-  mecrossTrackingUrl: string;
+  @Column('tinyint', { name: 'trackerTrackingStatus', default: () => "'0'" })
+  public trackerTrackingStatus: number;
 
-  @Column({
-    type: 'boolean',
-    name: 'trackerTrackingStatus',
-    default: false,
+  @Column('tinyint', { name: 'mecrossTrackingStatus', default: () => "'0'" })
+  public mecrossTrackingStatus: number;
+
+  @Column('tinyint', { name: 'status', default: () => "'1'" })
+  public status: boolean;
+
+  @Column('text', { name: 'trackerTrackingUrl' })
+  public trackerTrackingUrl: string;
+
+  @Column('text', { name: 'mecrossTrackingUrl' })
+  public mecrossTrackingUrl: string;
+
+  @Column('datetime', {
+    name: 'updated_at',
+    default: () => "'CURRENT_TIMESTAMP(6)'",
   })
-  trackerTrackingStatus: boolean;
+  public updatedAt: Date;
 
-  @Column({
-    type: 'boolean',
-    name: 'mecrossTrackingStatus',
-    default: false,
+  @Column('datetime', {
+    name: 'created_at',
+    default: () => "'CURRENT_TIMESTAMP(6)'",
   })
-  mecrossTrackingStatus: boolean;
+  public createdAt: Date;
 
-  @Column({
-    type: 'boolean',
-    name: 'status',
-    default: true,
+  @ManyToOne(() => Advertising, (advertising) => advertising.campaign, {
+    onDelete: 'NO ACTION',
+    onUpdate: 'NO ACTION',
   })
-  status: boolean;
-
-  @CreateDateColumn({ name: 'created_at' })
-  created_at: Date;
-
-  @UpdateDateColumn({ name: 'updated_at' })
-  updated_at: Date;
-
-  @ManyToOne(() => Advertising, (advertising) => advertising.campaign)
-  @JoinColumn({ name: 'advertising' })
-  advertising: Advertising;
-
-  @ManyToOne(() => Media, (media) => media.campaign, { onUpdate: 'CASCADE' })
-  @JoinColumn({ name: 'media' })
-  media: Media;
-
-  @OneToMany(() => PostBackEvent, (postBackEvent) => postBackEvent.campaign)
-  postBackEvent: PostBackEvent[];
+  @JoinColumn([{ name: 'advertising', referencedColumnName: 'idx' }])
+  public advertising: Advertising;
 
   @OneToMany(() => Reservation, (reservation) => reservation.campaign)
-  reservation: Reservation[];
+  public reservations: Reservation[];
 
-  @OneToMany(() => PostBackDaily, (postBackDaily) => postBackDaily.campaign)
-  postBackDaily: PostBackDaily[];
+  @ManyToOne(() => Media, (media) => media.campaign, {
+    onDelete: 'NO ACTION',
+    onUpdate: 'CASCADE',
+  })
+  @JoinColumn([{ name: 'media', referencedColumnName: 'idx' }])
+  public media: Media;
 
-  @OneToMany(() => SubMedia, (subMedia) => subMedia.campaign)
-  subMedia: SubMedia[];
+  @OneToMany(() => PostbackCampaignDaily, (postbackCampaignDaily) => postbackCampaignDaily.token)
+  public postbackCampaignDaily: PostbackCampaignDaily[];
 
-  @OneToMany(() => PostBackEventAppsflyer, (postBackEventAppsflyer) => postBackEventAppsflyer.campaign)
-  postBackEventAppsflyer: PostBackEventAppsflyer[];
-
-  @OneToMany(() => PostBackInstallAppsflyer, (postBackInstallAppsflyer) => postBackInstallAppsflyer.campaign)
-  postBackInstallAppsflyer: PostBackInstallAppsflyer[];
-
-  @OneToMany(() => PostBackEventAdbrixremaster, (postBackEventAdbrixremaster) => postBackEventAdbrixremaster.campaign)
-  postBackEventAdbrixremaster: PostBackEventAdbrixremaster[];
-
-  @OneToMany(() => PostBackInstallAdbrixremaster, (postBackInstallAdbrixremaster) => postBackInstallAdbrixremaster.campaign)
-  postBackInstallAdbrixremaster: PostBackInstallAdbrixremaster[];
+  @OneToMany(() => PostbackRegisteredEvent, (postbackRegisteredEvent) => postbackRegisteredEvent.token)
+  public postbackRegisteredEvent: PostbackRegisteredEvent[];
 }

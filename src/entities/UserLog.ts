@@ -1,21 +1,30 @@
-import { Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from './Entity';
 
-@Entity('user_log')
+@Entity('user_log', { schema: 'mcpro' })
 export default class UserLog {
-  @PrimaryGeneratedColumn({ name: 'idx', type: 'bigint' })
-  idx: number;
+  @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
+  public idx: number;
 
-  @Column({ type: 'nvarchar', name: 'ip_address' })
-  ip_address: string;
+  @Column('varchar', { name: 'ip_address', length: 255 })
+  public ipAddress: string;
 
-  @CreateDateColumn({ name: 'created_at' })
-  created_at: Date;
+  @Column('datetime', {
+    name: 'created_at',
+    default: () => "'CURRENT_TIMESTAMP(6)'",
+  })
+  public createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
-  updated_at: Date;
+  @Column('datetime', {
+    name: 'updated_at',
+    default: () => "'CURRENT_TIMESTAMP(6)'",
+  })
+  public updatedAt: Date;
 
-  @ManyToOne(() => User, (User) => User.user_log)
-  @JoinColumn({ name: 'user' })
-  user: User;
+  @ManyToOne(() => User, (user) => user.userLog, {
+    onDelete: 'NO ACTION',
+    onUpdate: 'NO ACTION',
+  })
+  @JoinColumn([{ name: 'user', referencedColumnName: 'idx' }])
+  public user: User;
 }

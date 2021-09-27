@@ -1,180 +1,186 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { Campaign } from './Entity';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity('postback_event_adbrixremaster')
-export default class PostBackEventAdbrixremaster {
-  @PrimaryGeneratedColumn({ name: 'idx', type: 'bigint' })
-  idx: number;
+@Entity('postback_event_adbrixremaster', { schema: 'mcpro' })
+export default class PostbackEventAdbrixremaster {
+  @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
+  public idx: number;
 
-  @Column({ name: 'view_code', type: 'nvarchar' })
-  view_code: string;
+  @Column('varchar', { name: 'view_code', length: 255 })
+  public viewCode: string;
 
-  @Column({ name: 'token', type: 'nvarchar', nullable: true })
-  token: string;
+  @Column('varchar', { name: 'a_key', nullable: true, length: 255 })
+  public aKey: string | null;
 
-  @Column({ name: 'media', type: 'nvarchar', nullable: true })
-  media: string;
+  @Column('varchar', { name: 'a_cookie', nullable: true, length: 255 })
+  public aCookie: string | null;
 
-  @Column({ name: 'pub_id', type: 'nvarchar', nullable: true })
-  pubId: string;
+  @Column('varchar', { name: 'a_ip', nullable: true, length: 255 })
+  public aIp: string | null;
 
-  @Column({ name: 'sub_id', type: 'nvarchar', nullable: true })
-  subId: string;
+  @Column('varchar', { name: 'a_fp', nullable: true, length: 255 })
+  public aFp: string | null;
 
-  @Column({ name: 'a_key', type: 'nvarchar', nullable: true })
-  a_key: string;
+  @Column('varchar', { name: 'a_country', nullable: true, length: 255 })
+  public aCountry: string | null;
 
-  @Column({ name: 'a_cookie', type: 'nvarchar', nullable: true })
-  a_cookie: string;
+  @Column('varchar', { name: 'a_city', nullable: true, length: 255 })
+  public aCity: string | null;
 
-  @Column({ name: 'a_ip', type: 'nvarchar', nullable: true })
-  a_ip: string;
+  @Column('varchar', { name: 'a_region', nullable: true, length: 255 })
+  public aRegion: string | null;
 
-  @Column({ name: 'a_fp', type: 'nvarchar', nullable: true })
-  a_fp: string;
+  @Column('varchar', { name: 'a_appkey', nullable: true, length: 255 })
+  public aAppkey: string | null;
 
-  @Column({ name: 'a_country', type: 'nvarchar', nullable: true })
-  a_country: string;
+  @Column('varchar', { name: 'm_publisher', nullable: true, length: 255 })
+  public mPublisher: string | null;
 
-  @Column({ name: 'a_city', type: 'nvarchar', nullable: true })
-  a_city: string;
+  @Column('varchar', { name: 'm_sub_publisher', nullable: true, length: 255 })
+  public mSubPublisher: string | null;
 
-  @Column({ name: 'a_region', type: 'nvarchar', nullable: true })
-  a_region: string;
+  @Column('varchar', { name: 'attr_adid', nullable: true, length: 255 })
+  public attrAdid: string | null;
 
-  @Column({ name: 'a_appkey', type: 'nvarchar', nullable: true })
-  a_appkey: string;
+  @Column('varchar', {
+    name: 'attr_event_datetime',
+    nullable: true,
+    length: 255,
+  })
+  public attrEventDatetime: string | null;
 
-  @Column({ name: 'm_publisher', type: 'nvarchar', nullable: true })
-  m_publisher: string;
+  @Column('varchar', {
+    name: 'attr_event_timestamp',
+    nullable: true,
+    length: 255,
+  })
+  public attrEventTimestamp: string | null;
 
-  @Column({ name: 'm_sub_publisher', type: 'nvarchar', nullable: true })
-  m_sub_publisher: string;
+  @Column('varchar', { name: 'attr_seconds_gap', nullable: true, length: 255 })
+  public attrSecondsGap: string | null;
 
-  @Column({ name: 'attr_adid', type: 'nvarchar', nullable: true })
-  attr_adid: string;
+  @Column('varchar', { name: 'adid', nullable: true, length: 255 })
+  public adid: string | null;
 
-  @Column({ name: 'attr_event_datetime', type: 'nvarchar', nullable: true })
-  attr_event_datetime: string;
+  @Column('varchar', { name: 'idfv', nullable: true, length: 255 })
+  public idfv: string | null;
 
-  @Column({ name: 'attr_event_timestamp', type: 'nvarchar', nullable: true })
-  attr_event_timestamp: string;
+  @Column('varchar', { name: 'ad_id_opt_out', nullable: true, length: 255 })
+  public adIdOptOut: string | null;
 
-  @Column({ name: 'attr_seconds_gap', type: 'nvarchar', nullable: true })
-  attr_seconds_gap: string;
+  @Column('varchar', { name: 'device_os_version', nullable: true, length: 255 })
+  public deviceOsVersion: string | null;
 
-  @Column({ name: 'adid', type: 'nvarchar', nullable: true })
-  adid: string;
+  @Column('varchar', { name: 'device_model', nullable: true, length: 255 })
+  public deviceModel: string | null;
 
-  @Column({ name: 'idfv', type: 'nvarchar', nullable: true })
-  idfv: string;
+  @Column('varchar', { name: 'device_vendor', nullable: true, length: 255 })
+  public deviceVendor: string | null;
 
-  @Column({ name: 'ad_id_opt_out', type: 'nvarchar', nullable: true })
-  ad_id_opt_out: string;
+  @Column('varchar', { name: 'device_resolution', nullable: true, length: 255 })
+  public deviceResolution: string | null;
 
-  @Column({ name: 'device_os_version', type: 'nvarchar', nullable: true })
-  device_os_version: string;
+  @Column('varchar', { name: 'device_portrait', nullable: true, length: 255 })
+  public devicePortrait: string | null;
 
-  @Column({ name: 'device_model', type: 'nvarchar', nullable: true })
-  device_model: string;
+  @Column('varchar', { name: 'device_platform', nullable: true, length: 255 })
+  public devicePlatform: string | null;
 
-  @Column({ name: 'device_vendor', type: 'nvarchar', nullable: true })
-  device_vendor: string;
+  @Column('varchar', { name: 'device_network', nullable: true, length: 255 })
+  public deviceNetwork: string | null;
 
-  @Column({ name: 'device_resolution', type: 'nvarchar', nullable: true })
-  device_resolution: string;
+  @Column('varchar', { name: 'device_wifi', nullable: true, length: 255 })
+  public deviceWifi: string | null;
 
-  @Column({ name: 'device_portrait', type: 'nvarchar', nullable: true })
-  device_portrait: string;
+  @Column('varchar', { name: 'device_carrier', nullable: true, length: 255 })
+  public deviceCarrier: string | null;
 
-  @Column({ name: 'device_platform', type: 'nvarchar', nullable: true })
-  device_platform: string;
+  @Column('varchar', { name: 'device_language', nullable: true, length: 255 })
+  public deviceLanguage: string | null;
 
-  @Column({ name: 'device_network', type: 'nvarchar', nullable: true })
-  device_network: string;
+  @Column('varchar', { name: 'device_country', nullable: true, length: 255 })
+  public deviceCountry: string | null;
 
-  @Column({ name: 'device_wifi', type: 'nvarchar', nullable: true })
-  device_wifi: string;
+  @Column('varchar', { name: 'device_build_id', nullable: true, length: 255 })
+  public deviceBuildId: string | null;
 
-  @Column({ name: 'device_carrier', type: 'nvarchar', nullable: true })
-  device_carrier: string;
+  @Column('varchar', { name: 'package_name', nullable: true, length: 255 })
+  public packageName: string | null;
 
-  @Column({ name: 'device_language', type: 'nvarchar', nullable: true })
-  device_language: string;
+  @Column('varchar', { name: 'appkey', nullable: true, length: 255 })
+  public appkey: string | null;
 
-  @Column({ name: 'device_country', type: 'nvarchar', nullable: true })
-  device_country: string;
+  @Column('varchar', { name: 'sdk_version', nullable: true, length: 255 })
+  public sdkVersion: string | null;
 
-  @Column({ name: 'device_build_id', type: 'nvarchar', nullable: true })
-  device_build_id: string;
+  @Column('varchar', { name: 'installer', nullable: true, length: 255 })
+  public installer: string | null;
 
-  @Column({ name: 'package_name', type: 'nvarchar', nullable: true })
-  package_name: string;
+  @Column('varchar', { name: 'app_version', nullable: true, length: 255 })
+  public appVersion: string | null;
 
-  @Column({ name: 'appkey', type: 'nvarchar', nullable: true })
-  appkey: string;
+  @Column('varchar', { name: 'event_name', nullable: true, length: 255 })
+  public eventName: string | null;
 
-  @Column({ name: 'sdk_version', type: 'nvarchar', nullable: true })
-  sdk_version: string;
+  @Column('varchar', { name: 'event_datetime', nullable: true, length: 255 })
+  public eventDatetime: string | null;
 
-  @Column({ name: 'installer', type: 'nvarchar', nullable: true })
-  installer: string;
+  @Column('varchar', { name: 'event_timestamp', nullable: true, length: 255 })
+  public eventTimestamp: string | null;
 
-  @Column({ name: 'app_version', type: 'nvarchar', nullable: true })
-  app_version: string;
+  @Column('varchar', { name: 'event_timestamp_d', nullable: true, length: 255 })
+  public eventTimestampD: string | null;
 
-  @Column({ name: 'event_name', type: 'nvarchar', nullable: true })
-  event_name: string;
+  @Column('text', { name: 'param_json', nullable: true })
+  public paramJson: string | null;
 
-  @Column({ name: 'event_datetime', type: 'nvarchar', nullable: true })
-  event_datetime: string;
+  @Column('varchar', { name: 'cb_1', length: 255 })
+  public cb_1: string;
 
-  @Column({ name: 'event_timestamp', type: 'nvarchar', nullable: true })
-  event_timestamp: string;
+  @Column('varchar', { name: 'cb_2', length: 255 })
+  public cb_2: string;
 
-  @Column({ name: 'event_timestamp_d', type: 'nvarchar', nullable: true })
-  event_timestamp_d: string;
+  @Column('varchar', { name: 'cb_3', length: 255 })
+  public cb_3: string;
 
-  @Column({ name: 'param_json', type: 'text', nullable: true })
-  param_json: string;
+  @Column('varchar', { name: 'cb_4', nullable: true, length: 255 })
+  public cb_4: string | null;
 
-  @Column({ name: 'cb_1', type: 'nvarchar' }) // campaign token
-  cb_1: string;
+  @Column('varchar', { name: 'cb_5', nullable: true, length: 255 })
+  public cb_5: string | null;
 
-  @Column({ name: 'cb_2', type: 'nvarchar' }) // view code
-  cb_2: string;
+  @Column('text', { name: 'originalUrl', nullable: true })
+  public originalUrl: string | null;
 
-  @Column({ name: 'cb_3', type: 'nvarchar' }) // click id
-  cb_3: string;
+  @Column('varchar', { name: 'send_time', nullable: true, length: 255 })
+  public sendTime: string | null;
 
-  @Column({ name: 'cb_4', type: 'nvarchar', nullable: true })
-  cb_4: string;
+  @Column('datetime', {
+    name: 'created_at',
+    default: () => "'CURRENT_TIMESTAMP(6)'",
+  })
+  public createdAt: Date;
 
-  @Column({ name: 'cb_5', type: 'nvarchar', nullable: true })
-  cb_5: string;
+  @Column('varchar', { name: 'product_id', nullable: true, length: 255 })
+  public productId: string | null;
 
-  @Column({ name: 'product_id', type: 'nvarchar', nullable: true })
-  product_id: string;
+  @Column('varchar', { name: 'currency', nullable: true, length: 255 })
+  public currency: string | null;
 
-  @Column({ name: 'currency', type: 'nvarchar', nullable: true })
-  currency: string;
+  @Column('int', { name: 'revenue', nullable: true })
+  public revenue: number | null;
 
-  @Column({ name: 'price', type: 'int', nullable: true })
-  price: number;
+  @Column('varchar', { name: 'token', nullable: true, length: 255 })
+  public token: string | null;
 
-  @Column({ name: 'originalUrl', type: 'text', nullable: true })
-  originalUrl: string;
+  @Column('text', { name: 'send_url', nullable: true })
+  public sendUrl: string | null;
 
-  @Column({ name: 'send_time', type: 'nvarchar', nullable: true })
-  send_time: string;
+  @Column('varchar', { name: 'pub_id', nullable: true, length: 255 })
+  public pubId: string | null;
 
-  @Column({ name: 'send_url', type: 'text', nullable: true })
-  send_url: string;
+  @Column('varchar', { name: 'sub_id', nullable: true, length: 255 })
+  public subId: string | null;
 
-  @CreateDateColumn({ name: 'created_at' })
-  created_at: Date;
-
-  @ManyToOne(() => Campaign, (campaign) => campaign.postBackEventAdbrixremaster)
-  @JoinColumn({ name: 'campaign' })
-  campaign: Campaign;
+  @Column('varchar', { name: 'media', nullable: true, length: 255 })
+  public media: string | null;
 }

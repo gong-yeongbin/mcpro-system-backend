@@ -1,10 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { getManager, Repository } from 'typeorm';
 import { RedisService } from 'nestjs-redis';
-import { RedisLockService } from 'nestjs-simple-redis-lock';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as moment from 'moment';
-import { Campaign, PostBackDaily, PostBackUnregisteredEvent, PostBackEvent } from '../entities/Entity';
+import { Campaign, PostbackDaily, PostbackUnregisteredEvent, PostbackRegisteredEvent } from '../entities/Entity';
 import { HttpService } from '@nestjs/common';
 
 @Injectable()
@@ -12,131 +11,130 @@ export class CommonService {
   constructor(
     private httpService: HttpService,
     private readonly redisService: RedisService,
-    private readonly lockService: RedisLockService,
     @InjectRepository(Campaign)
     private readonly campaignRepository: Repository<Campaign>,
-    @InjectRepository(PostBackDaily)
-    private readonly postBackDailyRepository: Repository<PostBackDaily>,
-    @InjectRepository(PostBackUnregisteredEvent)
-    private readonly postBackUnregisteredEventRepository: Repository<PostBackUnregisteredEvent>,
+    @InjectRepository(PostbackDaily)
+    private readonly postbackDailyRepository: Repository<PostbackDaily>,
+    @InjectRepository(PostbackUnregisteredEvent)
+    private readonly postbackUnregisteredEventRepository: Repository<PostbackUnregisteredEvent>,
   ) {}
 
-  async installCount(postBackDaily: PostBackDaily): Promise<void> {
+  async installCount(postbackDaily: PostbackDaily): Promise<void> {
     await getManager().transaction(async (transactionalEntityManager) => {
-      postBackDaily.install = +postBackDaily.install + 1;
-      await transactionalEntityManager.getRepository(PostBackDaily).save(postBackDaily);
+      postbackDaily.install = +postbackDaily.install + 1;
+      await transactionalEntityManager.getRepository(PostbackDaily).save(postbackDaily);
     });
   }
 
-  async signupCount(postBackDaily: PostBackDaily, price: number): Promise<void> {
+  async signupCount(postbackDaily: PostbackDaily, price: number): Promise<void> {
     await getManager().transaction(async (transactionalEntityManager) => {
-      postBackDaily.signup = +postBackDaily.signup + 1;
-      await transactionalEntityManager.getRepository(PostBackDaily).save(postBackDaily);
+      postbackDaily.registration = +postbackDaily.registration + 1;
+      await transactionalEntityManager.getRepository(PostbackDaily).save(postbackDaily);
     });
   }
 
-  async retentionCount(postBackDaily: PostBackDaily, price: number): Promise<void> {
+  async retentionCount(postbackDaily: PostbackDaily, price: number): Promise<void> {
     await getManager().transaction(async (transactionalEntityManager) => {
-      postBackDaily.retention = +postBackDaily.retention + 1;
-      await transactionalEntityManager.getRepository(PostBackDaily).save(postBackDaily);
+      postbackDaily.retention = +postbackDaily.retention + 1;
+      await transactionalEntityManager.getRepository(PostbackDaily).save(postbackDaily);
     });
   }
 
-  async buyCount(postBackDaily: PostBackDaily, price: number): Promise<void> {
+  async buyCount(postbackDaily: PostbackDaily, price: number): Promise<void> {
     await getManager().transaction(async (transactionalEntityManager) => {
-      postBackDaily.buy = +postBackDaily.buy + 1;
-      postBackDaily.price = +postBackDaily.price + price;
-      await transactionalEntityManager.getRepository(PostBackDaily).save(postBackDaily);
+      postbackDaily.purchase = +postbackDaily.purchase + 1;
+      postbackDaily.revenue = +postbackDaily.revenue + price;
+      await transactionalEntityManager.getRepository(PostbackDaily).save(postbackDaily);
     });
   }
 
-  async etc1Count(postBackDaily: PostBackDaily, price: number): Promise<void> {
+  async etc1Count(postbackDaily: PostbackDaily, price: number): Promise<void> {
     await getManager().transaction(async (transactionalEntityManager) => {
-      postBackDaily.etc1 = +postBackDaily.etc1 + 1;
-      await transactionalEntityManager.getRepository(PostBackDaily).save(postBackDaily);
+      postbackDaily.etc1 = +postbackDaily.etc1 + 1;
+      await transactionalEntityManager.getRepository(PostbackDaily).save(postbackDaily);
     });
   }
 
-  async etc2Count(postBackDaily: PostBackDaily, price: number): Promise<void> {
+  async etc2Count(postbackDaily: PostbackDaily, price: number): Promise<void> {
     await getManager().transaction(async (transactionalEntityManager) => {
-      postBackDaily.etc2 = +postBackDaily.etc2 + 1;
-      await transactionalEntityManager.getRepository(PostBackDaily).save(postBackDaily);
+      postbackDaily.etc2 = +postbackDaily.etc2 + 1;
+      await transactionalEntityManager.getRepository(PostbackDaily).save(postbackDaily);
     });
   }
 
-  async etc3Count(postBackDaily: PostBackDaily, price: number): Promise<void> {
+  async etc3Count(postbackDaily: PostbackDaily, price: number): Promise<void> {
     await getManager().transaction(async (transactionalEntityManager) => {
-      postBackDaily.etc3 = +postBackDaily.etc3 + 1;
-      await transactionalEntityManager.getRepository(PostBackDaily).save(postBackDaily);
+      postbackDaily.etc3 = +postbackDaily.etc3 + 1;
+      await transactionalEntityManager.getRepository(PostbackDaily).save(postbackDaily);
     });
   }
 
-  async etc4Count(postBackDaily: PostBackDaily, price: number): Promise<void> {
+  async etc4Count(postbackDaily: PostbackDaily, price: number): Promise<void> {
     await getManager().transaction(async (transactionalEntityManager) => {
-      postBackDaily.etc4 = +postBackDaily.etc4 + 1;
-      await transactionalEntityManager.getRepository(PostBackDaily).save(postBackDaily);
+      postbackDaily.etc4 = +postbackDaily.etc4 + 1;
+      await transactionalEntityManager.getRepository(PostbackDaily).save(postbackDaily);
     });
   }
 
-  async etc5Count(postBackDaily: PostBackDaily, price: number): Promise<void> {
+  async etc5Count(postbackDaily: PostbackDaily, price: number): Promise<void> {
     await getManager().transaction(async (transactionalEntityManager) => {
-      postBackDaily.etc5 = +postBackDaily.etc5 + 1;
-      await transactionalEntityManager.getRepository(PostBackDaily).save(postBackDaily);
+      postbackDaily.etc5 = +postbackDaily.etc5 + 1;
+      await transactionalEntityManager.getRepository(PostbackDaily).save(postbackDaily);
     });
   }
 
-  async dailyPostBackCountUp(postBackDailyEntity: PostBackDaily, postBackEventEntity: PostBackEvent, price?: number): Promise<PostBackDaily> {
-    switch (postBackEventEntity.adminPostback) {
+  async dailyPostbackCountUp(postbackDailyEntity: PostbackDaily, postbackEventEntity: PostbackRegisteredEvent, price?: number): Promise<PostbackDaily> {
+    switch (postbackEventEntity.admin) {
       case 'install':
-        postBackDailyEntity.install = +postBackDailyEntity.install + 1;
+        postbackDailyEntity.install = +postbackDailyEntity.install + 1;
         break;
       case 'signup':
-        postBackDailyEntity.signup = +postBackDailyEntity.signup + 1;
+        postbackDailyEntity.revenue = +postbackDailyEntity.revenue + 1;
         break;
       case 'retention':
-        postBackDailyEntity.retention = +postBackDailyEntity.retention + 1;
+        postbackDailyEntity.retention = +postbackDailyEntity.retention + 1;
         break;
       case 'buy':
-        postBackDailyEntity.buy = +postBackDailyEntity.buy + 1;
-        postBackDailyEntity.price = +postBackDailyEntity.price + price;
+        postbackDailyEntity.purchase = +postbackDailyEntity.purchase + 1;
+        postbackDailyEntity.revenue = +postbackDailyEntity.revenue + price;
         break;
       case 'etc1':
-        postBackDailyEntity.etc1 = +postBackDailyEntity.etc1 + 1;
+        postbackDailyEntity.etc1 = +postbackDailyEntity.etc1 + 1;
         break;
       case 'etc2':
-        postBackDailyEntity.etc2 = +postBackDailyEntity.etc2 + 1;
+        postbackDailyEntity.etc2 = +postbackDailyEntity.etc2 + 1;
         break;
       case 'etc3':
-        postBackDailyEntity.etc3 = +postBackDailyEntity.etc3 + 1;
+        postbackDailyEntity.etc3 = +postbackDailyEntity.etc3 + 1;
         break;
       case 'etc4':
-        postBackDailyEntity.etc4 = +postBackDailyEntity.etc4 + 1;
+        postbackDailyEntity.etc4 = +postbackDailyEntity.etc4 + 1;
         break;
       case 'etc5':
-        postBackDailyEntity.etc5 = +postBackDailyEntity.etc5 + 1;
+        postbackDailyEntity.etc5 = +postbackDailyEntity.etc5 + 1;
         break;
     }
-    return await this.postBackDailyRepository.save(postBackDailyEntity);
+    return await this.postbackDailyRepository.save(postbackDailyEntity);
   }
 
-  async postBackUnregisteredEvent(postBackDailyEntity: PostBackDaily, event_name: string): Promise<PostBackUnregisteredEvent> {
-    const postBackUnregisteredEventEntity: PostBackUnregisteredEvent = await this.postBackUnregisteredEventRepository.findOne({
+  async postbackUnregisteredEvent(postbackDailyEntity: PostbackDaily, eventName: string): Promise<PostbackUnregisteredEvent> {
+    const postbackUnregisteredEventEntity: PostbackUnregisteredEvent = await this.postbackUnregisteredEventRepository.findOne({
       where: {
-        event_name: event_name,
-        postBackDaily: postBackDailyEntity,
+        eventName: eventName,
+        postbackDaily: postbackDailyEntity,
       },
     });
 
-    if (postBackUnregisteredEventEntity) {
-      postBackUnregisteredEventEntity.event_count = +postBackUnregisteredEventEntity.event_count + 1;
+    if (postbackUnregisteredEventEntity) {
+      // postbackUnregisteredEventEntity.updatedAt = new Date();
 
-      return await this.postBackUnregisteredEventRepository.save(postBackUnregisteredEventEntity);
+      return await this.postbackUnregisteredEventRepository.save(postbackUnregisteredEventEntity);
     } else {
-      const postBackUnregisteredEvent: PostBackUnregisteredEvent = new PostBackUnregisteredEvent();
-      postBackUnregisteredEvent.postBackDaily = postBackDailyEntity;
-      postBackUnregisteredEvent.event_name = event_name;
+      const postbackUnregisteredEvent: PostbackUnregisteredEvent = new PostbackUnregisteredEvent();
+      postbackUnregisteredEvent.postbackDaily = postbackDailyEntity;
+      postbackUnregisteredEvent.eventName = eventName;
 
-      return await this.postBackUnregisteredEventRepository.save(postBackUnregisteredEvent);
+      return await this.postbackUnregisteredEventRepository.save(postbackUnregisteredEvent);
     }
   }
 
@@ -147,7 +145,7 @@ export class CommonService {
       .get(url)
       .toPromise()
       .then(async () => {
-        console.log(`[ mecrosspro ---> media ] install : ${url}`);
+        // console.log(`[ mecrosspro ---> media ] install : ${url}`);
         isSendtime = moment.utc().tz('Asia/Seoul').format('YYYY-MM-DD HH:mm:ss');
       })
       .catch();
@@ -155,66 +153,57 @@ export class CommonService {
     return isSendtime ? isSendtime : '';
   }
 
-  async isValidationPostbackDaily(view_code: string, cp_token: string): Promise<PostBackDaily> {
-    let postBackDailyEntity: PostBackDaily;
-
-    postBackDailyEntity = await this.postBackDailyRepository
-      .createQueryBuilder('postBackDaily')
-      .leftJoinAndSelect('postBackDaily.campaign', 'campaign')
-      .where('Date(postBackDaily.created_at) =:date', { date: moment.utc().tz('Asia/Seoul').format('YYYY-MM-DD') })
-      .andWhere('postBackDaily.view_code =:view_code', { view_code: view_code })
+  async isValidationPostbackDaily(viewCode: string, token: string): Promise<PostbackDaily> {
+    let postbackDailyEntity: PostbackDaily;
+    postbackDailyEntity = await this.postbackDailyRepository
+      .createQueryBuilder('postbackDaily')
+      .where('Date(postbackDaily.createdAt) =:date', { date: moment.utc().tz('Asia/Seoul').format('YYYY-MM-DD') })
+      .andWhere('postbackDaily.viewCode =:viewCode', { viewCode: viewCode })
       .getOne();
 
-    if (!postBackDailyEntity) {
-      try {
-        await this.lockService.lock(moment().format('YYYYMMDD'), 1 * 60 * 1000, 10, 30);
+    if (!postbackDailyEntity) {
+      const redis: any = this.redisService.getClient();
 
-        const redis: any = this.redisService.getClient();
+      let cursor: number;
+      cursor = 0;
+      do {
+        const data: any = await redis.hscan('view_code', cursor, 'MATCH', `${token}/*`, 'COUNT', 20000);
 
-        let cursor: number;
-        cursor = 0;
-        do {
-          const data: any = await redis.hscan('view_code', cursor, 'MATCH', `${cp_token}/*`, 'COUNT', 20000);
+        cursor = data[0];
+        const keys: Array<string> = data[1];
+        for (let i = 0; i < keys.length; i++) {
+          const isViewCode: string = await redis.hget('view_code', keys[i]);
 
-          cursor = data[0];
-          const keys: Array<string> = data[1];
-          for (let i = 0; i < keys.length; i++) {
-            const isViewCode: string = await redis.hget('view_code', keys[i]);
+          if (viewCode === isViewCode) {
+            const splitData: Array<string> = keys[i].split('/');
+            const pub_id: string = splitData[1];
+            const sub_id: string = splitData[2];
+            const media_idx: string = splitData[3];
 
-            if (view_code === isViewCode) {
-              const splitData: Array<string> = keys[i].split('/');
-              const pub_id: string = splitData[1];
-              const sub_id: string = splitData[2];
-              const media_idx: string = splitData[3];
+            const campaignEntity: Campaign = await this.campaignRepository.findOne({
+              where: {
+                token: token,
+                media: { idx: media_idx },
+              },
+              relations: ['media'],
+            });
 
-              const campaignEntity: Campaign = await this.campaignRepository.findOne({
-                where: {
-                  cp_token: cp_token,
-                  media: { idx: media_idx },
-                },
-                relations: ['media'],
-              });
+            if (!campaignEntity) throw new NotFoundException();
 
-              if (!campaignEntity) throw new NotFoundException();
+            const postbackDaily = this.postbackDailyRepository.create({
+              token: token,
+              pubId: pub_id,
+              subId: sub_id,
+              viewCode: viewCode,
+            });
 
-              const postBackDaily = this.postBackDailyRepository.create({
-                cp_token: cp_token,
-                pub_id: pub_id,
-                sub_id: sub_id,
-                view_code: view_code,
-                campaign: campaignEntity,
-              });
-
-              postBackDailyEntity = await this.postBackDailyRepository.save(postBackDaily);
-            }
+            postbackDailyEntity = await this.postbackDailyRepository.save(postbackDaily);
           }
-        } while (cursor != 0);
-      } finally {
-        this.lockService.unlock(moment().format('YYYYMMDD'));
-      }
+        }
+      } while (cursor != 0);
     }
 
-    return postBackDailyEntity;
+    return postbackDailyEntity;
   }
 
   async convertedPostbackInstallUrl(data: {
@@ -224,7 +213,7 @@ export class CommonService {
     event_datetime: string;
     click_datetime: string;
     campaignEntity: Campaign;
-    postBackDailyEntity: PostBackDaily;
+    postbackDailyEntity: PostbackDaily;
   }): Promise<string> {
     const mediaPostbackInstallUrlTemplate: string = data.campaignEntity.media.mediaPostbackInstallUrlTemplate;
     const platform: string = data.campaignEntity.advertising.platform;
@@ -232,8 +221,8 @@ export class CommonService {
     const adid: string = data.adid;
     const event_datetime: string = data.event_datetime;
     const click_datetime: string = data.click_datetime;
-    const pub_id: string = data.postBackDailyEntity.pub_id;
-    const sub_id: string = data.postBackDailyEntity.sub_id;
+    const pub_id: string = data.postbackDailyEntity.pubId;
+    const sub_id: string = data.postbackDailyEntity.subId;
     const uuid: string = data.uuid;
 
     return mediaPostbackInstallUrlTemplate
@@ -257,7 +246,7 @@ export class CommonService {
     event_datetime: string;
     install_datetime: string;
     campaignEntity: Campaign;
-    postBackDailyEntity: PostBackDaily;
+    postbackDailyEntity: PostbackDaily;
   }): Promise<string> {
     const mediaPostbackInstallUrlTemplate: string = data.campaignEntity.media.mediaPostbackEventUrlTemplate;
     const platform: string = data.campaignEntity.advertising.platform;
@@ -266,8 +255,8 @@ export class CommonService {
     const event_name: string = data.event_name;
     const event_datetime: string = data.event_datetime;
     const install_datetime: string = data.install_datetime;
-    const pub_id: string = data.postBackDailyEntity.pub_id;
-    const sub_id: string = data.postBackDailyEntity.sub_id;
+    const pub_id: string = data.postbackDailyEntity.pubId;
+    const sub_id: string = data.postbackDailyEntity.subId;
     const uuid: string = data.uuid;
 
     return mediaPostbackInstallUrlTemplate

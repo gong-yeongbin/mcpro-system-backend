@@ -1,22 +1,11 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { PostbackUnregisteredEvent } from './Entity';
+import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Campaign } from './Entity';
 
-@Entity('postback_daily', { schema: 'mcpro' })
-export default class PostbackDaily {
+@Index('token', ['token'], {})
+@Entity('postback_campaign_daily', { schema: 'mcpro' })
+export default class PostbackCampaignDaily {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
   public idx: number;
-
-  @Column('varchar', { name: 'token', nullable: true, length: 255 })
-  public token: string | null;
-
-  @Column('varchar', { name: 'pub_id', length: 255 })
-  public pubId: string;
-
-  @Column('varchar', { name: 'sub_id', nullable: true, length: 255 })
-  public subId: string | null;
-
-  @Column('varchar', { name: 'view_code', nullable: true, length: 255 })
-  public viewCode: string | null;
 
   @Column('int', { name: 'click', nullable: true, default: () => "'0'" })
   public click: number | null;
@@ -63,6 +52,10 @@ export default class PostbackDaily {
   })
   public updatedAt: Date;
 
-  @OneToMany(() => PostbackUnregisteredEvent, (postbackUnregisteredEvent) => postbackUnregisteredEvent.postbackDaily)
-  public postbackUnregisteredEvent: PostbackUnregisteredEvent[];
+  @ManyToOne(() => Campaign, (campaign) => campaign.postbackCampaignDaily, {
+    onDelete: 'NO ACTION',
+    onUpdate: 'NO ACTION',
+  })
+  @JoinColumn([{ name: 'token', referencedColumnName: 'token' }])
+  public token: Campaign;
 }

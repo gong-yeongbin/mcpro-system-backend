@@ -1,43 +1,35 @@
-import { Column, Entity, OneToMany, Unique, CreateDateColumn, UpdateDateColumn, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Campaign } from './Entity';
 
-@Entity('media')
-@Unique(['md_code'])
+@Entity('media', { schema: 'mcpro' })
 export default class Media {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
-  idx: number;
+  public idx: number;
 
-  @Column({ type: 'nvarchar', name: 'md_code' })
-  md_code: string;
+  @Column('varchar', { name: 'name', nullable: true, length: 255 })
+  public name: string | null;
 
-  @Column({ type: 'nvarchar', name: 'md_name' })
-  md_name: string;
+  @Column('tinyint', { name: 'status', default: () => "'1'" })
+  public status: number;
 
-  @Column({
-    type: 'boolean',
-    name: 'status',
-    default: true,
+  @Column('varchar', { name: 'mediaPostbackInstallUrlTemplate', length: 255 })
+  public mediaPostbackInstallUrlTemplate: string;
+
+  @Column('varchar', { name: 'mediaPostbackEventUrlTemplate', length: 255 })
+  public mediaPostbackEventUrlTemplate: string;
+
+  @Column('datetime', {
+    name: 'created_at',
+    default: () => "'CURRENT_TIMESTAMP(6)'",
   })
-  status: boolean;
+  public createdAt: Date;
 
-  @Column({
-    type: 'nvarchar',
-    name: 'mediaPostbackInstallUrlTemplate',
+  @Column('datetime', {
+    name: 'updated_at',
+    default: () => "'CURRENT_TIMESTAMP(6)'",
   })
-  mediaPostbackInstallUrlTemplate: string;
+  public updatedAt: Date;
 
-  @Column({
-    type: 'nvarchar',
-    name: 'mediaPostbackEventUrlTemplate',
-  })
-  mediaPostbackEventUrlTemplate: string;
-
-  @CreateDateColumn({ name: 'created_at' })
-  created_at: Date;
-
-  @UpdateDateColumn({ name: 'updated_at' })
-  updated_at: Date;
-
-  @OneToMany(() => Campaign, (campaign) => campaign.media, { cascade: true })
-  campaign: Campaign[];
+  @OneToMany(() => Campaign, (campaign) => campaign.media)
+  public campaign: Campaign[];
 }
