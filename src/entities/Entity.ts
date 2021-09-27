@@ -2,7 +2,7 @@ export { default as Advertiser } from '../entities/Advertiser';
 export { default as Advertising } from '../entities/Advertising';
 export { default as Campaign } from '../entities/Campaign';
 export { default as Media } from '../entities/Media';
-export { default as PostbackDaily } from './PostbackDaily';
+export { default as PostbackDaily } from './PostBackDaily';
 export { default as PostbackCampaignDaily } from '../entities/PostbackCampaignDaily';
 export { default as PostbackRegisteredEvent } from '../entities/PostbackRegisteredEvent';
 export { default as PostbackEventAppsflyer } from './PostbackEventAppsflyer';
