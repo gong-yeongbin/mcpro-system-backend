@@ -13,5 +13,5 @@ export { default as SubMedia } from '../entities/SubMedia';
 export { default as Tracker } from '../entities/Tracker';
 export { default as User } from '../entities/User';
 export { default as UserLog } from '../entities/UserLog';
-export { default as PostbackEventAdbrixremaster } from './PostbackEventAdbrixremaster';
-export { default as PostbackInstallAdbrixremaster } from './PostbackInstallAdbrixremaster';
+export { default as PostbackEventAdbrixremaster } from './PostBackEventAdbrixremaster';
+export { default as PostbackInstallAdbrixremaster } from './PostBackInstallAdbrixremaster';
