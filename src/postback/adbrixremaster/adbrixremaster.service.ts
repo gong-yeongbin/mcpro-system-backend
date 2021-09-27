@@ -22,6 +22,7 @@ export class AdbrixremasterService {
 
   async postbackInstallAdbrixRemaster(request: any) {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
+
     console.log(`[ adbrixremaster ---> mecrosspro ] install : ${originalUrl}`);
 
     const uuid: string = ['', undefined, '{uuid}'].includes(request.query.uuid) ? '' : request.query.uuid;
