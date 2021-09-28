@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { decodeUnicode } from 'src/util';
 import { Repository } from 'typeorm';
 import * as moment from 'moment-timezone';
-import { PostbackInstallAdbrixremaster, PostbackEventAdbrixremaster, PostbackDaily, Campaign, PostbackRegisteredEvent } from '../../entities/Entity';
+import { PostbackInstallAdbrixremaster, PostbackEventAdbrixremaster, PostbackDaily, Campaign, PostbackRegisteredEvent } from '../entities/Entity';
 import { CommonService } from 'src/common/common.service';
 
 @Injectable()

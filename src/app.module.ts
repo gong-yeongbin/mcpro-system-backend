@@ -2,7 +2,6 @@ import { HttpModule, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TrackingModule } from './tracking/tracking.module';
-import { PostbackModule } from './postback/postback.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { RedisModule } from 'nestjs-redis';
@@ -16,6 +15,8 @@ import {
   PostbackInstallAdbrixremaster,
   PostbackUnregisteredEvent,
 } from './entities/Entity';
+import { AppsflyerModule } from './appsflyer/appsflyer.module';
+import { AdbrixremasterModule } from './adbrixremaster/adbrixremaster.module';
 
 @Module({
   imports: [
@@ -52,7 +53,8 @@ import {
       PostbackDaily,
     ]),
     TrackingModule,
-    PostbackModule,
+    AppsflyerModule,
+    AdbrixremasterModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppClusterService, CommonService],

@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { decodeUnicode } from 'src/util';
 import { CommonService } from 'src/common/common.service';
-import { PostbackDaily, Campaign, PostbackRegisteredEvent, PostbackEventAppsflyer, PostbackInstallAppsflyer } from '../../entities/Entity';
+import { PostbackDaily, Campaign, PostbackRegisteredEvent, PostbackEventAppsflyer, PostbackInstallAppsflyer } from '../entities/Entity';
 
 @Injectable()
 export class AppsflyerService {
