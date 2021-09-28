@@ -1,6 +1,6 @@
-import { Res } from '@nestjs/common';
+import { Redirect } from '@nestjs/common';
 import { Controller, Get, Req } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Request } from 'express';
 import { TrackingService } from './tracking.service';
 
 @Controller('tracking')
@@ -8,10 +8,11 @@ export class TrackingController {
   constructor(private readonly trackingService: TrackingService) {}
 
   @Get()
-  async tracking(@Req() request: Request, @Res() response: Response) {
+  @Redirect()
+  async tracking(@Req() request: Request) {
     const redirectUrl: string = await this.trackingService.tracking(request);
 
     console.log(`[ mecrosspro ---> tracker ] redirectUrl:${redirectUrl}`);
-    response.status(302).redirect(redirectUrl);
+    return { url: redirectUrl, statusCode: 302 };
   }
 }

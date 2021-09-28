@@ -28,7 +28,6 @@
     "@nestjs/core": "^7.6.18",
     "@nestjs/mapped-types": "^0.4.1",
     "@nestjs/platform-express": "^7.6.18",
-    "@nestjs/platform-fastify": "^7.6.18",
     "@nestjs/typeorm": "^7.1.5",
     "@types/moment": "^2.13.0",
     "@types/uuid": "^8.3.0",
