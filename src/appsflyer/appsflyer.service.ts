@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { decodeUnicode } from 'src/util';
 import { CommonService } from 'src/common/common.service';
 import { PostbackDaily, Campaign, PostbackRegisteredEvent, PostbackEventAppsflyer, PostbackInstallAppsflyer } from '../entities/Entity';
+import { AppsflyerInstallDto } from './dto/appsflyer-install.dto';
 
 @Injectable()
 export class AppsflyerService {
@@ -12,7 +13,7 @@ export class AppsflyerService {
     @InjectRepository(Campaign)
     private readonly campaignRepository: Repository<Campaign>,
     @InjectRepository(PostbackRegisteredEvent)
-    private readonly postbackEventRepository: Repository<PostbackRegisteredEvent>,
+    private readonly postbackRegisteredEventRepository: Repository<PostbackRegisteredEvent>,
     @InjectRepository(PostbackInstallAppsflyer)
     private readonly postbackInstallAppsflyerRepository: Repository<PostbackInstallAppsflyer>,
     @InjectRepository(PostbackEventAppsflyer)
@@ -20,75 +21,74 @@ export class AppsflyerService {
   ) {}
 
   // appsflyer postback install
-  async postbackInstallAppsflyer(req: any) {
-    const originalUrl: string = decodeUnicode(`${req.protocol}://${req.headers.host}${req.url}`);
+  async postbackInstallAppsflyer(request: any, query: AppsflyerInstallDto): Promise<void> {
+    const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
 
     console.log(`[ appsflyer ---> mecrosspro ] install : ${originalUrl}`);
 
-    const uuid: string = ['', undefined, '{uuid}'].includes(req.query.uuid) ? '' : req.query.uuid;
+    query.uuid = ['', undefined, '{uuid}'].includes(query.uuid) ? '' : query.uuid;
 
     const postbackInstallAppsflyer: PostbackInstallAppsflyer = this.postbackInstallAppsflyerRepository.create({
-      viewCode: req.query.af_siteid,
-      token: req.query.af_c_id,
-      clickid: req.query.clickid,
-      afSiteid: req.query.af_siteid,
-      afCId: req.query.af_c_id,
-      advertisingId: req.query.advertising_id,
-      idfa: req.query.idfa,
-      idfv: req.query.idfv,
-      installTime: req.query.install_time,
-      countryCode: req.query.country_code,
-      language: req.query.language,
-      clickTime: req.query.click_time,
-      deviceCarrier: req.query.device_carrier,
-      deviceIp: req.query.device_ip,
+      viewCode: query.af_siteid,
+      token: query.af_c_id,
+      clickid: query.clickid,
+      afSiteid: query.af_siteid,
+      afCId: query.af_c_id,
+      advertisingId: query.advertising_id,
+      idfa: query.idfa,
+      idfv: query.idfv,
+      installTime: query.install_time,
+      countryCode: query.country_code,
+      language: query.language,
+      clickTime: query.click_time,
+      deviceCarrier: query.device_carrier,
+      deviceIp: query.device_ip,
       originalUrl: originalUrl,
     });
 
-    const token: string = postbackInstallAppsflyer.token;
-    const viewCode: string = postbackInstallAppsflyer.viewCode;
+    // const postbackDailyEntity: PostbackDaily = await this.commonService.isValidationPostbackDaily(query.af_siteid, query.af_c_id);
 
-    const postbackDailyEntity: PostbackDaily = await this.commonService.isValidationPostbackDaily(viewCode, token);
+    // if (!postbackDailyEntity) throw new NotFoundException();
 
-    if (!postbackDailyEntity) throw new NotFoundException();
+    // const campaignEntity: Campaign = await this.campaignRepository
+    //   .createQueryBuilder('campaign')
+    //   .leftJoinAndSelect('campaign.media', 'media')
+    //   .leftJoinAndSelect('campaign.advertising', 'advertising')
+    //   .where('campaign.token =:token', { token: query.af_c_id })
+    //   .getOne();
 
-    const campaignEntity: Campaign = await this.campaignRepository.findOne({
-      where: { token: token },
-      relations: ['media', 'advertising'],
-    });
+    // if (!campaignEntity) throw new NotFoundException();
 
-    if (!campaignEntity) throw new NotFoundException();
+    // const postbackRegisteredEventEntity: PostbackRegisteredEvent = await this.postbackRegisteredEventRepository
+    //   .createQueryBuilder('postbackRegisteredEvent')
+    //   .where('postbackRegisteredEvent.token =:token', { token: query.af_c_id })
+    //   .andWhere('postbackRegisteredEvent.admin =:event', { event: 'install' })
+    //   .getOne();
 
-    const postbackEventEntity: PostbackRegisteredEvent = await this.postbackEventRepository.findOne({
-      where: { token: token, tracker: 'install' },
-    });
+    // if (postbackRegisteredEventEntity.status) {
+    //   const url: string = await this.commonService.convertedPostbackInstallUrl({
+    //     uuid: query.uuid,
+    //     click_id: postbackInstallAppsflyer.clickid,
+    //     adid: postbackInstallAppsflyer.idfa,
+    //     event_datetime: postbackInstallAppsflyer.installTime,
+    //     click_datetime: postbackInstallAppsflyer.clickTime,
+    //     campaignEntity: campaignEntity,
+    //     postbackDailyEntity: postbackDailyEntity,
+    //   });
 
-    if (postbackEventEntity.status) {
-      const url: string = await this.commonService.convertedPostbackInstallUrl({
-        uuid: uuid,
-        click_id: postbackInstallAppsflyer.clickid,
-        adid: postbackInstallAppsflyer.idfa,
-        event_datetime: postbackInstallAppsflyer.installTime,
-        click_datetime: postbackInstallAppsflyer.clickTime,
-        campaignEntity: campaignEntity,
-        postbackDailyEntity: postbackDailyEntity,
-      });
+    //   postbackInstallAppsflyer.sendTime = await this.commonService.httpServiceHandler(url);
+    //   postbackInstallAppsflyer.sendUrl = url;
+    // }
 
-      postbackInstallAppsflyer.sendTime = await this.commonService.httpServiceHandler(url);
-      postbackInstallAppsflyer.sendUrl = url;
-    }
-
-    postbackInstallAppsflyer.pubId = postbackDailyEntity.pubId;
-    postbackInstallAppsflyer.subId = postbackDailyEntity.subId;
-    postbackInstallAppsflyer.media = campaignEntity.media.name;
+    // postbackInstallAppsflyer.pubId = postbackDailyEntity.pubId;
+    // postbackInstallAppsflyer.subId = postbackDailyEntity.subId;
+    // postbackInstallAppsflyer.media = campaignEntity.media.name;
 
     await this.postbackInstallAppsflyerRepository.save(postbackInstallAppsflyer);
-
-    return;
   }
 
   // appsflyer postback event
-  async postbackEventAppsflyer(req: any) {
+  async postbackEventAppsflyer(req: any): Promise<void> {
     const originalUrl: string = decodeUnicode(`${req.protocol}://${req.headers.host}${req.url}`);
 
     console.log(`[ appsflyer ---> mecrosspro ] event : ${originalUrl}`);
@@ -130,7 +130,7 @@ export class AppsflyerService {
 
     if (!campaignEntity) throw new NotFoundException();
 
-    const postbackEventEntity: PostbackRegisteredEvent = await this.postbackEventRepository.findOne({
+    const postbackEventEntity: PostbackRegisteredEvent = await this.postbackRegisteredEventRepository.findOne({
       where: { token: token, tracker: postbackEventAppsflyer.eventName },
     });
 

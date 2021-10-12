@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { getManager, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { RedisService } from 'nestjs-redis';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as moment from 'moment';
-import { Campaign, PostbackDaily, PostbackUnregisteredEvent, PostbackRegisteredEvent } from '../entities/Entity';
+import { Campaign, PostbackDaily, PostbackUnregisteredEvent } from '../entities/Entity';
 import { HttpService } from '@nestjs/common';
 
 @Injectable()
