@@ -1,5 +1,5 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { PostbackDaily } from './Entity';
+import { Campaign, PostbackDaily } from './Entity';
 
 @Entity('postback_unregistered_event', { schema: 'mcpro' })
 export default class PostbackUnregisteredEvent {
@@ -9,8 +9,8 @@ export default class PostbackUnregisteredEvent {
   @Column('varchar', { name: 'event_name', length: 255 })
   public eventName: string;
 
-  @Column('bigint', { name: 'event_count', default: () => "'1'" })
-  public eventCount: string;
+  @Column('bigint', { name: 'event_count', default: () => 1 })
+  public eventCount: number;
 
   @Column('datetime', {
     name: 'created_at',
@@ -24,7 +24,10 @@ export default class PostbackUnregisteredEvent {
   })
   public updatedAt: Date;
 
-  @ManyToOne(() => PostbackDaily, (postbackDaily) => postbackDaily.postbackUnregisteredEvent, { onDelete: 'NO ACTION', onUpdate: 'NO ACTION' })
-  @JoinColumn([{ name: 'postBackDaily', referencedColumnName: 'idx' }])
-  public postbackDaily: PostbackDaily;
+  @ManyToOne(() => Campaign, (campaign) => campaign.postbackCampaignDaily, {
+    onDelete: 'NO ACTION',
+    onUpdate: 'NO ACTION',
+  })
+  @JoinColumn([{ name: 'token', referencedColumnName: 'token' }])
+  public token: Campaign;
 }

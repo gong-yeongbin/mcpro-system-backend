@@ -62,7 +62,4 @@ export default class PostbackDaily {
     default: () => "'CURRENT_TIMESTAMP(6)'",
   })
   public updatedAt: Date;
-
-  @OneToMany(() => PostbackUnregisteredEvent, (postbackUnregisteredEvent) => postbackUnregisteredEvent.postbackDaily)
-  public postbackUnregisteredEvent: PostbackUnregisteredEvent[];
 }

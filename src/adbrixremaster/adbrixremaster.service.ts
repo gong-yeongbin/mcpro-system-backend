@@ -3,7 +3,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { decodeUnicode } from 'src/util';
 import { Repository } from 'typeorm';
 import * as moment from 'moment-timezone';
-import { PostbackInstallAdbrixremaster, PostbackEventAdbrixremaster, PostbackDaily, Campaign, PostbackRegisteredEvent } from '../entities/Entity';
+import {
+  PostbackInstallAdbrixremaster,
+  PostbackEventAdbrixremaster,
+  PostbackDaily,
+  Campaign,
+  PostbackRegisteredEvent,
+  PostbackUnregisteredEvent,
+} from '../entities/Entity';
 import { CommonService } from 'src/common/common.service';
 
 @Injectable()
@@ -13,7 +20,9 @@ export class AdbrixremasterService {
     @InjectRepository(Campaign)
     private readonly campaignRepository: Repository<Campaign>,
     @InjectRepository(PostbackRegisteredEvent)
-    private readonly postbackEventRepository: Repository<PostbackRegisteredEvent>,
+    private readonly postbackRegisteredEventRepository: Repository<PostbackRegisteredEvent>,
+    @InjectRepository(PostbackUnregisteredEvent)
+    private readonly postbackUnregisteredEventRepository: Repository<PostbackUnregisteredEvent>,
     @InjectRepository(PostbackInstallAdbrixremaster)
     private readonly postbackInstallAdbrixremasterRepository: Repository<PostbackInstallAdbrixremaster>,
     @InjectRepository(PostbackEventAdbrixremaster)
@@ -100,7 +109,7 @@ export class AdbrixremasterService {
 
     if (!campaignEntity) throw new NotFoundException();
 
-    const postbackEventEntity: PostbackRegisteredEvent = await this.postbackEventRepository.findOne({
+    const postbackEventEntity: PostbackRegisteredEvent = await this.postbackRegisteredEventRepository.findOne({
       where: { token: token, tracker: 'install' },
     });
 
@@ -213,13 +222,27 @@ export class AdbrixremasterService {
 
     if (!campaignEntity) throw new NotFoundException();
 
-    const postbackEventEntity: PostbackRegisteredEvent = await this.postbackEventRepository.findOne({
+    const postbackEventEntity: PostbackRegisteredEvent = await this.postbackRegisteredEventRepository.findOne({
       where: { token: token, tracker: postbackEventAdbrixremaster.eventName },
     });
 
-    // if (!postbackEventEntity) {
-    //   await this.commonService.postbackUnregisteredEvent(postbackDailyEntity, postbackEventAdbrixremaster.eventName);
-    // }
+    if (!postbackEventEntity) {
+      let postbackUnregisteredEventEntity: PostbackUnregisteredEvent = await this.postbackUnregisteredEventRepository
+        .createQueryBuilder('postbackUnregisteredEvent')
+        .where('postbackUnregisteredEvent.eventName =:eventName', { eventName: postbackEventAdbrixremaster.eventName })
+        .andWhere('postbackUnregisteredEvent.token =:token', { token: token })
+        .andWhere('Date(postbackUnregisteredEvent.createdAt) =:date', { date: moment().tz('Asia/Seoul').format('YYYY-MM-DD') })
+        .getOne();
+
+      postbackUnregisteredEventEntity
+        ? ++postbackUnregisteredEventEntity.eventCount
+        : (postbackUnregisteredEventEntity = this.postbackUnregisteredEventRepository.create({
+            eventName: postbackEventAdbrixremaster.eventName,
+            token: campaignEntity,
+          }));
+
+      await this.postbackUnregisteredEventRepository.save(postbackUnregisteredEventEntity);
+    }
 
     if (postbackEventEntity && postbackEventEntity.status) {
       const url: string = await this.commonService.convertedPostbackEventUrl({

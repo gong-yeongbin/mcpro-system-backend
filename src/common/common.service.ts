@@ -19,27 +19,6 @@ export class CommonService {
     private readonly postbackUnregisteredEventRepository: Repository<PostbackUnregisteredEvent>,
   ) {}
 
-  async postbackUnregisteredEvent(postbackDailyEntity: PostbackDaily, eventName: string): Promise<PostbackUnregisteredEvent> {
-    const postbackUnregisteredEventEntity: PostbackUnregisteredEvent = await this.postbackUnregisteredEventRepository.findOne({
-      where: {
-        eventName: eventName,
-        postbackDaily: postbackDailyEntity,
-      },
-    });
-
-    if (postbackUnregisteredEventEntity) {
-      // postbackUnregisteredEventEntity.updatedAt = new Date();
-
-      return await this.postbackUnregisteredEventRepository.save(postbackUnregisteredEventEntity);
-    } else {
-      const postbackUnregisteredEvent: PostbackUnregisteredEvent = new PostbackUnregisteredEvent();
-      postbackUnregisteredEvent.postbackDaily = postbackDailyEntity;
-      postbackUnregisteredEvent.eventName = eventName;
-
-      return await this.postbackUnregisteredEventRepository.save(postbackUnregisteredEvent);
-    }
-  }
-
   async httpServiceHandler(url: string): Promise<string> {
     let isSendtime: string;
 

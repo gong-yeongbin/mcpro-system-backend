@@ -1,9 +1,17 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import * as moment from 'moment-timezone';
 import { decodeUnicode } from 'src/util';
 import { CommonService } from 'src/common/common.service';
-import { PostbackDaily, Campaign, PostbackRegisteredEvent, PostbackEventAppsflyer, PostbackInstallAppsflyer } from '../entities/Entity';
+import {
+  PostbackDaily,
+  Campaign,
+  PostbackRegisteredEvent,
+  PostbackEventAppsflyer,
+  PostbackInstallAppsflyer,
+  PostbackUnregisteredEvent,
+} from '../entities/Entity';
 import { AppsflyerInstallDto } from './dto/appsflyer-install.dto';
 
 @Injectable()
@@ -14,6 +22,8 @@ export class AppsflyerService {
     private readonly campaignRepository: Repository<Campaign>,
     @InjectRepository(PostbackRegisteredEvent)
     private readonly postbackRegisteredEventRepository: Repository<PostbackRegisteredEvent>,
+    @InjectRepository(PostbackUnregisteredEvent)
+    private readonly postbackUnregisteredEventRepository: Repository<PostbackUnregisteredEvent>,
     @InjectRepository(PostbackInstallAppsflyer)
     private readonly postbackInstallAppsflyerRepository: Repository<PostbackInstallAppsflyer>,
     @InjectRepository(PostbackEventAppsflyer)
@@ -135,7 +145,21 @@ export class AppsflyerService {
     });
 
     if (!postbackEventEntity) {
-      await this.commonService.postbackUnregisteredEvent(postbackDailyEntity, postbackEventAppsflyer.eventName);
+      let postbackUnregisteredEventEntity: PostbackUnregisteredEvent = await this.postbackUnregisteredEventRepository
+        .createQueryBuilder('postbackUnregisteredEvent')
+        .where('postbackUnregisteredEvent.eventName =:eventName', { eventName: postbackEventAppsflyer.eventName })
+        .andWhere('postbackUnregisteredEvent.token =:token', { token: token })
+        .andWhere('Date(postbackUnregisteredEvent.createdAt) =:date', { date: moment().tz('Asia/Seoul').format('YYYY-MM-DD') })
+        .getOne();
+
+      postbackUnregisteredEventEntity
+        ? ++postbackUnregisteredEventEntity.eventCount
+        : (postbackUnregisteredEventEntity = this.postbackUnregisteredEventRepository.create({
+            eventName: postbackEventAppsflyer.eventName,
+            token: campaignEntity,
+          }));
+
+      await this.postbackUnregisteredEventRepository.save(postbackUnregisteredEventEntity);
     }
 
     if (postbackEventEntity && postbackEventEntity.status) {

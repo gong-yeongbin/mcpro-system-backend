@@ -1,5 +1,5 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { Advertising, Media, Reservation } from './Entity';
+import { Advertising, Media, PostbackUnregisteredEvent, Reservation } from './Entity';
 import PostbackCampaignDaily from './PostbackCampaignDaily';
 import PostbackRegisteredEvent from './PostbackRegisteredEvent';
 
@@ -75,4 +75,7 @@ export default class Campaign {
 
   @OneToMany(() => PostbackRegisteredEvent, (postbackRegisteredEvent) => postbackRegisteredEvent.token)
   public postbackRegisteredEvent: PostbackRegisteredEvent[];
+
+  @OneToMany(() => PostbackUnregisteredEvent, (postbackUnregisteredEvent) => postbackUnregisteredEvent.token)
+  public postbackUnregisteredEvent: PostbackUnregisteredEvent[];
 }
