@@ -1,5 +1,5 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { UserLog } from './Entity';
+import { UserLog } from '@entities/Entity';
 
 @Entity('user', { schema: 'mcpro' })
 export default class User {

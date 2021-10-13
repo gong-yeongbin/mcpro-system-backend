@@ -1,5 +1,5 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { Campaign } from './Entity';
+import { Campaign } from '@entities/Entity';
 
 @Entity('media', { schema: 'mcpro' })
 export default class Media {

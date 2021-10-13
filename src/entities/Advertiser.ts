@@ -1,5 +1,5 @@
 import { Column, Entity, Index, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { Advertising } from './Entity';
+import { Advertising } from '@entities/Entity';
 
 @Index('IDX_e72a5d292995a75f0f251b7a7d', ['name'], { unique: true })
 @Entity('advertiser', { schema: 'mcpro' })

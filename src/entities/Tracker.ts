@@ -1,5 +1,5 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { Advertising } from './Entity';
+import { Advertising } from '@entities/Entity';
 
 @Entity('tracker', { schema: 'mcpro' })
 export default class Tracker {

@@ -1,5 +1,5 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { Advertiser, Campaign, Tracker } from './Entity';
+import { Advertiser, Campaign, Tracker } from '@entities/Entity';
 
 @Entity('advertising', { schema: 'mcpro' })
 export default class Advertising {

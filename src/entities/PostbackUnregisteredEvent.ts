@@ -1,5 +1,5 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { Campaign, PostbackDaily } from './Entity';
+import { Campaign } from '@entities/Entity';
 
 @Entity('postback_unregistered_event', { schema: 'mcpro' })
 export default class PostbackUnregisteredEvent {

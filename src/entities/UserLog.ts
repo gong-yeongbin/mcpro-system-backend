@@ -1,5 +1,5 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { User } from './Entity';
+import { User } from '@entities/Entity';
 
 @Entity('user_log', { schema: 'mcpro' })
 export default class UserLog {

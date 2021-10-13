@@ -1,5 +1,5 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { Campaign } from './Entity';
+import { Campaign } from '@entities/Entity';
 
 @Index('token', ['token'], {})
 @Entity('postback_campaign_daily', { schema: 'mcpro' })

@@ -1,5 +1,4 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { PostbackUnregisteredEvent } from './Entity';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('postback_daily', { schema: 'mcpro' })
 export default class PostbackDaily {

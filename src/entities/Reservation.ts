@@ -1,5 +1,5 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { Campaign } from './Entity';
+import { Campaign } from '@entities/Entity';
 
 @Entity('reservation', { schema: 'mcpro' })
 export default class Reservation {

@@ -1,7 +1,5 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { Advertising, Media, PostbackUnregisteredEvent, Reservation } from './Entity';
-import PostbackCampaignDaily from './PostbackCampaignDaily';
-import PostbackRegisteredEvent from './PostbackRegisteredEvent';
+import { Advertising, Media, PostbackCampaignDaily, PostbackRegisteredEvent, PostbackUnregisteredEvent, Reservation } from '@entities/Entity';
 
 @Index('IDX_1ab622056fec78ded2dccbf2ce', ['token'], { unique: true })
 @Entity('campaign', { schema: 'mcpro' })
