@@ -3,7 +3,7 @@ import { Repository } from 'typeorm';
 import { RedisService } from 'nestjs-redis';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as moment from 'moment';
-import { Campaign, PostbackDaily, PostbackUnregisteredEvent } from '../entities/Entity';
+import { Campaign, PostbackDaily } from '../entities/Entity';
 import { HttpService } from '@nestjs/common';
 
 @Injectable()
@@ -15,8 +15,6 @@ export class CommonService {
     private readonly campaignRepository: Repository<Campaign>,
     @InjectRepository(PostbackDaily)
     private readonly postbackDailyRepository: Repository<PostbackDaily>,
-    @InjectRepository(PostbackUnregisteredEvent)
-    private readonly postbackUnregisteredEventRepository: Repository<PostbackUnregisteredEvent>,
   ) {}
 
   async httpServiceHandler(url: string): Promise<string> {
