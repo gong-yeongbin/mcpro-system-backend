@@ -36,7 +36,7 @@ export class AppsflyerService {
 
     console.log(`[ appsflyer ---> mecrosspro ] install : ${originalUrl}`);
 
-    query.uuid = ['', undefined, '{uuid}'].includes(query.uuid) ? '' : query.uuid;
+    // query.uuid = ['', undefined, '{uuid}'].includes(query.uuid) ? '' : query.uuid;
 
     const postbackInstallAppsflyer: PostbackInstallAppsflyer = this.postbackInstallAppsflyerRepository.create({
       viewCode: query.af_siteid,
@@ -56,43 +56,43 @@ export class AppsflyerService {
       originalUrl: originalUrl,
     });
 
-    const postbackDailyEntity: PostbackDaily = await this.commonService.isValidationPostbackDaily(query.af_siteid, query.af_c_id);
+    // const postbackDailyEntity: PostbackDaily = await this.commonService.isValidationPostbackDaily(query.af_siteid, query.af_c_id);
 
-    if (!postbackDailyEntity) throw new NotFoundException();
+    // if (!postbackDailyEntity) throw new NotFoundException();
 
-    const campaignEntity: Campaign = await this.campaignRepository
-      .createQueryBuilder('campaign')
-      .leftJoinAndSelect('campaign.media', 'media')
-      .leftJoinAndSelect('campaign.advertising', 'advertising')
-      .where('campaign.token =:token', { token: query.af_c_id })
-      .getOne();
+    // const campaignEntity: Campaign = await this.campaignRepository
+    //   .createQueryBuilder('campaign')
+    //   .leftJoinAndSelect('campaign.media', 'media')
+    //   .leftJoinAndSelect('campaign.advertising', 'advertising')
+    //   .where('campaign.token =:token', { token: query.af_c_id })
+    //   .getOne();
 
-    if (!campaignEntity) throw new NotFoundException();
+    // if (!campaignEntity) throw new NotFoundException();
 
-    const postbackRegisteredEventEntity: PostbackRegisteredEvent = await this.postbackRegisteredEventRepository
-      .createQueryBuilder('postbackRegisteredEvent')
-      .where('postbackRegisteredEvent.token =:token', { token: query.af_c_id })
-      .andWhere('postbackRegisteredEvent.admin =:event', { event: 'install' })
-      .getOne();
+    // const postbackRegisteredEventEntity: PostbackRegisteredEvent = await this.postbackRegisteredEventRepository
+    //   .createQueryBuilder('postbackRegisteredEvent')
+    //   .where('postbackRegisteredEvent.token =:token', { token: query.af_c_id })
+    //   .andWhere('postbackRegisteredEvent.admin =:event', { event: 'install' })
+    //   .getOne();
 
-    if (postbackRegisteredEventEntity.status) {
-      const url: string = await this.commonService.convertedPostbackInstallUrl({
-        uuid: query.uuid,
-        click_id: postbackInstallAppsflyer.clickid,
-        adid: postbackInstallAppsflyer.idfa,
-        event_datetime: postbackInstallAppsflyer.installTime,
-        click_datetime: postbackInstallAppsflyer.clickTime,
-        campaignEntity: campaignEntity,
-        postbackDailyEntity: postbackDailyEntity,
-      });
+    // if (postbackRegisteredEventEntity.status) {
+    //   const url: string = await this.commonService.convertedPostbackInstallUrl({
+    //     uuid: query.uuid,
+    //     click_id: postbackInstallAppsflyer.clickid,
+    //     adid: postbackInstallAppsflyer.idfa,
+    //     event_datetime: postbackInstallAppsflyer.installTime,
+    //     click_datetime: postbackInstallAppsflyer.clickTime,
+    //     campaignEntity: campaignEntity,
+    //     postbackDailyEntity: postbackDailyEntity,
+    //   });
 
-      postbackInstallAppsflyer.sendTime = await this.commonService.httpServiceHandler(url);
-      postbackInstallAppsflyer.sendUrl = url;
-    }
+    //   postbackInstallAppsflyer.sendTime = await this.commonService.httpServiceHandler(url);
+    //   postbackInstallAppsflyer.sendUrl = url;
+    // }
 
-    postbackInstallAppsflyer.pubId = postbackDailyEntity.pubId;
-    postbackInstallAppsflyer.subId = postbackDailyEntity.subId;
-    postbackInstallAppsflyer.media = campaignEntity.media.name;
+    // postbackInstallAppsflyer.pubId = postbackDailyEntity.pubId;
+    // postbackInstallAppsflyer.subId = postbackDailyEntity.subId;
+    // postbackInstallAppsflyer.media = campaignEntity.media.name;
 
     await this.postbackInstallAppsflyerRepository.save(postbackInstallAppsflyer);
   }
@@ -103,7 +103,7 @@ export class AppsflyerService {
 
     console.log(`[ appsflyer ---> mecrosspro ] event : ${originalUrl}`);
 
-    const uuid: string = ['', undefined, '{uuid}'].includes(req.query.uuid) ? '' : req.query.uuid;
+    // const uuid: string = ['', undefined, '{uuid}'].includes(req.query.uuid) ? '' : req.query.uuid;
 
     const postbackEventAppsflyer: PostbackEventAppsflyer = this.postbackEventAppsflyerRepository.create({
       viewCode: req.query.af_siteid,
@@ -127,15 +127,15 @@ export class AppsflyerService {
     });
 
     const token: string = postbackEventAppsflyer.token;
-    const viewCode: string = postbackEventAppsflyer.viewCode;
+    // const viewCode: string = postbackEventAppsflyer.viewCode;
 
-    const postbackDailyEntity: PostbackDaily = await this.commonService.isValidationPostbackDaily(viewCode, token);
+    // const postbackDailyEntity: PostbackDaily = await this.commonService.isValidationPostbackDaily(viewCode, token);
 
-    if (!postbackDailyEntity) throw new NotFoundException();
+    // if (!postbackDailyEntity) throw new NotFoundException();
 
     const campaignEntity: Campaign = await this.campaignRepository.findOne({
       where: { token: token },
-      relations: ['media', 'advertising'],
+      // relations: ['media', 'advertising'],
     });
 
     if (!campaignEntity) throw new NotFoundException();
@@ -162,25 +162,25 @@ export class AppsflyerService {
       await this.postbackUnregisteredEventRepository.save(postbackUnregisteredEventEntity);
     }
 
-    if (postbackEventEntity && postbackEventEntity.status) {
-      const url: string = await this.commonService.convertedPostbackEventUrl({
-        uuid: uuid,
-        click_id: postbackEventAppsflyer.clickid,
-        adid: postbackEventAppsflyer.idfa,
-        event_name: postbackEventAppsflyer.eventName,
-        event_datetime: postbackEventAppsflyer.eventTime,
-        install_datetime: postbackEventAppsflyer.installTime,
-        campaignEntity: campaignEntity,
-        postbackDailyEntity: postbackDailyEntity,
-      });
+    // if (postbackEventEntity && postbackEventEntity.status) {
+    //   const url: string = await this.commonService.convertedPostbackEventUrl({
+    //     uuid: uuid,
+    //     click_id: postbackEventAppsflyer.clickid,
+    //     adid: postbackEventAppsflyer.idfa,
+    //     event_name: postbackEventAppsflyer.eventName,
+    //     event_datetime: postbackEventAppsflyer.eventTime,
+    //     install_datetime: postbackEventAppsflyer.installTime,
+    //     campaignEntity: campaignEntity,
+    //     postbackDailyEntity: postbackDailyEntity,
+    //   });
 
-      postbackEventAppsflyer.sendTime = await this.commonService.httpServiceHandler(url);
-      postbackEventAppsflyer.sendUrl = url;
-    }
+    //   postbackEventAppsflyer.sendTime = await this.commonService.httpServiceHandler(url);
+    //   postbackEventAppsflyer.sendUrl = url;
+    // }
 
-    postbackEventAppsflyer.pubId = postbackDailyEntity.pubId;
-    postbackEventAppsflyer.subId = postbackDailyEntity.subId;
-    postbackEventAppsflyer.media = campaignEntity.media.name;
+    // postbackEventAppsflyer.pubId = postbackDailyEntity.pubId;
+    // postbackEventAppsflyer.subId = postbackDailyEntity.subId;
+    // postbackEventAppsflyer.media = campaignEntity.media.name;
 
     await this.postbackEventAppsflyerRepository.save(postbackEventAppsflyer);
 
