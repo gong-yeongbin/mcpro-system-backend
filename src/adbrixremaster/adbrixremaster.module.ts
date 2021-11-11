@@ -1,8 +1,7 @@
-import { HttpModule, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AdbrixremasterController } from './adbrixremaster.controller';
 import { AdbrixremasterService } from './adbrixremaster.service';
-import { CommonService } from 'src/common/common.service';
 import {
   Campaign,
   PostbackInstallAdbrixremaster,
@@ -22,12 +21,8 @@ import {
       PostbackEventAdbrixremaster,
       PostbackInstallAdbrixremaster,
     ]),
-    HttpModule.register({
-      timeout: 5000,
-      maxRedirects: 3,
-    }),
   ],
   controllers: [AdbrixremasterController],
-  providers: [AdbrixremasterService, CommonService],
+  providers: [AdbrixremasterService],
 })
 export class AdbrixremasterModule {}

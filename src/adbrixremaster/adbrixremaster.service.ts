@@ -1,28 +1,15 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { decodeUnicode } from 'src/util';
 import { Repository } from 'typeorm';
 import * as moment from 'moment-timezone';
-import {
-  PostbackInstallAdbrixremaster,
-  PostbackEventAdbrixremaster,
-  PostbackDaily,
-  Campaign,
-  PostbackRegisteredEvent,
-  PostbackUnregisteredEvent,
-} from '../entities/Entity';
-import { CommonService } from 'src/common/common.service';
+import { PostbackInstallAdbrixremaster, PostbackEventAdbrixremaster } from '../entities/Entity';
+import { RedisService } from 'nestjs-redis';
 
 @Injectable()
 export class AdbrixremasterService {
   constructor(
-    private readonly commonService: CommonService,
-    @InjectRepository(Campaign)
-    private readonly campaignRepository: Repository<Campaign>,
-    @InjectRepository(PostbackRegisteredEvent)
-    private readonly postbackRegisteredEventRepository: Repository<PostbackRegisteredEvent>,
-    @InjectRepository(PostbackUnregisteredEvent)
-    private readonly postbackUnregisteredEventRepository: Repository<PostbackUnregisteredEvent>,
+    private readonly redisService: RedisService,
     @InjectRepository(PostbackInstallAdbrixremaster)
     private readonly postbackInstallAdbrixremasterRepository: Repository<PostbackInstallAdbrixremaster>,
     @InjectRepository(PostbackEventAdbrixremaster)
@@ -32,8 +19,6 @@ export class AdbrixremasterService {
   async postbackInstallAdbrixRemaster(request: any): Promise<void> {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
     console.log(`[ adbrixremaster ---> mecrosspro ] install : ${originalUrl}`);
-
-    // const uuid: string = ['', undefined, '{uuid}'].includes(request.query.uuid) ? '' : request.query.uuid;
 
     const postbackInstallAdbrixremaster: PostbackInstallAdbrixremaster = this.postbackInstallAdbrixremasterRepository.create({
       viewCode: request.query.cb_2,
@@ -86,62 +71,31 @@ export class AdbrixremasterService {
       aServerDatetime: moment.utc(request.query.a_server_datetime.replace('+', ' ')).tz('Asia/Seoul').format('YYYY-MM-DD HH:mm:ss'),
     });
 
-    // const isValidationPostback: PostbackInstallAdbrixremaster = await this.postbackInstallAdbrixremasterRepository
-    //   .createQueryBuilder('postbackInstallAdbrixremaster')
-    //   .where('Date(postbackInstallAdbrixremaster.createdAt) =:date', { date: moment().tz('Asia/Seoul').format('YYYY-MM-DD') })
-    //   .andWhere('postbackInstallAdbrixremaster.adid =:adid', { adid: postbackInstallAdbrixremaster.adid })
-    //   .andWhere('postbackInstallAdbrixremaster.idfv =:idfv', { idfv: postbackInstallAdbrixremaster.idfv })
-    //   .getOne();
+    const redis: any = this.redisService.getClient();
 
-    // if (isValidationPostback) return;
+    let cursor: number;
+    cursor = 0;
 
-    // const token: string = postbackInstallAdbrixremaster.token;
-    // const viewCode: string = postbackInstallAdbrixremaster.viewCode;
+    do {
+      const scanData: [string, string[]] = await redis.hscan('view_code', cursor, 'MATCH', `${postbackInstallAdbrixremaster.token}/*`, 'COUNT', 10000);
 
-    // const postbackDailyEntity: PostbackDaily = await this.commonService.isValidationPostbackDaily(viewCode, token);
-
-    // if (!postbackDailyEntity) throw new NotFoundException();
-
-    // const campaignEntity: Campaign = await this.campaignRepository.findOne({
-    //   where: { token: token },
-    //   relations: ['media', 'advertising'],
-    // });
-
-    // if (!campaignEntity) throw new NotFoundException();
-
-    // const postbackEventEntity: PostbackRegisteredEvent = await this.postbackRegisteredEventRepository.findOne({
-    //   where: { token: token, tracker: 'install' },
-    // });
-
-    // if (postbackEventEntity.status) {
-    //   const url: string = await this.commonService.convertedPostbackInstallUrl({
-    //     uuid: uuid,
-    //     click_id: postbackInstallAdbrixremaster.cb_3,
-    //     adid: postbackInstallAdbrixremaster.adid,
-    //     event_datetime: postbackInstallAdbrixremaster.eventDatetime,
-    //     click_datetime: postbackInstallAdbrixremaster.aServerDatetime,
-    //     campaignEntity: campaignEntity,
-    //     postbackDailyEntity: postbackDailyEntity,
-    //   });
-
-    //   postbackInstallAdbrixremaster.sendTime = await this.commonService.httpServiceHandler(url);
-    //   postbackInstallAdbrixremaster.sendUrl = url;
-    // }
-
-    // postbackInstallAdbrixremaster.pubId = postbackDailyEntity.pubId;
-    // postbackInstallAdbrixremaster.subId = postbackDailyEntity.subId;
-    // postbackInstallAdbrixremaster.media = campaignEntity.media.name;
+      cursor = +scanData[0];
+      const data: string[] = scanData[1];
+      for (let index = 0; index < data.length; index++) {
+        if (index % 2 && data[index] == postbackInstallAdbrixremaster.viewCode) {
+          postbackInstallAdbrixremaster.pubId = data[index - 1].split('/')[1];
+          postbackInstallAdbrixremaster.subId = data[index - 1].split('/')[2];
+          cursor = 0;
+        }
+      }
+    } while (cursor != 0);
 
     await this.postbackInstallAdbrixremasterRepository.save(postbackInstallAdbrixremaster);
-
-    return;
   }
 
   async postbackEventAdbrixRemaster(request: any) {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
     console.log(`[ adbrixremaster ---> mecrosspro ] event : ${originalUrl}`);
-
-    // const uuid: string = ['', undefined, '{uuid}'].includes(request.query.uuid) ? '' : request.query.uuid;
 
     const postbackEventAdbrixremaster: PostbackEventAdbrixremaster = this.postbackEventAdbrixremasterRepository.create({
       viewCode: request.query.cb_2,
@@ -194,9 +148,6 @@ export class AdbrixremasterService {
       revenue: 0,
     });
 
-    const token: string = postbackEventAdbrixremaster.token;
-    // const viewCode: string = postbackEventAdbrixremaster.viewCode;
-
     if (postbackEventAdbrixremaster.paramJson != 'null' && postbackEventAdbrixremaster.paramJson != '') {
       const jsonData: any = JSON.parse(postbackEventAdbrixremaster.paramJson);
 
@@ -211,61 +162,25 @@ export class AdbrixremasterService {
       }
     }
 
-    // const postbackDailyEntity: PostbackDaily = await this.commonService.isValidationPostbackDaily(viewCode, token);
+    const redis: any = this.redisService.getClient();
 
-    // if (!postbackDailyEntity) throw new NotFoundException();
+    let cursor: number;
+    cursor = 0;
 
-    const campaignEntity: Campaign = await this.campaignRepository.findOne({
-      where: { token: token },
-      // relations: ['media', 'advertising'],
-    });
+    do {
+      const scanData: [string, string[]] = await redis.hscan('view_code', cursor, 'MATCH', `${postbackEventAdbrixremaster.token}/*`, 'COUNT', 10000);
 
-    // if (!campaignEntity) throw new NotFoundException();
-
-    const postbackEventEntity: PostbackRegisteredEvent = await this.postbackRegisteredEventRepository.findOne({
-      where: { token: token, tracker: postbackEventAdbrixremaster.eventName },
-    });
-
-    if (!postbackEventEntity) {
-      let postbackUnregisteredEventEntity: PostbackUnregisteredEvent = await this.postbackUnregisteredEventRepository
-        .createQueryBuilder('postbackUnregisteredEvent')
-        .where('postbackUnregisteredEvent.eventName =:eventName', { eventName: postbackEventAdbrixremaster.eventName })
-        .andWhere('postbackUnregisteredEvent.token =:token', { token: token })
-        .andWhere('Date(postbackUnregisteredEvent.createdAt) =:date', { date: moment().tz('Asia/Seoul').format('YYYY-MM-DD') })
-        .getOne();
-
-      postbackUnregisteredEventEntity
-        ? ++postbackUnregisteredEventEntity.eventCount
-        : (postbackUnregisteredEventEntity = this.postbackUnregisteredEventRepository.create({
-            eventName: postbackEventAdbrixremaster.eventName,
-            token: campaignEntity,
-          }));
-
-      await this.postbackUnregisteredEventRepository.save(postbackUnregisteredEventEntity);
-    }
-
-    // if (postbackEventEntity && postbackEventEntity.status) {
-    //   const url: string = await this.commonService.convertedPostbackEventUrl({
-    //     uuid: uuid,
-    //     click_id: postbackEventAdbrixremaster.cb_3,
-    //     adid: postbackEventAdbrixremaster.adid,
-    //     event_name: postbackEventAdbrixremaster.eventName,
-    //     event_datetime: postbackEventAdbrixremaster.eventDatetime,
-    //     install_datetime: postbackEventAdbrixremaster.attrEventDatetime,
-    //     campaignEntity: campaignEntity,
-    //     postbackDailyEntity: postbackDailyEntity,
-    //   });
-
-    //   postbackEventAdbrixremaster.sendTime = await this.commonService.httpServiceHandler(url);
-    //   postbackEventAdbrixremaster.sendUrl = url;
-    // }
-
-    // postbackEventAdbrixremaster.pubId = postbackDailyEntity.pubId;
-    // postbackEventAdbrixremaster.subId = postbackDailyEntity.subId;
-    // postbackEventAdbrixremaster.media = campaignEntity.media.name;
+      cursor = +scanData[0];
+      const data: string[] = scanData[1];
+      for (let index = 0; index < data.length; index++) {
+        if (index % 2 && data[index] == postbackEventAdbrixremaster.viewCode) {
+          postbackEventAdbrixremaster.pubId = data[index - 1].split('/')[1];
+          postbackEventAdbrixremaster.subId = data[index - 1].split('/')[2];
+          cursor = 0;
+        }
+      }
+    } while (cursor != 0);
 
     await this.postbackEventAdbrixremasterRepository.save(postbackEventAdbrixremaster);
-
-    return;
   }
 }

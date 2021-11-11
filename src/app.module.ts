@@ -1,4 +1,4 @@
-import { HttpModule, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TrackingModule } from './tracking/tracking.module';
@@ -6,15 +6,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { RedisModule } from 'nestjs-redis';
 import { AppClusterService } from './app-cluster/app-cluster.service';
-import { CommonService } from './common/common.service';
-import {
-  Campaign,
-  PostbackDaily,
-  PostbackRegisteredEvent,
-  PostbackEventAdbrixremaster,
-  PostbackInstallAdbrixremaster,
-  PostbackUnregisteredEvent,
-} from './entities/Entity';
 import { AppsflyerModule } from './appsflyer/appsflyer.module';
 import { AdbrixremasterModule } from './adbrixremaster/adbrixremaster.module';
 
@@ -28,10 +19,6 @@ import { AdbrixremasterModule } from './adbrixremaster/adbrixremaster.module';
       host: process.env.REDIS_HOST,
       port: +process.env.REDIS_PORT,
     }),
-    HttpModule.register({
-      timeout: 5000,
-      maxRedirects: 3,
-    }),
     TypeOrmModule.forRoot({
       type: process.env.MYSQL_TYPE as 'mysql',
       host: process.env.MYSQL_HOST,
@@ -43,21 +30,12 @@ import { AdbrixremasterModule } from './adbrixremaster/adbrixremaster.module';
       entities: [__dirname + '/**/*{.ts,.js}'],
       connectTimeout: 5000,
     }),
-    TypeOrmModule.forFeature([
-      Campaign,
-      PostbackDaily,
-      PostbackRegisteredEvent,
-      PostbackUnregisteredEvent,
-      PostbackInstallAdbrixremaster,
-      PostbackEventAdbrixremaster,
-      PostbackDaily,
-    ]),
     TrackingModule,
     AppsflyerModule,
     AdbrixremasterModule,
   ],
   controllers: [AppController],
-  providers: [AppService, AppClusterService, CommonService],
+  providers: [AppService, AppClusterService],
   exports: [ConfigModule],
 })
 export class AppModule {}

@@ -40,6 +40,9 @@ export default class PostbackCampaignDaily {
   @Column('int', { name: 'etc5', nullable: true, default: () => "'0'" })
   public etc5: number | null;
 
+  @Column('int', { name: 'unregistered', nullable: true, default: () => "'0'" })
+  public unregistered: number | null;
+
   @Column('datetime', {
     name: 'created_at',
     default: () => "'CURRENT_TIMESTAMP(6)'",
