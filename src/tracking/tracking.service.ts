@@ -49,7 +49,7 @@ export class TrackingService {
       redisData['tracker'] = campaignEntity.advertising.tracker.name;
       redisData['trackerTrackingUrl'] = campaignEntity.trackerTrackingUrl;
 
-      await redis.hset(query.token, 'meidaIdx', redisData.mediaIdx, 'tracker', redisData.tracker, 'trackerTrackingUrl', redisData.trackerTrackingUrl);
+      await redis.hset(query.token, 'mediaIdx', redisData.mediaIdx, 'tracker', redisData.tracker, 'trackerTrackingUrl', redisData.trackerTrackingUrl);
       await redis.expire(query.token, 21600);
     }
 
@@ -71,7 +71,7 @@ export class TrackingService {
     return viewCode;
   }
 
-  async convertTrackerTrackingUrl(redisData: Record<string, string>, query: TrackingDto, viewCode: string): Promise<string> {
+  async convertTrackerTrackingUrl(redisData: any, query: TrackingDto, viewCode: string): Promise<string> {
     const tracker: string = redisData.tracker;
     const trackerTrackingUrl: string = redisData.trackerTrackingUrl;
     const deviceId: string = query.adid ? query.adid : query.idfa;
