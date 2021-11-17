@@ -32,7 +32,9 @@ export class TrackingService {
 
     const redis: Redis = this.redisService.getClient();
 
-    const redisData: Record<string, string> = await redis.hgetall(query.token);
+    let redisData: any;
+    // eslint-disable-next-line prefer-const
+    redisData = await redis.hgetall(query.token);
 
     if (!Object.keys(redisData).length) {
       const campaignEntity: Campaign = await this.campaignRepository.findOne({
@@ -73,7 +75,6 @@ export class TrackingService {
     const tracker: string = redisData.tracker;
     const trackerTrackingUrl: string = redisData.trackerTrackingUrl;
     const deviceId: string = query.adid ? query.adid : query.idfa;
-    console.log(`tracker: ${tracker}, trackerTrackingUrl: ${trackerTrackingUrl}`);
 
     let convertedTrackerTrackingUrl: string = null;
 
