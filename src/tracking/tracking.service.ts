@@ -32,7 +32,7 @@ export class TrackingService {
 
     const redis: Redis = this.redisService.getClient();
 
-    const redisData: Record<string, string> = await redis.hgetall('bcdb10ef4de14a7f8bd557cb44a3571d');
+    const redisData: Record<string, string> = await redis.hgetall(query.token);
 
     if (!Object.keys(redisData).length) {
       const campaignEntity: Campaign = await this.campaignRepository.findOne({
