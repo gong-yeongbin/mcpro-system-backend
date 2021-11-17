@@ -20,7 +20,7 @@ import { AdbrixremasterModule } from './adbrixremaster/adbrixremaster.module';
       port: +process.env.REDIS_PORT,
     }),
     TypeOrmModule.forRoot({
-      type: process.env.MYSQL_TYPE as 'mysql',
+      type: 'mysql',
       host: process.env.MYSQL_HOST,
       port: +process.env.MYSQL_PORT,
       username: process.env.MYSQL_USERNAME,
@@ -28,7 +28,6 @@ import { AdbrixremasterModule } from './adbrixremaster/adbrixremaster.module';
       database: process.env.MYSQL_DATABASE,
       synchronize: false,
       entities: [__dirname + '/**/*{.ts,.js}'],
-      connectTimeout: 5000,
     }),
     TrackingModule,
     AppsflyerModule,
