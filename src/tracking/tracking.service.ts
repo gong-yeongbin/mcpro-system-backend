@@ -37,24 +37,22 @@ export class TrackingService {
     redisData = await redis.hgetall(query.token);
 
     if (!Object.keys(redisData).length) {
-      const campaignEntity: Campaign = await this.campaignRepository.findOne({
-        where: {
-          token: query.token,
-          status: true,
-        },
-        relations: ['media', 'advertising', 'advertising.tracker'],
-      });
-
-      if (!campaignEntity) {
-        throw new NotFoundException();
-      }
-
-      redisData['mediaIdx'] = campaignEntity.media.idx.toString();
-      redisData['tracker'] = campaignEntity.advertising.tracker.name;
-      redisData['trackerTrackingUrl'] = campaignEntity.trackerTrackingUrl;
-
-      await redis.hset(query.token, 'mediaIdx', redisData.mediaIdx, 'tracker', redisData.tracker, 'trackerTrackingUrl', redisData.trackerTrackingUrl);
-      await redis.expire(query.token, 21600);
+      // const campaignEntity: Campaign = await this.campaignRepository.findOne({
+      //   where: {
+      //     token: query.token,
+      //     status: true,
+      //   },
+      //   relations: ['media', 'advertising', 'advertising.tracker'],
+      // });
+      // if (!campaignEntity) {
+      //   throw new NotFoundException();
+      // }
+      // redisData['mediaIdx'] = campaignEntity.media.idx.toString();
+      // redisData['tracker'] = campaignEntity.advertising.tracker.name;
+      // redisData['trackerTrackingUrl'] = campaignEntity.trackerTrackingUrl;
+      // await redis.hset(query.token, 'mediaIdx', redisData.mediaIdx, 'tracker', redisData.tracker, 'trackerTrackingUrl', redisData.trackerTrackingUrl);
+      // await redis.expire(query.token, 21600);
+      throw new NotFoundException();
     }
 
     const redisKey: string = `${query.token}/${query.pub_id}/${query.sub_id}/${redisData.mediaIdx}` as string;
