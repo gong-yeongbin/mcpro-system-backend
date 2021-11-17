@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RedisService } from 'nestjs-redis';
 import { Repository } from 'typeorm';
@@ -44,6 +44,10 @@ export class TrackingService {
         },
         relations: ['media', 'advertising', 'advertising.tracker'],
       });
+
+      if (!campaignEntity) {
+        throw new NotFoundException();
+      }
 
       redisData['mediaIdx'] = campaignEntity.media.idx.toString();
       redisData['tracker'] = campaignEntity.advertising.tracker.name;
