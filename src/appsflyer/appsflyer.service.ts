@@ -58,6 +58,7 @@ export class AppsflyerService {
     } while (cursor != 0);
 
     await this.postbackInstallAppsflyerRepository.save(postbackInstallAppsflyer);
+    return;
   }
 
   async postbackEventAppsflyer(req: any): Promise<void> {
@@ -105,5 +106,6 @@ export class AppsflyerService {
     } while (cursor != 0);
 
     await this.postbackEventAppsflyerRepository.save(postbackEventAppsflyer);
+    return;
   }
 }
