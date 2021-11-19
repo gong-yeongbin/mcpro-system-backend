@@ -5,11 +5,6 @@ files:
      group: root
      content: |
        keepalive_timeout 120s;
-       proxy_connect_timeout 120s;
-       proxy_send_timeout 120s; 
-       proxy_read_timeout 120s; 
-       fastcgi_send_timeout 120s; 
-       fastcgi_read_timeout 120s;
 container_commands:
   nginx_reload:
      command: “sudo service nginx reload”
