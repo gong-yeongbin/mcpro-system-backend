@@ -8,11 +8,11 @@ export class AppsflyerController {
 
   @Get('/install')
   postbackInstallAppsflyer(@Request() request: any, @Query() query: AppsflyerInstallDto) {
-    return this.appsflyerService.postbackInstallAppsflyer(request, query);
+    this.appsflyerService.postbackInstallAppsflyer(request, query);
   }
 
   @Get('/event')
   postbackEventAppsflyer(@Request() req: any) {
-    return this.appsflyerService.postbackEventAppsflyer(req);
+    this.appsflyerService.postbackEventAppsflyer(req);
   }
 }
