@@ -91,7 +91,6 @@ export class AdbrixremasterService {
     } while (cursor != 0);
 
     await this.postbackInstallAdbrixremasterRepository.save(postbackInstallAdbrixremaster);
-    return;
   }
 
   async postbackEventAdbrixRemaster(request: any) {
@@ -183,6 +182,5 @@ export class AdbrixremasterService {
     } while (cursor != 0);
 
     await this.postbackEventAdbrixremasterRepository.save(postbackEventAdbrixremaster);
-    return;
   }
 }
