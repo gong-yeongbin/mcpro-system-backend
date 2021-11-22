@@ -8,6 +8,7 @@ import { RedisModule } from 'nestjs-redis';
 import { AppClusterService } from './app-cluster/app-cluster.service';
 import { AppsflyerModule } from './appsflyer/appsflyer.module';
 import { AdbrixremasterModule } from './adbrixremaster/adbrixremaster.module';
+import { AdjustModule } from './adjust/adjust.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { AdbrixremasterModule } from './adbrixremaster/adbrixremaster.module';
     TrackingModule,
     AppsflyerModule,
     AdbrixremasterModule,
+    AdjustModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppClusterService],

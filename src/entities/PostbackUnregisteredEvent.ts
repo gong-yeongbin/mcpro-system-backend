@@ -24,7 +24,7 @@ export default class PostbackUnregisteredEvent {
   })
   public updatedAt: Date;
 
-  @ManyToOne(() => Campaign, (campaign) => campaign.postbackCampaignDaily, {
+  @ManyToOne(() => Campaign, (campaign) => campaign.postbackUnregisteredEvent, {
     onDelete: 'NO ACTION',
     onUpdate: 'NO ACTION',
   })

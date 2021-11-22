@@ -1,5 +1,5 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { Advertising, Media, PostbackCampaignDaily, PostbackRegisteredEvent, PostbackUnregisteredEvent, Reservation } from '@entities/Entity';
+import { Advertising, Media, PostbackRegisteredEvent, PostbackUnregisteredEvent, Reservation } from '@entities/Entity';
 
 @Index('IDX_1ab622056fec78ded2dccbf2ce', ['token'], { unique: true })
 @Entity('campaign', { schema: 'mcpro' })
@@ -67,9 +67,6 @@ export default class Campaign {
   })
   @JoinColumn([{ name: 'media', referencedColumnName: 'idx' }])
   public media: Media;
-
-  @OneToMany(() => PostbackCampaignDaily, (postbackCampaignDaily) => postbackCampaignDaily.token)
-  public postbackCampaignDaily: PostbackCampaignDaily[];
 
   @OneToMany(() => PostbackRegisteredEvent, (postbackRegisteredEvent) => postbackRegisteredEvent.token)
   public postbackRegisteredEvent: PostbackRegisteredEvent[];
