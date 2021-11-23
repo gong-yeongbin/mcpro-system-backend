@@ -1,39 +1,39 @@
-# name: mecrosspro-system-main
+name: mecrosspro-system-main
 
-# on:
-#   push:
-#     branches: [main]
+on:
+  push:
+    branches: [main]
 
-#   workflow_dispatch:
+  workflow_dispatch:
 
-# jobs:
-#   build:
-#     runs-on: ubuntu-18.04
+jobs:
+  build:
+    runs-on: ubuntu-18.04
 
-#     steps:
-#       - uses: actions/checkout@v2
-#       - name: Use Node.js
-#         uses: actions/setup-node@v1
-#         with:
-#           node-version: '12.x'
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
 
-#       - name: Install Dependencies
-#         run: npm install
+      - name: Install Dependencies
+        run: npm install
 
-#       - name: Build
-#         run: npm run build
+      - name: Build
+        run: npm run build
 
-#       - name: Make zip file
-#         run: |
-#           zip -r dist.zip ./dist/* ./package.json
+      - name: Make zip file
+        run: |
+          zip -r dist.zip ./dist/* ./package.json
 
-#       - name: Beanstalk Deploy for app
-#         uses: einaregilsson/beanstalk-deploy@v14
-#         with:
-#           aws_access_key: ${{secrets.AWS_ACCESS_KEY_ID}}
-#           aws_secret_key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
-#           application_name: 'mecrosspro-system'
-#           environment_name: 'Mecrossprosystem-env'
-#           region: ap-northeast-2
-#           version_label: 'mecrosspro-system-${{ github.run_number }}'
-#           deployment_package: dist.zip
+      - name: Beanstalk Deploy for app
+        uses: einaregilsson/beanstalk-deploy@v14
+        with:
+          aws_access_key: ${{secrets.AWS_ACCESS_KEY_ID}}
+          aws_secret_key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+          application_name: 'mecrosspro-system'
+          environment_name: 'Mecrossprosystem-env'
+          region: ap-northeast-2
+          version_label: 'mecrosspro-system-${{ github.run_number }}'
+          deployment_package: dist.zip

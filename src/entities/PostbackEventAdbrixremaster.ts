@@ -180,7 +180,4 @@ export default class PostbackEventAdbrixremaster {
 
   @Column('varchar', { name: 'sub_id', nullable: true, length: 255 })
   public subId: string | null;
-
-  @Column('varchar', { name: 'media', nullable: true, length: 255 })
-  public media: string | null;
 }

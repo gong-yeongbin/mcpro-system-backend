@@ -7,12 +7,12 @@ export class AppsflyerController {
   constructor(private readonly appsflyerService: AppsflyerService) {}
 
   @Get('/install')
-  postbackInstallAppsflyer(@Request() request: any, @Query() query: AppsflyerInstallDto) {
-    this.appsflyerService.postbackInstallAppsflyer(request, query);
+  async postbackInstallAppsflyer(@Request() request: any, @Query() query: AppsflyerInstallDto): Promise<void> {
+    await this.appsflyerService.postbackInstallAppsflyer(request, query);
   }
 
   @Get('/event')
-  postbackEventAppsflyer(@Request() req: any) {
-    this.appsflyerService.postbackEventAppsflyer(req);
+  async postbackEventAppsflyer(@Request() req: any): Promise<void> {
+    await this.appsflyerService.postbackEventAppsflyer(req);
   }
 }

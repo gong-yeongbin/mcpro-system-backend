@@ -7,12 +7,12 @@ export class AdbrixremasterController {
   constructor(private readonly adbrixremasterService: AdbrixremasterService) {}
 
   @Get('/install')
-  postbackInstall(@Req() request: Request) {
-    this.adbrixremasterService.postbackInstallAdbrixRemaster(request);
+  async postbackInstall(@Req() request: Request): Promise<void> {
+    await this.adbrixremasterService.postbackInstallAdbrixRemaster(request);
   }
 
   @Get('/event')
-  postbackEvent(@Req() request: Request) {
-    this.adbrixremasterService.postbackEventAdbrixRemaster(request);
+  async postbackEvent(@Req() request: Request): Promise<void> {
+    await this.adbrixremasterService.postbackEventAdbrixRemaster(request);
   }
 }

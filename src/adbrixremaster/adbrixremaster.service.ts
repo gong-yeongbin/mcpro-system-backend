@@ -93,7 +93,7 @@ export class AdbrixremasterService {
     await this.postbackInstallAdbrixremasterRepository.save(postbackInstallAdbrixremaster);
   }
 
-  async postbackEventAdbrixRemaster(request: any) {
+  async postbackEventAdbrixRemaster(request: any): Promise<void> {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
     console.log(`[ adbrixremaster ---> mecrosspro ] event : ${originalUrl}`);
 
