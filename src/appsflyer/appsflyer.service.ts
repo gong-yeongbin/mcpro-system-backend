@@ -16,7 +16,7 @@ export class AppsflyerService {
     private readonly postbackEventAppsflyerRepository: Repository<PostbackEventAppsflyer>,
   ) {}
 
-  async postbackInstallAppsflyer(request: any, query: AppsflyerInstallDto): Promise<PostbackInstallAppsflyer> {
+  async postbackInstallAppsflyer(request: any, query: AppsflyerInstallDto): Promise<void> {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
     console.log(`[ appsflyer ---> mecrosspro ] install : ${originalUrl}`);
 
@@ -57,7 +57,7 @@ export class AppsflyerService {
       }
     } while (cursor != 0);
 
-    return await this.postbackInstallAppsflyerRepository.save(postbackInstallAppsflyer);
+    await this.postbackInstallAppsflyerRepository.save(postbackInstallAppsflyer);
   }
 
   async postbackEventAppsflyer(req: any): Promise<PostbackEventAppsflyer> {
