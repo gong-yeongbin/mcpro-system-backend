@@ -16,7 +16,7 @@ export class AdbrixremasterService {
     private readonly postbackEventAdbrixremasterRepository: Repository<PostbackEventAdbrixremaster>,
   ) {}
 
-  async postbackInstallAdbrixRemaster(request: any): Promise<void> {
+  async postbackInstallAdbrixRemaster(request: any): Promise<PostbackInstallAdbrixremaster> {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
     console.log(`[ adbrixremaster ---> mecrosspro ] install : ${originalUrl}`);
 
@@ -90,10 +90,10 @@ export class AdbrixremasterService {
       }
     } while (cursor != 0);
 
-    await this.postbackInstallAdbrixremasterRepository.save(postbackInstallAdbrixremaster);
+    return await this.postbackInstallAdbrixremasterRepository.save(postbackInstallAdbrixremaster);
   }
 
-  async postbackEventAdbrixRemaster(request: any): Promise<void> {
+  async postbackEventAdbrixRemaster(request: any): Promise<PostbackEventAdbrixremaster> {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
     console.log(`[ adbrixremaster ---> mecrosspro ] event : ${originalUrl}`);
 
@@ -181,6 +181,6 @@ export class AdbrixremasterService {
       }
     } while (cursor != 0);
 
-    await this.postbackEventAdbrixremasterRepository.save(postbackEventAdbrixremaster);
+    return await this.postbackEventAdbrixremasterRepository.save(postbackEventAdbrixremaster);
   }
 }
