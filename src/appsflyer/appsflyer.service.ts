@@ -5,6 +5,8 @@ import { decodeUnicode } from 'src/util';
 import { PostbackEventAppsflyer, PostbackInstallAppsflyer } from '../entities/Entity';
 import { AppsflyerInstallDto } from './dto/appsflyer-install.dto';
 import { RedisService } from 'nestjs-redis';
+import * as moment from 'moment-timezone';
+import { Redis } from 'ioredis';
 
 @Injectable()
 export class AppsflyerService {
@@ -16,7 +18,7 @@ export class AppsflyerService {
     private readonly postbackEventAppsflyerRepository: Repository<PostbackEventAppsflyer>,
   ) {}
 
-  async postbackInstallAppsflyer(request: any, query: AppsflyerInstallDto): Promise<PostbackInstallAppsflyer> {
+  async postbackInstallAppsflyer(request: any, query: AppsflyerInstallDto): Promise<void> {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
     console.log(`[ appsflyer ---> mecrosspro ] install : ${originalUrl}`);
 
@@ -38,29 +40,13 @@ export class AppsflyerService {
       originalUrl: originalUrl,
     });
 
-    const redis: any = this.redisService.getClient();
+    const date: string = moment().tz('Asia/Seoul').format('YYYY-MM-DD.HH:mm:ss');
 
-    let cursor: number;
-    cursor = 0;
-
-    do {
-      const scanData: [string, string[]] = await redis.hscan('view_code', cursor, 'MATCH', `${postbackInstallAppsflyer.token}/*`, 'COUNT', 10000);
-
-      cursor = +scanData[0];
-      const data: string[] = scanData[1];
-      for (let index = 0; index < data.length; index++) {
-        if (index % 2 && data[index] == postbackInstallAppsflyer.viewCode) {
-          postbackInstallAppsflyer.pubId = data[index - 1].split('/')[1];
-          postbackInstallAppsflyer.subId = data[index - 1].split('/')[2];
-          cursor = 0;
-        }
-      }
-    } while (cursor != 0);
-
-    return await this.postbackInstallAppsflyerRepository.save(postbackInstallAppsflyer);
+    const redis: Redis = this.redisService.getClient();
+    await redis.hset('appsflyer:install', date, JSON.stringify(postbackInstallAppsflyer));
   }
 
-  async postbackEventAppsflyer(req: any): Promise<PostbackEventAppsflyer> {
+  async postbackEventAppsflyer(req: any): Promise<void> {
     const originalUrl: string = decodeUnicode(`${req.protocol}://${req.headers.host}${req.url}`);
     console.log(`[ appsflyer ---> mecrosspro ] event : ${originalUrl}`);
 
@@ -85,25 +71,9 @@ export class AppsflyerService {
       originalUrl: originalUrl,
     });
 
-    const redis: any = this.redisService.getClient();
+    const date: string = moment().tz('Asia/Seoul').format('YYYY-MM-DD.HH:mm:ss');
 
-    let cursor: number;
-    cursor = 0;
-
-    do {
-      const scanData: [string, string[]] = await redis.hscan('view_code', cursor, 'MATCH', `${postbackEventAppsflyer.token}/*`, 'COUNT', 10000);
-
-      cursor = +scanData[0];
-      const data: string[] = scanData[1];
-      for (let index = 0; index < data.length; index++) {
-        if (index % 2 && data[index] == postbackEventAppsflyer.viewCode) {
-          postbackEventAppsflyer.pubId = data[index - 1].split('/')[1];
-          postbackEventAppsflyer.subId = data[index - 1].split('/')[2];
-          cursor = 0;
-        }
-      }
-    } while (cursor != 0);
-
-    return await this.postbackEventAppsflyerRepository.save(postbackEventAppsflyer);
+    const redis: Redis = this.redisService.getClient();
+    await redis.hset('appsflyer:event', date, JSON.stringify(postbackEventAppsflyer));
   }
 }
