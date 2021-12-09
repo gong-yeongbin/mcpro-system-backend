@@ -4,6 +4,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { RedisService } from 'nestjs-redis';
 import { decodeUnicode } from 'src/util';
 import { Repository } from 'typeorm';
+import * as moment from 'moment-timezone';
+import { Redis } from 'ioredis';
 
 @Injectable()
 export class AdjustService {
@@ -17,7 +19,7 @@ export class AdjustService {
 
   async postbackInstall(request: any): Promise<void> {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
-    console.log(`[ adbrixremaster ---> mecrosspro ] install : ${originalUrl}`);
+    console.log(`[ adjust ---> mecrosspro ] install : ${originalUrl}`);
 
     const postbackInstallAdjust: PostbackInstallAdjust = this.postbackInstallAdjustRepository.create({
       cpToken: request.query.cp_token,
@@ -50,32 +52,15 @@ export class AdjustService {
       viewCode: request.query.publisher_id,
       originalUrl: originalUrl,
     });
+    const date: string = moment().tz('Asia/Seoul').format('YYYY-MM-DD.HH:mm:ss');
 
-    const redis: any = this.redisService.getClient();
-
-    let cursor: number;
-    cursor = 0;
-
-    do {
-      const scanData: [string, string[]] = await redis.hscan('view_code', cursor, 'MATCH', `${postbackInstallAdjust.token}/*`, 'COUNT', 10000);
-
-      cursor = +scanData[0];
-      const data: string[] = scanData[1];
-      for (let index = 0; index < data.length; index++) {
-        if (index % 2 && data[index] == postbackInstallAdjust.viewCode) {
-          postbackInstallAdjust.pubId = data[index - 1].split('/')[1];
-          postbackInstallAdjust.subId = data[index - 1].split('/')[2];
-          cursor = 0;
-        }
-      }
-    } while (cursor != 0);
-
-    await this.postbackInstallAdjustRepository.save(postbackInstallAdjust);
+    const redis: Redis = this.redisService.getClient();
+    await redis.hset('adjust:install', date, JSON.stringify(postbackInstallAdjust));
   }
 
   async postbackEvent(request: any): Promise<void> {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
-    console.log(`[ adbrixremaster ---> mecrosspro ] event : ${originalUrl}`);
+    console.log(`[ adjust ---> mecrosspro ] event : ${originalUrl}`);
 
     const postbackEventAdjust: PostbackEventAdjust = this.postbackEventAdjustRepository.create({
       eventToken: request.query.event_token,
@@ -119,25 +104,9 @@ export class AdjustService {
       originalUrl: originalUrl,
     });
 
-    const redis: any = this.redisService.getClient();
+    const date: string = moment().tz('Asia/Seoul').format('YYYY-MM-DD.HH:mm:ss');
 
-    let cursor: number;
-    cursor = 0;
-
-    do {
-      const scanData: [string, string[]] = await redis.hscan('view_code', cursor, 'MATCH', `${postbackEventAdjust.token}/*`, 'COUNT', 10000);
-
-      cursor = +scanData[0];
-      const data: string[] = scanData[1];
-      for (let index = 0; index < data.length; index++) {
-        if (index % 2 && data[index] == postbackEventAdjust.viewCode) {
-          postbackEventAdjust.pubId = data[index - 1].split('/')[1];
-          postbackEventAdjust.subId = data[index - 1].split('/')[2];
-          cursor = 0;
-        }
-      }
-    } while (cursor != 0);
-
-    await this.postbackEventAdjustRepository.save(postbackEventAdjust);
+    const redis: Redis = this.redisService.getClient();
+    await redis.hset('adjust:event', date, JSON.stringify(postbackEventAdjust));
   }
 }

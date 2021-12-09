@@ -106,7 +106,15 @@ export class TrackingService {
           .replace('{cb_3}', query.click_id) //click id
           .replace('{cb_4}', '')
           .replace('{cb_5}', '');
-
+        break;
+      case 'adjust':
+        convertedTrackerTrackingUrl = trackerTrackingUrl
+          .replace('{m_adid}', deviceId) //device id
+          .replace('{publisher_id}', viewCode) //view code
+          .replace('{cp_token}', query.token) //campaign code
+          .replace('{cb_2}', viewCode) //view code
+          .replace('{click_id}', query.click_id) //click id
+          .replace('{uid}', '');
         break;
     }
 

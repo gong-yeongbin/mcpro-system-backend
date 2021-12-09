@@ -33,7 +33,7 @@ export default class Reservation {
   @Column('text', { name: 'newTrackerTrackingUrl' })
   public newTrackerTrackingUrl: string;
 
-  @ManyToOne(() => Campaign, (campaign) => campaign.reservations, {
+  @ManyToOne(() => Campaign, (campaign) => campaign.reservation, {
     onDelete: 'NO ACTION',
     onUpdate: 'NO ACTION',
   })

@@ -59,7 +59,7 @@ export default class Campaign {
   public advertising: Advertising;
 
   @OneToMany(() => Reservation, (reservation) => reservation.campaign)
-  public reservations: Reservation[];
+  public reservation: Reservation[];
 
   @ManyToOne(() => Media, (media) => media.campaign, {
     onDelete: 'NO ACTION',

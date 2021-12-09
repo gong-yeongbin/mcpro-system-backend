@@ -7,12 +7,12 @@ export class AdjustController {
   constructor(private readonly adjustService: AdjustService) {}
 
   @Get('/install')
-  postbackInstall(@Req() request: Request): void {
-    this.adjustService.postbackInstall(request);
+  async postbackInstall(@Req() request: Request): Promise<void> {
+    await this.adjustService.postbackInstall(request);
   }
 
   @Get('/event')
-  postbackEvent(@Req() request: Request): void {
-    this.adjustService.postbackEvent(request);
+  async postbackEvent(@Req() request: Request): Promise<void> {
+    await this.adjustService.postbackEvent(request);
   }
 }
