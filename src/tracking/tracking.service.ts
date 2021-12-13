@@ -78,6 +78,8 @@ export class TrackingService {
   async convertTrackerTrackingUrl(redisData: any, query: TrackingDto, viewCode: string): Promise<string> {
     const tracker: string = redisData.tracker;
     const trackerTrackingUrl: string = redisData.trackerTrackingUrl;
+    const adid: string = query.adid;
+    const idfa: string = query.idfa;
     const deviceId: string = query.adid ? query.adid : query.idfa;
 
     let convertedTrackerTrackingUrl: string = null;
@@ -109,12 +111,12 @@ export class TrackingService {
         break;
       case 'adjust':
         convertedTrackerTrackingUrl = trackerTrackingUrl
-          .replace('{m_adid}', deviceId) //device id
-          .replace('{publisher_id}', viewCode) //view code
-          .replace('{cp_token}', query.token) //campaign code
-          .replace('{cb_2}', viewCode) //view code
-          .replace('{click_id}', query.click_id) //click id
-          .replace('{uid}', '');
+          .replace(/{adid}/gi, adid) //view code
+          .replace(/{idfa}/gi, idfa) //view code
+          .replace(/{publisher_id}/gi, viewCode) //view code
+          .replace(/{cp_token}/gi, query.token) //campaign code
+          .replace(/{click_id}/gi, query.click_id) //click id
+          .replace(/{uid}/gi, '');
         break;
     }
 
