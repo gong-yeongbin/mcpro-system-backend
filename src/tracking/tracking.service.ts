@@ -107,7 +107,7 @@ export class TrackingService {
           .replace('{cb_2}', viewCode) //view code
           .replace('{cb_3}', query.click_id) //click id
           .replace('{cb_4}', '')
-          .replace('{cb_5}', '');
+          .replace('{cb_5}', query.uuid);
         break;
       case 'adjust':
         convertedTrackerTrackingUrl = trackerTrackingUrl
