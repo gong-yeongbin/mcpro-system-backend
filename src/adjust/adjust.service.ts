@@ -52,7 +52,7 @@ export class AdjustService {
       viewCode: request.query.publisher_id,
       originalUrl: originalUrl,
     });
-    const date: string = moment().tz('Asia/Seoul').format('YYYY-MM-DD.HH:mm:ss');
+    const date: string = moment().tz('Asia/Seoul').format('YYYY-MM-DD.HH:mm:ss.SSSSS');
 
     const redis: Redis = this.redisService.getClient();
     await redis.hset('adjust:install', date, JSON.stringify(postbackInstallAdjust));
@@ -104,7 +104,7 @@ export class AdjustService {
       originalUrl: originalUrl,
     });
 
-    const date: string = moment().tz('Asia/Seoul').format('YYYY-MM-DD.HH:mm:ss');
+    const date: string = moment().tz('Asia/Seoul').format('YYYY-MM-DD.HH:mm:ss.SSSSS');
 
     const redis: Redis = this.redisService.getClient();
     await redis.hset('adjust:event', date, JSON.stringify(postbackEventAdjust));

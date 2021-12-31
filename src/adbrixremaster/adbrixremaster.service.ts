@@ -72,7 +72,7 @@ export class AdbrixremasterService {
       aServerDatetime: moment.utc(request.query.a_server_datetime.replace('+', ' ')).tz('Asia/Seoul').format('YYYY-MM-DD HH:mm:ss'),
     });
 
-    const date: string = moment().tz('Asia/Seoul').format('YYYY-MM-DD.HH:mm:ss');
+    const date: string = moment().tz('Asia/Seoul').format('YYYY-MM-DD.HH:mm:ss.SSSSS');
 
     const redis: Redis = this.redisService.getClient();
     await redis.hset('adbrixremaster:install', date, JSON.stringify(postbackInstallAdbrixremaster));
@@ -133,7 +133,7 @@ export class AdbrixremasterService {
       revenue: 0,
     });
 
-    const date: string = moment().tz('Asia/Seoul').format('YYYY-MM-DD.HH:mm:ss');
+    const date: string = moment().tz('Asia/Seoul').format('YYYY-MM-DD.HH:mm:ss.SSSSS');
 
     const redis: Redis = this.redisService.getClient();
     await redis.hset('adbrixremaster:event', date, JSON.stringify(postbackEventAdbrixremaster));

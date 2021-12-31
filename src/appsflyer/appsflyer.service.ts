@@ -40,7 +40,7 @@ export class AppsflyerService {
       originalUrl: originalUrl,
     });
 
-    const date: string = moment().tz('Asia/Seoul').format('YYYY-MM-DD.HH:mm:ss');
+    const date: string = moment().tz('Asia/Seoul').format('YYYY-MM-DD.HH:mm:ss.SSSSS');
 
     const redis: Redis = this.redisService.getClient();
     await redis.hset('appsflyer:install', date, JSON.stringify(postbackInstallAppsflyer));
@@ -71,7 +71,7 @@ export class AppsflyerService {
       originalUrl: originalUrl,
     });
 
-    const date: string = moment().tz('Asia/Seoul').format('YYYY-MM-DD.HH:mm:ss');
+    const date: string = moment().tz('Asia/Seoul').format('YYYY-MM-DD.HH:mm:ss.SSSSS');
 
     const redis: Redis = this.redisService.getClient();
     await redis.hset('appsflyer:event', date, JSON.stringify(postbackEventAppsflyer));
