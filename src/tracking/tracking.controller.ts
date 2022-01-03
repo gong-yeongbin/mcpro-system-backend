@@ -12,7 +12,6 @@ export class TrackingController {
   @Redirect()
   async tracking(@Req() request: Request, @Query() query: TrackingDto, @Res() res: Response) {
     const redirectUrl: string = await this.trackingService.tracking(request, query);
-    console.log(res);
 
     console.log(`[ mecrosspro ---> tracker ] redirectUrl:${redirectUrl}`);
     return { url: redirectUrl, statusCode: 302 };
