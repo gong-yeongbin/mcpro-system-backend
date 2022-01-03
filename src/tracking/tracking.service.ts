@@ -119,6 +119,7 @@ export class TrackingService {
           .replace(/{uid}/gi, '');
         break;
     }
+    console.log(convertedTrackerTrackingUrl);
 
     return !query.uuid ? convertedTrackerTrackingUrl : convertedTrackerTrackingUrl + `&uuid=${query.uuid}`;
   }
