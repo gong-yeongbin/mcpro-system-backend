@@ -1,6 +1,6 @@
-import { Query, Redirect, Res } from '@nestjs/common';
+import { Query, Redirect } from '@nestjs/common';
 import { Controller, Get, Req } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Request } from 'express';
 import { TrackingDto } from './dto/tracking.dto';
 import { TrackingService } from './tracking.service';
 
@@ -10,7 +10,7 @@ export class TrackingController {
 
   @Get()
   @Redirect()
-  async tracking(@Req() request: Request, @Query() query: TrackingDto, @Res() res: Response) {
+  async tracking(@Req() request: Request, @Query() query: TrackingDto) {
     const redirectUrl: string = await this.trackingService.tracking(request, query);
 
     console.log(`[ mecrosspro ---> tracker ] redirectUrl:${redirectUrl}`);
