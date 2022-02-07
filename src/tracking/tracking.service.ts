@@ -118,6 +118,14 @@ export class TrackingService {
           .replace(/{click_id}/gi, query.click_id) //click id
           .replace(/{uid}/gi, '');
         break;
+      case 'singular':
+        convertedTrackerTrackingUrl = trackerTrackingUrl
+          .replace(/{idfa}/gi, idfa)
+          .replace(/{gaid}/gi, adid)
+          .replace(/{click_id}/gi, query.click_id) //click id
+          .replace(/{sub1}/gi, query.token) //view code
+          .replace(/{sub2}/gi, viewCode); //campaign code
+        break;
     }
 
     return !query.uuid ? convertedTrackerTrackingUrl : convertedTrackerTrackingUrl + `&uuid=${query.uuid}`;

@@ -9,6 +9,7 @@ import { AppClusterService } from './app-cluster/app-cluster.service';
 import { AppsflyerModule } from './appsflyer/appsflyer.module';
 import { AdbrixremasterModule } from './adbrixremaster/adbrixremaster.module';
 import { AdjustModule } from './adjust/adjust.module';
+import { SingularModule } from './singular/singular.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { AdjustModule } from './adjust/adjust.module';
     AppsflyerModule,
     AdbrixremasterModule,
     AdjustModule,
+    SingularModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppClusterService],
