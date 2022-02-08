@@ -19,7 +19,7 @@ export class TrackingService {
 
   async tracking(request: any, query: TrackingDto): Promise<string> {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
-    // console.log(`[ media ---> mecrosspro ] ${originalUrl}`);
+    console.log(`[ media ---> mecrosspro ] ${originalUrl}`);
 
     const todayDate: string = moment().tz('Asia/Seoul').format('YYYYMMDD');
     query.token = ['', undefined, '{token}'].includes(query.token) ? '' : query.token;
@@ -127,7 +127,6 @@ export class TrackingService {
           .replace(/{sub3}/gi, '') //campaign code
           .replace(/{sub4}/gi, '') //campaign code
           .replace(/{sub5}/gi, ''); //campaign code
-        console.log(`[ mecrosspro ---> tracker ] redirectUrl:${convertedTrackerTrackingUrl}`);
         break;
     }
 
