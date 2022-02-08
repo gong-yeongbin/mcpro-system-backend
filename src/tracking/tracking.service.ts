@@ -42,22 +42,19 @@ export class TrackingService {
           token: query.token,
           status: true,
         },
-        relations: ['media', 'advertising', 'advertising.tracker'],
+        relations: ['advertising', 'advertising.tracker'],
       });
 
-      if (!campaignEntity) {
-        throw new NotFoundException();
-      }
+      if (!campaignEntity) throw new NotFoundException();
 
-      redisData['mediaIdx'] = campaignEntity.media.idx.toString();
       redisData['tracker'] = campaignEntity.advertising.tracker.name;
       redisData['trackerTrackingUrl'] = campaignEntity.trackerTrackingUrl;
 
-      await redis.hset(query.token, 'mediaIdx', redisData.mediaIdx, 'tracker', redisData.tracker, 'trackerTrackingUrl', redisData.trackerTrackingUrl);
+      await redis.hset(query.token, 'tracker', redisData.tracker, 'trackerTrackingUrl', redisData.trackerTrackingUrl);
       await redis.expire(query.token, 21600);
     }
 
-    const redisKey: string = `${query.token}/${query.pub_id}/${query.sub_id}/${redisData.mediaIdx}` as string;
+    const redisKey: string = `${query.token}/${query.pub_id}/${query.sub_id}` as string;
 
     const isClickValidation: number = +(await redis.hget(todayDate, redisKey));
 
@@ -91,22 +88,22 @@ export class TrackingService {
           .replace('{af_siteid}', viewCode) //view code
           .replace('{af_c_id}', query.token) //campaign token
           .replace('{advertising_id}', query.adid) //android device id
-          .replace('{idfa}', query.idfa) //ios device id
-          .replace('{af_adset_id}', '')
-          .replace('{af_ad_id}', '')
-          .replace('{af_ip}', '') //device ip
-          .replace('{af_ua}', '') //user agent
-          .replace('{af_lang}', ''); //device language
+          .replace('{idfa}', query.idfa); //ios device id
+        // .replace('{af_adset_id}', '')
+        // .replace('{af_ad_id}', '')
+        // .replace('{af_ip}', '') //device ip
+        // .replace('{af_ua}', '') //user agent
+        // .replace('{af_lang}', ''); //device language
         break;
       case 'adbrixremaster':
         convertedTrackerTrackingUrl = trackerTrackingUrl
           .replace('{m_adid}', deviceId) //device id
           .replace('{m_publisher}', viewCode) //view code
-          .replace('{m_sub_publisher}', '') //view code
+          // .replace('{m_sub_publisher}', '') //view code
           .replace('{cb_1}', query.token) //campaign code
           .replace('{cb_2}', viewCode) //view code
           .replace('{cb_3}', query.click_id) //click id
-          .replace('{cb_4}', '')
+          // .replace('{cb_4}', '')
           .replace('{cb_5}', query.uuid);
         break;
       case 'adjust':
@@ -115,16 +112,21 @@ export class TrackingService {
           .replace(/{idfa}/gi, idfa) //view code
           .replace(/{publisher_id}/gi, viewCode) //view code
           .replace(/{cp_token}/gi, query.token) //campaign code
-          .replace(/{click_id}/gi, query.click_id) //click id
-          .replace(/{uid}/gi, '');
+          .replace(/{click_id}/gi, query.click_id); //click id
+        // .replace(/{uid}/gi, '');
         break;
       case 'singular':
         convertedTrackerTrackingUrl = trackerTrackingUrl
           .replace(/{idfa}/gi, idfa)
           .replace(/{gaid}/gi, adid)
+          .replace(/{campaignName}/gi, '')
+          .replace(/{campaignId}/gi, '')
           .replace(/{click_id}/gi, query.click_id) //click id
           .replace(/{sub1}/gi, query.token) //view code
-          .replace(/{sub2}/gi, viewCode); //campaign code
+          .replace(/{sub2}/gi, viewCode) //campaign code
+          .replace(/{sub3}/gi, '') //campaign code
+          .replace(/{sub4}/gi, '') //campaign code
+          .replace(/{sub5}/gi, ''); //campaign code
         break;
     }
 
