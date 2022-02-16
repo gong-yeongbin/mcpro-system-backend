@@ -15,3 +15,5 @@ export { default as PostbackEventAdbrixremaster } from '@entities/PostbackEventA
 export { default as PostbackInstallAdbrixremaster } from '@entities/PostbackInstallAdbrixremaster';
 export { default as PostbackInstallAdjust } from '@entities/PostbackInstallAdjust';
 export { default as PostbackEventAdjust } from '@entities/PostbackEventAdjust';
+export { default as PostbackInstallSingular } from '@entities/PostbackInstallSingular';
+export { default as PostbackEventSingular } from '@entities/PostbackEventSingular';
