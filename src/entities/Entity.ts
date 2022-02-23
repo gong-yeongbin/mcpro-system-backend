@@ -7,7 +7,6 @@ export { default as PostbackRegisteredEvent } from '@entities/PostbackRegistered
 export { default as PostbackEventAppsflyer } from './PostbackEventAppsflyer';
 export { default as PostbackInstallAppsflyer } from './PostbackInstallAppsflyer';
 export { default as Reservation } from '@entities/Reservation';
-export { default as SubMedia } from '@entities/Submedia';
 export { default as Tracker } from '@entities/Tracker';
 export { default as User } from '@entities/User';
 export { default as UserLog } from '@entities/UserLog';
