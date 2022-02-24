@@ -13,7 +13,7 @@ export class TrackingController {
   async tracking(@Req() request: Request, @Query() query: TrackingDto) {
     const redirectUrl: string = await this.trackingService.tracking(request, query);
 
-    // console.log(`[ mecrosspro ---> tracker ] redirectUrl:${redirectUrl}`);
+    console.log(`[ mecrosspro ---> tracker ] redirectUrl:${redirectUrl}`);
     return { url: redirectUrl, statusCode: 302 };
   }
 }
