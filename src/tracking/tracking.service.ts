@@ -124,6 +124,7 @@ export class TrackingService {
           .replace(/{click_id}/gi, query.click_id) //click id
           .replace(/{token}/gi, query.token) //view code
           .replace(/{view_code}/gi, viewCode) //campaign code
+          .replace(/{psid}/gi, viewCode) //campaign code
           .replace(/{sub3}/gi, query.click_id)
           .replace(/{sub4}/gi, '')
           .replace(/{sub5}/gi, '');
