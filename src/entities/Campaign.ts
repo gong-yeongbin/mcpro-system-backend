@@ -39,6 +39,14 @@ export default class Campaign {
   @Column('text', { name: 'mecrossTrackingUrl' })
   public mecrossTrackingUrl: string;
 
+  @Column('tinyint', {
+    name: 'block',
+    nullable: true,
+    width: 1,
+    default: () => "'0'",
+  })
+  public block: boolean | null;
+
   @Column('datetime', {
     name: 'updated_at',
     default: () => "'CURRENT_TIMESTAMP(6)'",

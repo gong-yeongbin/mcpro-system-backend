@@ -18,14 +18,6 @@ export default class Advertising {
   @Column('tinyint', { name: 'status', default: () => "'1'" })
   public status: boolean;
 
-  @Column('tinyint', {
-    name: 'block',
-    nullable: true,
-    width: 1,
-    default: () => "'0'",
-  })
-  public block: boolean | null;
-
   @Column('datetime', {
     name: 'created_at',
     default: () => "'CURRENT_TIMESTAMP(6)'",
