@@ -46,6 +46,7 @@ export class TrackingService {
       });
 
       if (!campaignEntity) throw new NotFoundException();
+      if (campaignEntity.advertising.block) return;
 
       redisData['tracker'] = campaignEntity.advertising.tracker.name;
       redisData['trackerTrackingUrl'] = campaignEntity.trackerTrackingUrl;
