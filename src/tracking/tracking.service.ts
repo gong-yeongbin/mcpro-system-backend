@@ -1,13 +1,17 @@
+import { Model } from 'mongoose';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RedisService } from 'nestjs-redis';
 import { Repository } from 'typeorm';
 import { Redis } from 'ioredis';
-import { Campaign } from '../entities/Entity';
 import { v4 } from 'uuid';
 import * as moment from 'moment';
 import { decodeUnicode } from 'src/util';
 import { TrackingDto } from './dto/tracking.dto';
+import { Campaign } from '../entities/Entity';
+import { InjectModel } from '@nestjs/mongoose';
+import { Config, ConfigDocument } from 'src/schema/Config';
+import { TrackingInfo, TrackingInfoDocument } from 'src/schema/TrackingInfo';
 
 @Injectable()
 export class TrackingService {
@@ -15,6 +19,8 @@ export class TrackingService {
     private readonly redisService: RedisService,
     @InjectRepository(Campaign)
     private readonly campaignRepository: Repository<Campaign>,
+    @InjectModel(Config.name) private configModel: Model<ConfigDocument>,
+    @InjectModel(TrackingInfo.name) private trackingInfoModel: Model<TrackingInfoDocument>,
   ) {}
 
   async tracking(request: any, query: TrackingDto): Promise<string> {
@@ -22,13 +28,12 @@ export class TrackingService {
     console.log(`[ media ---> mecrosspro ] ${originalUrl}`);
 
     const todayDate: string = moment().tz('Asia/Seoul').format('YYYYMMDD');
-    query.token = ['', undefined, '{token}'].includes(query.token) ? '' : query.token;
-    query.click_id = ['', undefined, '{click_id}'].includes(query.click_id) ? '' : query.click_id;
-    query.pub_id = ['', undefined, '{pub_id}'].includes(query.pub_id) ? '' : query.pub_id;
-    query.sub_id = ['', undefined, '{sub_id}'].includes(query.sub_id) ? '' : query.sub_id;
-    query.adid = ['', undefined, '{adid}'].includes(query.adid) ? '' : query.adid;
-    query.idfa = ['', undefined, '{idfa}'].includes(query.idfa) ? '' : query.idfa;
-    query.uuid = ['', undefined, '{uuid}'].includes(query.uuid) ? '' : query.uuid;
+
+    const configInstance: Config = await this.configModel.findOne({ name: 'identificationValue' });
+
+    if (configInstance.status) {
+      await this.trackingInfoModel.create(query);
+    }
 
     const redis: Redis = this.redisService.getClient();
 

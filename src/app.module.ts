@@ -10,6 +10,7 @@ import { AppsflyerModule } from './appsflyer/appsflyer.module';
 import { AdbrixremasterModule } from './adbrixremaster/adbrixremaster.module';
 import { AdjustModule } from './adjust/adjust.module';
 import { SingularModule } from './singular/singular.module';
+import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { SingularModule } from './singular/singular.module';
       synchronize: false,
       entities: [__dirname + '/**/*{.ts,.js}'],
     }),
+    MongooseModule.forRoot(process.env.MONGODB_URL),
     TrackingModule,
     AppsflyerModule,
     AdbrixremasterModule,
