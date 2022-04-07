@@ -11,6 +11,7 @@ import { AdbrixremasterModule } from './adbrixremaster/adbrixremaster.module';
 import { AdjustModule } from './adjust/adjust.module';
 import { SingularModule } from './singular/singular.module';
 import { MongooseModule } from '@nestjs/mongoose';
+import { DeveloperModule } from './developer/developer.module';
 
 @Module({
   imports: [
@@ -38,6 +39,8 @@ import { MongooseModule } from '@nestjs/mongoose';
     AdbrixremasterModule,
     AdjustModule,
     SingularModule,
+    ConfigModule,
+    DeveloperModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppClusterService],
