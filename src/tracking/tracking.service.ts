@@ -133,6 +133,15 @@ export class TrackingService {
           .replace(/{sub4}/gi, '')
           .replace(/{sub5}/gi, '');
         break;
+      case 'tradingworks':
+        convertedTrackerTrackingUrl = trackerTrackingUrl
+          .replace(/{transaction_id}/gi, query.click_id)
+          .replace(/{publisher_id}/gi, viewCode)
+          .replace(/{idfa}/gi, idfa)
+          .replace(/{adid}/gi, adid)
+          .replace(/{cb_param1}/gi, query.token)
+          .replace(/{cb_param2}/gi, '');
+        break;
     }
 
     return !query.uuid ? convertedTrackerTrackingUrl : convertedTrackerTrackingUrl + `&uuid=${query.uuid}`;
