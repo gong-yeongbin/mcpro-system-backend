@@ -12,6 +12,7 @@ import { AdjustModule } from './adjust/adjust.module';
 import { SingularModule } from './singular/singular.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { DeveloperModule } from './developer/developer.module';
+import { TradingworksModule } from './tradingworks/tradingworks.module';
 
 @Module({
   imports: [
@@ -33,14 +34,14 @@ import { DeveloperModule } from './developer/developer.module';
       synchronize: false,
       entities: [__dirname + '/**/*{.ts,.js}'],
     }),
-    MongooseModule.forRoot(process.env.MONGODB_URL),
+    // MongooseModule.forRoot(process.env.MONGODB_URL),
     TrackingModule,
     AppsflyerModule,
     AdbrixremasterModule,
     AdjustModule,
     SingularModule,
-    ConfigModule,
-    DeveloperModule,
+    TradingworksModule,
+    // DeveloperModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppClusterService],

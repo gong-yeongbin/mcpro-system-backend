@@ -16,3 +16,5 @@ export { default as PostbackInstallAdjust } from '@entities/PostbackInstallAdjus
 export { default as PostbackEventAdjust } from '@entities/PostbackEventAdjust';
 export { default as PostbackInstallSingular } from '@entities/PostbackInstallSingular';
 export { default as PostbackEventSingular } from '@entities/PostbackEventSingular';
+export { default as PostbackInstallTradingworks } from '@entities/PostbackInstallTradingworks';
+export { default as PostbackEventTradingworks } from '@entities/PostbackEventTradingworks';

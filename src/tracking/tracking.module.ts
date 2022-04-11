@@ -11,10 +11,10 @@ import { TrackingService } from './tracking.service';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Campaign]),
-    MongooseModule.forFeature([
-      { name: Config.name, schema: ConfigSchema },
-      { name: TrackingInfo.name, schema: TrackingInfoSchema },
-    ]),
+    // MongooseModule.forFeature([
+    //   { name: Config.name, schema: ConfigSchema },
+    //   { name: TrackingInfo.name, schema: TrackingInfoSchema },
+    // ]),
   ],
   controllers: [TrackingController],
   providers: [TrackingService],
