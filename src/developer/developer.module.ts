@@ -5,7 +5,7 @@ import { DeveloperController } from './developer.controller';
 import { DeveloperService } from './developer.service';
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: Config.name, schema: ConfigSchema }])],
+  // imports: [MongooseModule.forFeature([{ name: Config.name, schema: ConfigSchema }])],
   controllers: [DeveloperController],
   providers: [DeveloperService],
 })
