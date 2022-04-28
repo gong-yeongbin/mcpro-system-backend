@@ -28,7 +28,7 @@ export class TrackingService {
 
     const todayDate: string = moment().tz('Asia/Seoul').format('YYYYMMDD');
 
-    const configInstance: Config = await this.configModel.findOne({ name: 'tracking' });
+    const configInstance: Config = await this.configModel.findOne({ name: 'trackingInfo' });
     if (configInstance.status) {
       await this.trackingInfoModel.create(query);
     }
