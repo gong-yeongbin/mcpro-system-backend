@@ -19,19 +19,19 @@ export class TrackingService {
     private readonly redisService: RedisService,
     @InjectRepository(Campaign)
     private readonly campaignRepository: Repository<Campaign>,
+    @InjectModel(Config.name) private configModel: Model<ConfigDocument>,
+    @InjectModel(TrackingInfo.name) private trackingInfoModel: Model<TrackingInfoDocument>,
   ) {}
-  // @InjectModel(Config.name) private configModel: Model<ConfigDocument>,
-  // @InjectModel(TrackingInfo.name) private trackingInfoModel: Model<TrackingInfoDocument>,
   async tracking(request: any, query: TrackingDto): Promise<string> {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
     console.log(`[ media ---> mecrosspro ] ${originalUrl}`);
 
     const todayDate: string = moment().tz('Asia/Seoul').format('YYYYMMDD');
 
-    // const configInstance: Config = await this.configModel.findOne({ name: 'tracking' });
-    // if (configInstance.status) {
-    //   await this.trackingInfoModel.create(query);
-    // }
+    const configInstance: Config = await this.configModel.findOne({ name: 'tracking' });
+    if (configInstance.status) {
+      await this.trackingInfoModel.create(query);
+    }
 
     const redis: Redis = this.redisService.getClient();
 
