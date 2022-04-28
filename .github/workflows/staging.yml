@@ -1,4 +1,4 @@
-name: mecrosspro-system-develop
+name: mecrosspro-system-staging
 
 on:
   push:
