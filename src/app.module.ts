@@ -5,7 +5,6 @@ import { TrackingModule } from './tracking/tracking.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { RedisModule } from 'nestjs-redis';
-import { AppClusterService } from './app-cluster/app-cluster.service';
 import { AppsflyerModule } from './appsflyer/appsflyer.module';
 import { AdbrixremasterModule } from './adbrixremaster/adbrixremaster.module';
 import { AdjustModule } from './adjust/adjust.module';
@@ -44,7 +43,7 @@ import { TradingworksModule } from './tradingworks/tradingworks.module';
     DeveloperModule,
   ],
   controllers: [AppController],
-  providers: [AppService, AppClusterService],
+  providers: [AppService],
   exports: [ConfigModule],
 })
 export class AppModule {}
