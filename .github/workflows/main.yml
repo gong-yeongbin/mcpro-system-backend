@@ -1,4 +1,4 @@
-name: mecrosspro-system-main
+name: mecrosspro-system-production
 
 on:
   push:
@@ -32,7 +32,7 @@ jobs:
           aws_access_key: ${{secrets.AWS_ACCESS_KEY_ID}}
           aws_secret_key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
           application_name: 'mecrosspro-system'
-          environment_name: 'Mecrossprosystem-env'
+          environment_name: 'production'
           region: ap-northeast-2
-          version_label: 'mecrosspro-system-${{ github.run_number }}'
+          version_label: 'mecrosspro-production-${{ github.run_number }}'
           deployment_package: dist.zip
