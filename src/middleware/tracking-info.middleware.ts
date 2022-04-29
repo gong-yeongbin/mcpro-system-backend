@@ -1,7 +1,7 @@
 import { Model } from 'mongoose';
-import { ConsoleLogger, Injectable, NestMiddleware } from '@nestjs/common';
+import { Injectable, NestMiddleware } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { NextFunction, Request } from 'express';
+import { NextFunction } from 'express';
 import { Config, ConfigDocument } from 'src/schema/Config';
 import { TrackingInfo, TrackingInfoDocument } from 'src/schema/TrackingInfo';
 
