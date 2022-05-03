@@ -12,6 +12,7 @@ import { SingularModule } from './singular/singular.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { DeveloperModule } from './developer/developer.module';
 import { TradingworksModule } from './tradingworks/tradingworks.module';
+import { ClusterService } from './cluster.service';
 
 @Module({
   imports: [
@@ -43,7 +44,7 @@ import { TradingworksModule } from './tradingworks/tradingworks.module';
     DeveloperModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, ClusterService],
   exports: [ConfigModule],
 })
 export class AppModule {}
