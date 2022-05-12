@@ -127,6 +127,9 @@ export default class PostbackEventAirbridge {
   @Column('varchar', { name: 'product_info', nullable: true, length: 255 })
   public productInfo: string | null;
 
+  @Column('int', { name: 'revenue', default: 0 })
+  public revenue: number | null;
+
   @Column('varchar', { name: 'attributedChannel', nullable: true, length: 255 })
   public attributedChannel: string | null;
 

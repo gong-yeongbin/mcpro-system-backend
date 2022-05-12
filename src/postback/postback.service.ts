@@ -135,6 +135,7 @@ export class PostbackService {
       inAppPurchased: request.query.inAppPurchased,
       transactionId: request.query.transactionID,
       productInfo: request.query.product_info,
+      revenue: 0,
       attributedChannel: request.query.attributedChannel,
       campaign: request.query.campaign,
       adType: request.query.ad_type,
@@ -150,6 +151,18 @@ export class PostbackService {
       viewCode: request.query.sub_id,
       token: request.query.custom_param1,
     });
+
+    const productInfo: {
+      currency: string;
+      productId: string;
+      productName: string;
+      productPrice: number;
+      quantity: number;
+    }[] = JSON.parse(postbackEventAirbridge.productInfo);
+
+    for (let i = 0; i < productInfo.length; i++) {
+      postbackEventAirbridge.revenue += productInfo[i].productPrice;
+    }
 
     const date: string = moment().tz('Asia/Seoul').format('YYYY-MM-DD.HH:mm:ss.SSSSS');
 
