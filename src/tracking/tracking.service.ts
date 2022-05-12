@@ -135,7 +135,6 @@ export class TrackingService {
         convertedTrackerTrackingUrl = trackerTrackingUrl
           .replace(/{click_id}/gi, query.click_id)
           .replace(/{publisher_id}/gi, viewCode)
-          .replace(/{adid}/gi, deviceId)
           .replace(/{gaid}/gi, adid)
           .replace(/{idfa}/gi, idfa)
           .replace(/{custom_param1}/gi, query.token)

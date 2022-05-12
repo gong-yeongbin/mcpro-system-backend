@@ -36,12 +36,14 @@
     "moment-timezone": "^0.5.34",
     "mongoose": "^6.3.2",
     "mysql": "^2.18.1",
+    "nest-winston": "^1.6.2",
     "nestjs-redis": "git+https://github.com/GyanendroKh/nestjs-redis.git#nest8-fix",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.5.5",
     "typeorm": "^0.3.6",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "winston": "^3.7.2"
   },
   "devDependencies": {
     "@nestjs/cli": "^8.2.5",

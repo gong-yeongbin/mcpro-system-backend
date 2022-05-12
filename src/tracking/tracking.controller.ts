@@ -1,6 +1,7 @@
-import { Query, Redirect } from '@nestjs/common';
+import { Inject, LoggerService, Query, Redirect } from '@nestjs/common';
 import { Controller, Get, Req } from '@nestjs/common';
 import { Request } from 'express';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { TrackingDto } from './dto/tracking.dto';
 import { TrackingService } from './tracking.service';
 
