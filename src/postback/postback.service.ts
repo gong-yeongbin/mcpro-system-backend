@@ -1,4 +1,17 @@
-import { PostbackEventAirbridge, PostbackEventTradingworks, PostbackInstallAirbridge, PostbackInstallTradingworks } from '@entities/Entity';
+import {
+  PostbackEventAdbrixremaster,
+  PostbackEventAdjust,
+  PostbackEventAirbridge,
+  PostbackEventAppsflyer,
+  PostbackEventSingular,
+  PostbackEventTradingworks,
+  PostbackInstallAdbrixremaster,
+  PostbackInstallAdjust,
+  PostbackInstallAirbridge,
+  PostbackInstallAppsflyer,
+  PostbackInstallSingular,
+  PostbackInstallTradingworks,
+} from '@entities/Entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RedisService } from 'nestjs-redis';
@@ -15,6 +28,14 @@ export class PostbackService {
     @InjectRepository(PostbackEventAirbridge) private readonly postBackEventAirbridgeRepository: Repository<PostbackEventAirbridge>,
     @InjectRepository(PostbackInstallTradingworks) private readonly postbackInstallTradingworksRepository: Repository<PostbackInstallTradingworks>,
     @InjectRepository(PostbackEventTradingworks) private readonly postbackEventTradingworksRepository: Repository<PostbackEventTradingworks>,
+    @InjectRepository(PostbackInstallAppsflyer) private readonly postbackInstallAppsflyerRepository: Repository<PostbackInstallAppsflyer>,
+    @InjectRepository(PostbackEventAppsflyer) private readonly postbackEventAppsflyerRepository: Repository<PostbackEventAppsflyer>,
+    @InjectRepository(PostbackInstallAdbrixremaster) private readonly postbackInstallAdbrixremasterRepository: Repository<PostbackInstallAdbrixremaster>,
+    @InjectRepository(PostbackEventAdbrixremaster) private readonly postbackEventAdbrixremasterRepository: Repository<PostbackEventAdbrixremaster>,
+    @InjectRepository(PostbackInstallAdjust) private readonly postbackInstallAdjustRepository: Repository<PostbackInstallAdjust>,
+    @InjectRepository(PostbackEventAdjust) private readonly postbackEventAdjustRepository: Repository<PostbackEventAdjust>,
+    @InjectRepository(PostbackInstallSingular) private readonly postbackInstallSingularRepository: Repository<PostbackInstallSingular>,
+    @InjectRepository(PostbackEventSingular) private readonly postbackEventSingularRepository: Repository<PostbackEventSingular>,
   ) {}
 
   async installAirbridge(request: any) {
@@ -192,15 +213,343 @@ export class PostbackService {
     await redis.hset('tradingworks:event', date, JSON.stringify(postbackEventTradingworks));
   }
 
-  async InstallAppsflyer() {}
-  async EventAppsflyer() {}
+  async installAppsflyer(request: any) {
+    const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
+    console.log(`[ appsflyer ---> mecrosspro ] install : ${originalUrl}`);
 
-  async InstallAdbrixremaster() {}
-  async EventAdbrixremaster() {}
+    const postbackInstallAppsflyer: PostbackInstallAppsflyer = this.postbackInstallAppsflyerRepository.create({
+      viewCode: request.query.af_siteid,
+      token: request.query.af_c_id,
+      clickid: request.query.clickid,
+      afSiteid: request.query.af_siteid,
+      afCId: request.query.af_c_id,
+      advertisingId: request.query.advertising_id,
+      idfa: request.query.idfa,
+      idfv: request.query.idfv,
+      installTime: moment(moment.utc(request.query.install_time).toDate()).format('YYYY-MM-DD HH:mm:ss'),
+      countryCode: request.query.country_code,
+      language: request.query.language,
+      clickTime: moment(moment.utc(request.query.click_time).toDate()).format('YYYY-MM-DD HH:mm:ss'),
+      deviceCarrier: request.query.device_carrier,
+      deviceIp: request.query.device_ip,
+      originalUrl: originalUrl,
+    });
 
-  async InstallAdjust() {}
-  async EventAdjust() {}
+    const date: string = moment().tz('Asia/Seoul').format('YYYY-MM-DD.HH:mm:ss.SSSSS');
 
-  async InstallSingular() {}
-  async EventSingular() {}
+    const redis: Redis = this.redisService.getClient();
+    await redis.hset('appsflyer:install', date, JSON.stringify(postbackInstallAppsflyer));
+  }
+  async eventAppsflyer(request: any) {
+    const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
+    console.log(`[ appsflyer ---> mecrosspro ] event : ${originalUrl}`);
+
+    const postbackEventAppsflyer: PostbackEventAppsflyer = this.postbackEventAppsflyerRepository.create({
+      viewCode: request.query.af_siteid,
+      token: request.query.af_c_id,
+      clickid: request.query.clickid,
+      afSiteid: request.query.af_siteid,
+      afCId: request.query.af_c_id,
+      advertisingId: request.query.advertising_id,
+      idfa: request.query.idfa,
+      idfv: request.query.idfv,
+      installTime: moment(moment.utc(request.query.install_time).toDate()).format('YYYY-MM-DD HH:mm:ss'),
+      countryCode: request.query.country_code,
+      language: request.query.language,
+      eventName: request.query.event_name,
+      eventRevenueCurrency: request.query.event_revenue_currency == 'N/A' ? '' : request.query.event_revenue_currency,
+      eventRevenue: request.query.event_revenue == 'N/A' ? 0 : request.query.event_revenue,
+      eventTime: moment(moment.utc(request.query.event_time).toDate()).format('YYYY-MM-DD HH:mm:ss'),
+      deviceCarrier: request.query.device_carrier,
+      deviceIp: request.query.device_ip,
+      originalUrl: originalUrl,
+    });
+
+    const date: string = moment().tz('Asia/Seoul').format('YYYY-MM-DD.HH:mm:ss.SSSSS');
+
+    const redis: Redis = this.redisService.getClient();
+    await redis.hset('appsflyer:event', date, JSON.stringify(postbackEventAppsflyer));
+  }
+
+  async installAdbrixremaster(request: any) {
+    const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
+    console.log(`[ adbrixremaster ---> mecrosspro ] install : ${originalUrl}`);
+
+    const postbackInstallAdbrixremaster: PostbackInstallAdbrixremaster = this.postbackInstallAdbrixremasterRepository.create({
+      viewCode: request.query.cb_2,
+      token: request.query.cb_1,
+      aKey: request.query.a_key,
+      aCookie: request.query.a_cookie,
+      aIp: request.query.a_ip,
+      aFp: request.query.a_fp,
+      aCountry: request.query.a_country,
+      aCity: request.query.a_city,
+      aRegion: request.query.a_region,
+      aAppkey: request.query.a_appkey,
+      mPublisher: request.query.m_publisher,
+      mSubPublisher: request.query.m_sub_publisher,
+      adid: request.query.adid,
+      idfv: request.query.idfv,
+      adIdOptOut: request.query.ad_id_opt_out,
+      deviceOsVersion: request.query.device_os_version,
+      deviceModel: request.query.device_model,
+      deviceVendor: request.query.device_vendor,
+      deviceResolution: request.query.device_resolution,
+      devicePortrait: request.query.device_portrait,
+      devicePlatform: request.query.device_platform,
+      deviceNetwork: request.query.device_network,
+      deviceWifi: request.query.device_wifi,
+      deviceCarrier: request.query.device_carrier,
+      deviceLanguage: request.query.device_language,
+      deviceCountry: request.query.device_country,
+      deviceBuildId: request.query.device_build_id,
+      packageName: request.query.package_name,
+      appkey: request.query.appkey,
+      sdkVersion: request.query.sdk_version,
+      installer: request.query.installer,
+      appVersion: request.query.app_version,
+      attrType: request.query.attr_type,
+      eventName: request.query.event_name,
+      eventDatetime: moment.utc(request.query.event_datetime.replace('+', ' ')).tz('Asia/Seoul').format('YYYY-MM-DD HH:mm:ss'),
+      deeplinkPath: request.query.deeplink_path,
+      marketInstallBtnClicked: request.query.market_install_btn_clicked,
+      appInstallStart: request.query.app_install_start,
+      appInstallCompleted: request.query.app_install_completed,
+      appFirstOpen: request.query.app_first_open,
+      secondsGap: request.query.seconds_gap,
+      cb_1: request.query.cb_1,
+      cb_2: request.query.cb_2,
+      cb_3: request.query.cb_3,
+      cb_4: request.query.cb_4,
+      cb_5: request.query.cb_5,
+      originalUrl: originalUrl,
+      aServerDatetime: moment.utc(request.query.a_server_datetime.replace('+', ' ')).tz('Asia/Seoul').format('YYYY-MM-DD HH:mm:ss'),
+    });
+
+    const date: string = moment().tz('Asia/Seoul').format('YYYY-MM-DD.HH:mm:ss.SSSSS');
+
+    const redis: Redis = this.redisService.getClient();
+    await redis.hset('adbrixremaster:install', date, JSON.stringify(postbackInstallAdbrixremaster));
+  }
+  async eventAdbrixremaster(request: any) {
+    const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
+    console.log(`[ adbrixremaster ---> mecrosspro ] event : ${originalUrl}`);
+
+    const postbackEventAdbrixremaster: PostbackEventAdbrixremaster = this.postbackEventAdbrixremasterRepository.create({
+      viewCode: request.query.cb_2,
+      token: request.query.cb_1,
+      aKey: request.query.a_key,
+      aCookie: request.query.a_cookie,
+      aIp: request.query.a_ip,
+      aFp: request.query.a_fp,
+      aCountry: request.query.a_country,
+      aCity: request.query.a_city,
+      aRegion: request.query.a_region,
+      aAppkey: request.query.a_appkey,
+      mPublisher: request.query.m_publisher,
+      mSubPublisher: request.query.m_sub_publisher,
+      attrAdid: request.query.attr_adid,
+      attrEventDatetime: moment.utc(request.query.attr_event_datetime.replace('+', ' ')).tz('Asia/Seoul').format('YYYY-MM-DD HH:mm:ss'),
+      attrEventTimestamp: request.query.attr_event_timestamp,
+      attrSecondsGap: request.query.attr_seconds_gap,
+      adid: request.query.adid,
+      idfv: request.query.idfv,
+      adIdOptOut: request.query.ad_id_opt_out,
+      deviceOsVersion: request.query.device_os_version,
+      deviceModel: request.query.device_model,
+      deviceVendor: request.query.device_vendor,
+      deviceResolution: request.query.device_resolution,
+      devicePortrait: request.query.device_portrait,
+      devicePlatform: request.query.device_platform,
+      deviceNetwork: request.query.device_network,
+      deviceWifi: request.query.device_wifi,
+      deviceCarrier: request.query.device_carrier,
+      deviceLanguage: request.query.device_language,
+      deviceCountry: request.query.device_country,
+      deviceBuildId: request.query.device_build_id,
+      packageName: request.query.package_name,
+      appkey: request.query.appkey,
+      sdkVersion: request.query.sdk_version,
+      installer: request.query.installer,
+      appVersion: request.query.app_version,
+      eventName: request.query.event_name,
+      eventDatetime: moment.utc(request.query.event_datetime.replace('+', ' ')).tz('Asia/Seoul').format('YYYY-MM-DD HH:mm:ss'),
+      eventTimestamp: request.query.event_timestamp,
+      eventTimestampD: request.query.event_timestamp_d,
+      cb_1: request.query.cb_1,
+      cb_2: request.query.cb_2,
+      cb_3: request.query.cb_3,
+      cb_4: request.query.cb_4,
+      cb_5: request.query.cb_5,
+      paramJson: request.query.param_json,
+      originalUrl: originalUrl,
+      revenue: 0,
+    });
+
+    const date: string = moment().tz('Asia/Seoul').format('YYYY-MM-DD.HH:mm:ss.SSSSS');
+
+    const redis: Redis = this.redisService.getClient();
+    await redis.hset('adbrixremaster:event', date, JSON.stringify(postbackEventAdbrixremaster));
+  }
+
+  async installAdjust(request: any) {
+    const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
+    console.log(`[ adjust ---> mecrosspro ] install : ${originalUrl}`);
+
+    const postbackInstallAdjust: PostbackInstallAdjust = this.postbackInstallAdjustRepository.create({
+      cpToken: request.query.cp_token,
+      publisherId: request.query.publisher_id,
+      clickId: request.query.click_id,
+      uid: request.query.uid,
+      appId: request.query.app_id,
+      appVersion: request.query.app_version,
+      networkName: request.query.network_name,
+      campaignName: request.query.campaign_name,
+      adgroupName: request.query.adgroup_name,
+      adid: request.query.adid,
+      idfa: request.query.idfa,
+      idfv: request.query.idfv,
+      androidId: request.query.android_id,
+      gpsAdid: request.query.gps_adid,
+      ipAddress: request.query.ip_address,
+      clickTime: request.query.click_time,
+      engagementTime: request.query.engagement_time,
+      installedAt: request.query.installed_at,
+      isp: request.query.isp,
+      country: request.query.country,
+      language: request.query.language,
+      deviceName: request.query.device_name,
+      deviceType: request.query.device_type,
+      osName: request.query.os_name,
+      sdkVersion: request.query.sdk_version,
+      osVersion: request.query.os_version,
+      token: request.query.cp_token,
+      viewCode: request.query.publisher_id,
+      originalUrl: originalUrl,
+    });
+    const date: string = moment().tz('Asia/Seoul').format('YYYY-MM-DD.HH:mm:ss.SSSSS');
+
+    const redis: Redis = this.redisService.getClient();
+    await redis.hset('adjust:install', date, JSON.stringify(postbackInstallAdjust));
+  }
+  async eventAdjust(request: any) {
+    const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
+    console.log(`[ adjust ---> mecrosspro ] event : ${originalUrl}`);
+
+    const postbackEventAdjust: PostbackEventAdjust = this.postbackEventAdjustRepository.create({
+      eventToken: request.query.event_token,
+      eventType: request.query.event_type,
+      cpToken: request.query.cp_token,
+      publisherId: request.query.publisher_id,
+      clickId: request.query.click_id,
+      uid: request.query.uid,
+      appId: request.query.app_id,
+      appVersion: request.query.app_version,
+      networkName: request.query.network_name,
+      campaignName: request.query.campaign_name,
+      adgroupName: request.query.adgroup_name,
+      adid: request.query.adid,
+      idfa: request.query.idfa,
+      idfv: request.query.idfv,
+      androidId: request.query.android_id,
+      gpsAdid: request.query.gps_adid,
+      ipAddress: request.query.ip_address,
+      clickTime: request.query.click_time,
+      engagementTime: request.query.engagement_time,
+      installedAt: request.query.installed_at,
+      createdAt2: request.query.created_at,
+      isp: request.query.isp,
+      country: request.query.country,
+      language: request.query.language,
+      deviceName: request.query.device_name,
+      deviceType: request.query.device_type,
+      osName: request.query.os_name,
+      sdkVersion: request.query.sdk_version,
+      osVersion: request.query.os_version,
+      currency: request.query.currency,
+      revenue: request.query.revenue,
+      revenueFloat: request.query.revenue_float,
+      revenueUsd: request.query.revenue_usd,
+      revenueUsdCents: request.query.revenue_usd_cents,
+      reportingRevenue: request.query.reporting_revenue,
+      reportingCurrency: request.query.reporting_currency,
+      viewCode: request.query.publisher_id,
+      token: request.query.cp_token,
+      originalUrl: originalUrl,
+    });
+
+    const date: string = moment().tz('Asia/Seoul').format('YYYY-MM-DD.HH:mm:ss.SSSSS');
+
+    const redis: Redis = this.redisService.getClient();
+    await redis.hset('adjust:event', date, JSON.stringify(postbackEventAdjust));
+  }
+
+  async installSingular(request: any) {
+    const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
+    console.log(`[ singular ---> mecrosspro ] install : ${originalUrl}`);
+
+    const postbackIntallSingular: PostbackInstallSingular = this.postbackInstallSingularRepository.create({
+      viewCode: request.query.sub2,
+      token: request.query.sub1,
+      attributionIp: request.query.attribution_ip,
+      osVersion: request.query.os_version,
+      appVersion: request.query.app_version,
+      idfa: request.query.idfa,
+      idfv: request.query.idfv,
+      gaid: request.query.gaid,
+      attributionCountry: request.query.attribution_country,
+      platform: request.query.platform,
+      time: request.query.time,
+      utc: request.query.utc,
+      clickTime: request.query.click_time,
+      clickUtc: request.query.click_utc,
+      sub1: request.query.sub1,
+      sub2: request.query.sub2,
+      sub3: request.query.sub3,
+      sub4: request.query.sub4,
+      sub5: request.query.sub5,
+      originalUrl: originalUrl,
+    });
+
+    const date: string = moment().tz('Asia/Seoul').format('YYYY-MM-DD.HH:mm:ss.SSSSS');
+
+    const redis: Redis = this.redisService.getClient();
+    await redis.hset('singular:install', date, JSON.stringify(postbackIntallSingular));
+  }
+  async eventSingular(request: any) {
+    const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
+    console.log(`[ singular ---> mecrosspro ] event : ${originalUrl}`);
+
+    const postbackEventSingular: PostbackEventSingular = this.postbackEventSingularRepository.create({
+      viewCode: request.query.sub2,
+      token: request.query.sub1,
+      attributionIp: request.query.attribution_ip,
+      osVersion: request.query.os_version,
+      appVersion: request.query.app_version,
+      idfa: request.query.idfa,
+      idfv: request.query.idfv,
+      gaid: request.query.gaid,
+      attributionCountry: request.query.attribution_country,
+      platform: request.query.platform,
+      amount: request.query.amount,
+      currency: request.query.currency,
+      eventName: request.query.event_name,
+      eventAttrs: request.query.event_attrs,
+      time: request.query.time,
+      utc: request.query.utc,
+      clickTime: request.query.click_time,
+      clickUtc: request.query.click_utc,
+      sub1: request.query.sub1,
+      sub2: request.query.sub2,
+      sub3: request.query.sub3,
+      sub4: request.query.sub4,
+      sub5: request.query.sub5,
+      originalUrl: originalUrl,
+    });
+
+    const date: string = moment().tz('Asia/Seoul').format('YYYY-MM-DD.HH:mm:ss.SSSSS');
+
+    const redis: Redis = this.redisService.getClient();
+    await redis.hset('singular:event', date, JSON.stringify(postbackEventSingular));
+  }
 }
