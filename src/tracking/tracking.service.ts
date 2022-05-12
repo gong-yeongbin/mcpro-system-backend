@@ -131,6 +131,19 @@ export class TrackingService {
           .replace(/{cb_param1}/gi, query.token)
           .replace(/{cb_param2}/gi, '');
         break;
+      case 'airbridge':
+        convertedTrackerTrackingUrl = trackerTrackingUrl
+          .replace(/{click_id}/gi, query.click_id)
+          .replace(/{publisher_id}/gi, viewCode)
+          .replace(/{adid}/gi, deviceId)
+          .replace(/{gaid}/gi, adid)
+          .replace(/{idfa}/gi, idfa)
+          .replace(/{custom_param1}/gi, query.token)
+          .replace(/{custom_param2}/gi, '')
+          .replace(/{custom_param3}/gi, '')
+          .replace(/{custom_param4}/gi, '')
+          .replace(/{custom_param5}/gi, '');
+        break;
     }
 
     return !query.uuid ? convertedTrackerTrackingUrl : convertedTrackerTrackingUrl + `&uuid=${query.uuid}`;

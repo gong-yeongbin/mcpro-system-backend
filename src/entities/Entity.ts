@@ -18,3 +18,5 @@ export { default as PostbackInstallSingular } from '@entities/PostbackInstallSin
 export { default as PostbackEventSingular } from '@entities/PostbackEventSingular';
 export { default as PostbackInstallTradingworks } from '@entities/PostbackInstallTradingworks';
 export { default as PostbackEventTradingworks } from '@entities/PostbackEventTradingworks';
+export { default as PostbackInstallAirbridge } from '@entities/PostbackInstallAirbridge';
+export { default as PostbackEventAirbridge } from '@entities/PostbackEventAirbridge';

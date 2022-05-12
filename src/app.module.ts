@@ -11,8 +11,8 @@ import { AdjustModule } from './adjust/adjust.module';
 import { SingularModule } from './singular/singular.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { DeveloperModule } from './developer/developer.module';
-import { TradingworksModule } from './tradingworks/tradingworks.module';
 import { ClusterService } from './cluster.service';
+import { PostbackModule } from './postback/postback.module';
 
 @Module({
   imports: [
@@ -40,8 +40,8 @@ import { ClusterService } from './cluster.service';
     AdbrixremasterModule,
     AdjustModule,
     SingularModule,
-    TradingworksModule,
     DeveloperModule,
+    PostbackModule,
   ],
   controllers: [AppController],
   providers: [AppService, ClusterService],

@@ -41,7 +41,6 @@ export default class PostbackEventTradingworks {
 
   @Column('varchar', { name: 'cb_param2', nullable: true, length: 255 })
   public cbParam2: string | null;
-
   @Column('varchar', { name: 'action', nullable: true, length: 255 })
   public action: string | null;
 
