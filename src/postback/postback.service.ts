@@ -81,7 +81,7 @@ export class PostbackService {
       customParam3: request.query.custom_param3,
       customParam4: request.query.custom_param4,
       customParam5: request.query.custom_param5,
-      originalUrl: request.query.originalUrl,
+      originalUrl: originalUrl,
       viewCode: request.query.sub_id,
       token: request.query.custom_param1,
     });
