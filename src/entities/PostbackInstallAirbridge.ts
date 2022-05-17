@@ -85,16 +85,16 @@ export default class PostbackInstallAirbridge {
   @Column('varchar', { name: 'event_datetime', nullable: true, length: 255 })
   public eventDatetime: string | null;
 
-  @Column('int', { name: 'event_timestamp', nullable: true })
+  @Column('bigint', { name: 'event_timestamp', nullable: true })
   public eventTimestamp: number | null;
 
-  @Column('int', { name: 'install_timestamp', nullable: true })
+  @Column('bigint', { name: 'install_timestamp', nullable: true })
   public installTimestamp: number | null;
 
   @Column('varchar', { name: 'click_datetime', nullable: true, length: 255 })
   public clickDatetime: string | null;
 
-  @Column('int', { name: 'click_timestamp', nullable: true })
+  @Column('bigint', { name: 'click_timestamp', nullable: true })
   public clickTimestamp: number | null;
 
   @Column('text', { name: 'deeplink', nullable: true })

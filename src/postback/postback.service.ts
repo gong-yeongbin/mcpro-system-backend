@@ -152,16 +152,19 @@ export class PostbackService {
       token: request.query.custom_param1,
     });
 
-    const productInfo: {
-      currency: string;
-      productId: string;
-      productName: string;
-      productPrice: number;
-      quantity: number;
-    }[] = JSON.parse(postbackEventAirbridge.productInfo);
+    if (postbackEventAirbridge.productInfo) {
+      const productInfo: {
+        currency: string;
+        productId: string;
+        productName: string;
+        productPrice: number;
+        quantity: number;
+      }[] = JSON.parse(postbackEventAirbridge.productInfo);
 
-    for (let i = 0; i < productInfo.length; i++) {
-      postbackEventAirbridge.revenue += productInfo[i].productPrice;
+      for (let i = 0; i < productInfo.length; i++) {
+        postbackEventAirbridge.revenue += productInfo[i].productPrice;
+        postbackEventAirbridge.currency = productInfo[i].currency;
+      }
     }
 
     const date: string = moment().tz('Asia/Seoul').format('YYYY-MM-DD.HH:mm:ss.SSSSS');
