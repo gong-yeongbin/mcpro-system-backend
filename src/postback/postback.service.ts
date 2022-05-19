@@ -3,12 +3,14 @@ import {
   PostbackEventAdjust,
   PostbackEventAirbridge,
   PostbackEventAppsflyer,
+  PostbackEventMobiconnect,
   PostbackEventSingular,
   PostbackEventTradingworks,
   PostbackInstallAdbrixremaster,
   PostbackInstallAdjust,
   PostbackInstallAirbridge,
   PostbackInstallAppsflyer,
+  PostbackInstallMobiconnect,
   PostbackInstallSingular,
   PostbackInstallTradingworks,
 } from '@entities/Entity';
@@ -36,6 +38,8 @@ export class PostbackService {
     @InjectRepository(PostbackEventAdjust) private readonly postbackEventAdjustRepository: Repository<PostbackEventAdjust>,
     @InjectRepository(PostbackInstallSingular) private readonly postbackInstallSingularRepository: Repository<PostbackInstallSingular>,
     @InjectRepository(PostbackEventSingular) private readonly postbackEventSingularRepository: Repository<PostbackEventSingular>,
+    @InjectRepository(PostbackInstallMobiconnect) private readonly postbackInstallMobiconnectRepository: Repository<PostbackInstallMobiconnect>,
+    @InjectRepository(PostbackEventMobiconnect) private readonly postbackEventMobiconnectRepository: Repository<PostbackEventMobiconnect>,
   ) {}
 
   async installAirbridge(request: any) {
@@ -136,6 +140,7 @@ export class PostbackService {
       transactionId: request.query.transactionID,
       productInfo: request.query.product_info,
       revenue: 0,
+      currency: '',
       attributedChannel: request.query.attributedChannel,
       campaign: request.query.campaign,
       adType: request.query.ad_type,
@@ -567,5 +572,71 @@ export class PostbackService {
 
     const redis: Redis = this.redisService.getClient();
     await redis.hset('singular:event', date, JSON.stringify(postbackEventSingular));
+  }
+
+  async installMobiconnect(request: any) {
+    const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
+    console.log(`[ mobiconnect ---> mecrosspro ] install : ${originalUrl}`);
+
+    const postbackInstallMobiconnect: PostbackInstallMobiconnect = this.postbackInstallMobiconnectRepository.create({
+      viewCode: request.query.pub_id,
+      token: request.query.custom1,
+      pubId2: request.query.pub_id2,
+      subPubId: request.query.sub_pub_id,
+      clickId: request.query.click_id,
+      gaid: request.query.gaid,
+      idfa: request.query.idfa,
+      androidId: request.query.android_id,
+      os: request.query.os,
+      ip: request.query.ip,
+      carrier: request.query.carrier,
+      countryCode: request.query.country_code,
+      language: request.query.language,
+      clickTimestamp: request.query.click_timestamp,
+      installTimestamp: request.query.install_timestamp,
+      custom1: request.query.custom1,
+      custom2: request.query.custom2,
+      custom3: request.query.custom3,
+      originalUrl: originalUrl,
+    });
+
+    const date: string = moment().tz('Asia/Seoul').format('YYYY-MM-DD.HH:mm:ss.SSSSS');
+
+    const redis: Redis = this.redisService.getClient();
+    await redis.hset('mobiconnect:install', date, JSON.stringify(postbackInstallMobiconnect));
+  }
+  async eventMobiconnect(request: any) {
+    const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
+    console.log(`[ mobiconnect ---> mecrosspro ] event : ${originalUrl}`);
+
+    const postbackEventMobiconnect: PostbackEventMobiconnect = this.postbackEventMobiconnectRepository.create({
+      viewCode: request.query.pub_id,
+      token: request.query.custom1,
+      pubId2: request.query.pub_id,
+      subPubId: request.query.sub_pub_id,
+      clickId: request.query.click_id,
+      gaid: request.query.gaid,
+      idfa: request.query.idfa,
+      androidId: request.query.android_id,
+      os: request.query.os,
+      ip: request.query.ip,
+      carrier: request.query.carrier,
+      countryCode: request.query.country_code,
+      language: request.query.language,
+      clickTimestamp: request.query.click_timestamp,
+      installTimestamp: request.query.install_timestamp,
+      eventTimestamp: request.query.event_timestamp,
+      eventId: request.query.event_id,
+      revenue: request.query.revenue,
+      currency: request.query.currency,
+      custom1: request.query.custom1,
+      custom2: request.query.custom2,
+      custom3: request.query.custom,
+      originalUrl: originalUrl,
+    });
+    const date: string = moment().tz('Asia/Seoul').format('YYYY-MM-DD.HH:mm:ss.SSSSS');
+
+    const redis: Redis = this.redisService.getClient();
+    await redis.hset('mobiconnect:event', date, JSON.stringify(postbackEventMobiconnect));
   }
 }

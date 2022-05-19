@@ -20,3 +20,5 @@ export { default as PostbackInstallTradingworks } from '@entities/PostbackInstal
 export { default as PostbackEventTradingworks } from '@entities/PostbackEventTradingworks';
 export { default as PostbackInstallAirbridge } from '@entities/PostbackInstallAirbridge';
 export { default as PostbackEventAirbridge } from '@entities/PostbackEventAirbridge';
+export { default as PostbackInstallMobiconnect } from '@entities/PostbackInstallMobiconnect';
+export { default as PostbackEventMobiconnect } from '@entities/PostbackEventMobiconnect';
