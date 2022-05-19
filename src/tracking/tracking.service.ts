@@ -143,6 +143,18 @@ export class TrackingService {
           .replace(/{custom_param4}/gi, '')
           .replace(/{custom_param5}/gi, '');
         break;
+      case 'mobiconnect':
+        convertedTrackerTrackingUrl = trackerTrackingUrl
+          .replace(/{click_id}/gi, query.click_id)
+          .replace(/{view_code}}/gi, viewCode)
+          .replace(/{pub_sub_id2}}/gi, '')
+          .replace(/{gaid}/gi, adid)
+          .replace(/{ifa}/gi, idfa)
+          .replace(/{token}/gi, query.token)
+          .replace(/{custom_id2}/gi, '')
+          .replace(/{custom_id3}/gi, '');
+
+        break;
     }
 
     return !query.uuid ? convertedTrackerTrackingUrl : convertedTrackerTrackingUrl + `&uuid=${query.uuid}`;
