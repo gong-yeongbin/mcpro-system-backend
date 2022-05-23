@@ -30,7 +30,7 @@ import { PostbackModule } from './postback/postback.module';
       synchronize: false,
       entities: [__dirname + '/**/*{.ts,.js}'],
     }),
-    MongooseModule.forRoot(process.env.MONGODB_URL),
+    // MongooseModule.forRoot(process.env.MONGODB_URL),
     TrackingModule,
     DeveloperModule,
     PostbackModule,

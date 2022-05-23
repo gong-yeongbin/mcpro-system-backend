@@ -5,21 +5,22 @@ import { Config, ConfigDocument } from 'src/schema/Config';
 
 @Injectable()
 export class DeveloperService {
-  constructor(@InjectModel(Config.name) private configModel: Model<ConfigDocument>) {}
+  constructor() {}
 
+  // @InjectModel(Config.name) private configModel: Model<ConfigDocument>
   async getConfig() {
-    return await this.configModel.find();
+    // return await this.configModel.find();
   }
 
   async createConfig(body: { name: string }) {
-    try {
-      await this.configModel.create({ name: body.name });
-    } catch (error) {
-      throw new ConflictException();
-    }
+    // try {
+    //   await this.configModel.create({ name: body.name });
+    // } catch (error) {
+    //   throw new ConflictException();
+    // }
   }
 
   async putConfig(body: { name: string }) {
-    await this.configModel.updateOne({ name: body.name }, [{ $set: { status: { $not: '$status' } } }]);
+    // await this.configModel.updateOne({ name: body.name }, [{ $set: { status: { $not: '$status' } } }]);
   }
 }

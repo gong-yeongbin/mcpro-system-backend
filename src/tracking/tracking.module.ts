@@ -5,17 +5,17 @@ import { Campaign } from 'src/entities/Entity';
 import { TrackingInfoMiddleware } from 'src/middleware/tracking-info.middleware';
 import { TrackingMiddleware } from 'src/middleware/tracking.middleware';
 import { Config, ConfigSchema } from 'src/schema/Config';
-import { TrackingInfo, TrackingInfoSchema } from 'src/schema/TrackingInfo';
+// import { TrackingInfo, TrackingInfoSchema } from 'src/schema/TrackingInfo';
 import { TrackingController } from './tracking.controller';
 import { TrackingService } from './tracking.service';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Campaign]),
-    MongooseModule.forFeature([
-      { name: Config.name, schema: ConfigSchema },
-      { name: TrackingInfo.name, schema: TrackingInfoSchema },
-    ]),
+    // MongooseModule.forFeature([
+    //   { name: Config.name, schema: ConfigSchema },
+    //   { name: TrackingInfo.name, schema: TrackingInfoSchema },
+    // ]),
   ],
   controllers: [TrackingController],
   providers: [TrackingService],
@@ -23,6 +23,6 @@ import { TrackingService } from './tracking.service';
 export class TrackingModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(TrackingMiddleware).forRoutes(TrackingController);
-    consumer.apply(TrackingInfoMiddleware).forRoutes(TrackingController);
+    // consumer.apply(TrackingInfoMiddleware).forRoutes(TrackingController);
   }
 }
