@@ -21,6 +21,9 @@ import { decodeUnicode } from 'src/util';
 import { Repository } from 'typeorm';
 import * as moment from 'moment-timezone';
 import { Redis } from 'ioredis';
+import { InjectModel } from '@nestjs/mongoose';
+import { AirbridgeInstall, AirbridgeInstallDocument } from 'src/schema/airbridge_install';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class PostbackService {
@@ -40,11 +43,16 @@ export class PostbackService {
     @InjectRepository(PostbackEventSingular) private readonly postbackEventSingularRepository: Repository<PostbackEventSingular>,
     @InjectRepository(PostbackInstallMobiconnect) private readonly postbackInstallMobiconnectRepository: Repository<PostbackInstallMobiconnect>,
     @InjectRepository(PostbackEventMobiconnect) private readonly postbackEventMobiconnectRepository: Repository<PostbackEventMobiconnect>,
+    @InjectModel(AirbridgeInstall.name) private airbridgeInstallModel: Model<AirbridgeInstallDocument>,
   ) {}
 
   async installAirbridge(request: any) {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
     console.log(`[ airbridge ---> mecrosspro ] install : ${originalUrl}`);
+
+    await this.airbridgeInstallModel.create({
+      ...request.query,
+    });
 
     const postbackInstallAirbridge: PostbackInstallAirbridge = this.postBackInstallAirbridgeRepository.create({
       clickId: request.query.click_id,

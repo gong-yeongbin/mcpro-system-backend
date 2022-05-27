@@ -2,10 +2,7 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Campaign } from 'src/entities/Entity';
-import { TrackingInfoMiddleware } from 'src/middleware/tracking-info.middleware';
 import { TrackingMiddleware } from 'src/middleware/tracking.middleware';
-import { Config, ConfigSchema } from 'src/schema/Config';
-// import { TrackingInfo, TrackingInfoSchema } from 'src/schema/TrackingInfo';
 import { TrackingController } from './tracking.controller';
 import { TrackingService } from './tracking.service';
 

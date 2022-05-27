@@ -6,7 +6,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { RedisModule } from 'nestjs-redis';
 import { MongooseModule } from '@nestjs/mongoose';
-import { DeveloperModule } from './developer/developer.module';
 import { ClusterService } from './cluster.service';
 import { PostbackModule } from './postback/postback.module';
 
@@ -32,7 +31,6 @@ import { PostbackModule } from './postback/postback.module';
     }),
     // MongooseModule.forRoot(process.env.MONGODB_URL),
     TrackingModule,
-    DeveloperModule,
     PostbackModule,
   ],
   controllers: [AppController],

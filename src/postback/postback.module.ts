@@ -15,7 +15,9 @@ import {
   PostbackInstallTradingworks,
 } from '@entities/Entity';
 import { Module } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AirbridgeInstall, AirbridgeInstallSchema } from 'src/schema/airbridge_install';
 import { PostbackController } from './postback.controller';
 import { PostbackService } from './postback.service';
 
@@ -37,6 +39,8 @@ import { PostbackService } from './postback.service';
       PostbackEventSingular,
       PostbackEventMobiconnect,
     ]),
+    MongooseModule.forRoot(process.env.MONGODB_URL),
+    MongooseModule.forFeature([{ name: AirbridgeInstall.name, schema: AirbridgeInstallSchema }]),
   ],
   controllers: [PostbackController],
   providers: [PostbackService],
