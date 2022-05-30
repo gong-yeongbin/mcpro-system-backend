@@ -17,6 +17,7 @@ import {
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AirbridgeEvent, AirbridgeEventSchema } from 'src/schema/airbridge_event';
 import { AirbridgeInstall, AirbridgeInstallSchema } from 'src/schema/airbridge_install';
 import { PostbackController } from './postback.controller';
 import { PostbackService } from './postback.service';
@@ -40,7 +41,10 @@ import { PostbackService } from './postback.service';
       PostbackEventMobiconnect,
     ]),
     MongooseModule.forRoot(process.env.MONGODB_URL),
-    MongooseModule.forFeature([{ name: AirbridgeInstall.name, schema: AirbridgeInstallSchema }]),
+    MongooseModule.forFeature([
+      { name: AirbridgeInstall.name, schema: AirbridgeInstallSchema },
+      { name: AirbridgeEvent.name, schema: AirbridgeEventSchema },
+    ]),
   ],
   controllers: [PostbackController],
   providers: [PostbackService],

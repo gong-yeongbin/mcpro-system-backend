@@ -24,6 +24,7 @@ import { Redis } from 'ioredis';
 import { InjectModel } from '@nestjs/mongoose';
 import { AirbridgeInstall, AirbridgeInstallDocument } from 'src/schema/airbridge_install';
 import { Model } from 'mongoose';
+import { AirbridgeEvent, AirbridgeEventDocument } from 'src/schema/airbridge_event';
 
 @Injectable()
 export class PostbackService {
@@ -44,6 +45,7 @@ export class PostbackService {
     @InjectRepository(PostbackInstallMobiconnect) private readonly postbackInstallMobiconnectRepository: Repository<PostbackInstallMobiconnect>,
     @InjectRepository(PostbackEventMobiconnect) private readonly postbackEventMobiconnectRepository: Repository<PostbackEventMobiconnect>,
     @InjectModel(AirbridgeInstall.name) private airbridgeInstallModel: Model<AirbridgeInstallDocument>,
+    @InjectModel(AirbridgeEvent.name) private airbridgeEventModel: Model<AirbridgeEventDocument>,
   ) {}
 
   async installAirbridge(request: any) {
@@ -52,6 +54,8 @@ export class PostbackService {
 
     await this.airbridgeInstallModel.create({
       ...request.query,
+      limitAdTracking: Boolean(request.query.limitAdTracking),
+      isUnique: Boolean(request.query.isUnique),
     });
 
     const postbackInstallAirbridge: PostbackInstallAirbridge = this.postBackInstallAirbridgeRepository.create({
@@ -106,6 +110,13 @@ export class PostbackService {
   async eventAirbridge(request: any) {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
     console.log(`[ airbridge ---> mecrosspro ] event : ${originalUrl}`);
+
+    await this.airbridgeEventModel.create({
+      ...request.query,
+      limitAdTracking: Boolean(request.query.limitAdTracking),
+      isUnique: Boolean(request.query.isUnique),
+      inAppPurchased: Boolean(request.query.inAppPurchased),
+    });
 
     const postbackEventAirbridge: PostbackEventAirbridge = this.postBackEventAirbridgeRepository.create({
       clickId: request.query.click_id,
