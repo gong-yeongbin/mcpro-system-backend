@@ -25,6 +25,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { AirbridgeInstall, AirbridgeInstallDocument } from 'src/schema/airbridge_install';
 import { Model } from 'mongoose';
 import { AirbridgeEvent, AirbridgeEventDocument } from 'src/schema/airbridge_event';
+import { TradingworksInstall, TradingworksInstallDocument } from 'src/schema/tradingworks_install';
+import { TradingworksEvent, TradingworksEventDocument } from 'src/schema/tradingworks_event';
 
 @Injectable()
 export class PostbackService {
@@ -46,6 +48,8 @@ export class PostbackService {
     @InjectRepository(PostbackEventMobiconnect) private readonly postbackEventMobiconnectRepository: Repository<PostbackEventMobiconnect>,
     @InjectModel(AirbridgeInstall.name) private airbridgeInstallModel: Model<AirbridgeInstallDocument>,
     @InjectModel(AirbridgeEvent.name) private airbridgeEventModel: Model<AirbridgeEventDocument>,
+    @InjectModel(TradingworksInstall.name) private tradingworksInstallModel: Model<TradingworksInstallDocument>,
+    @InjectModel(TradingworksEvent.name) private tradingworksEventModel: Model<TradingworksEventDocument>,
   ) {}
 
   async installAirbridge(request: any) {
@@ -194,12 +198,16 @@ export class PostbackService {
     const date: string = moment().tz('Asia/Seoul').format('YYYY-MM-DD.HH:mm:ss.SSSSS');
 
     const redis: Redis = this.redisService.getClient();
-    await redis.hset('airbridge:event', date, JSON.stringify(postbackEventAirbridge));
+    // await redis.hset('airbridge:event', date, JSON.stringify(postbackEventAirbridge));
   }
 
   async installTradingworks(request: any) {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
     console.log(`[ tradingworks ---> mecrosspro ] install : ${originalUrl}`);
+
+    // await this.tradingworksInstallModel.create({
+    //   ...request.query,
+    // });
 
     const postbackInstallTradingworks: PostbackInstallTradingworks = this.postbackInstallTradingworksRepository.create({
       viewCode: request.query.publisher_id,
@@ -227,6 +235,10 @@ export class PostbackService {
   async eventTradingworks(request: any) {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
     console.log(`[ tradingworks ---> mecrosspro ] event : ${originalUrl}`);
+
+    // await this.tradingworksEventModel.create({
+    //   ...request.query,
+    // });
 
     const postbackEventTradingworks: PostbackEventTradingworks = this.postbackEventTradingworksRepository.create({
       viewCode: request.query.publisher_id,

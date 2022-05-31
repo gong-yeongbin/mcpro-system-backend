@@ -19,6 +19,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AirbridgeEvent, AirbridgeEventSchema } from 'src/schema/airbridge_event';
 import { AirbridgeInstall, AirbridgeInstallSchema } from 'src/schema/airbridge_install';
+import { TradingworksEvent, TradingworksEventSchema } from 'src/schema/tradingworks_event';
+import { TradingworksInstall, TradingworksInstallSchema } from 'src/schema/tradingworks_install';
 import { PostbackController } from './postback.controller';
 import { PostbackService } from './postback.service';
 
@@ -44,6 +46,8 @@ import { PostbackService } from './postback.service';
     MongooseModule.forFeature([
       { name: AirbridgeInstall.name, schema: AirbridgeInstallSchema },
       { name: AirbridgeEvent.name, schema: AirbridgeEventSchema },
+      { name: TradingworksInstall.name, schema: TradingworksInstallSchema },
+      { name: TradingworksEvent.name, schema: TradingworksEventSchema },
     ]),
   ],
   controllers: [PostbackController],
