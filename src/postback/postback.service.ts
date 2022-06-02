@@ -198,16 +198,16 @@ export class PostbackService {
     const date: string = moment().tz('Asia/Seoul').format('YYYY-MM-DD.HH:mm:ss.SSSSS');
 
     const redis: Redis = this.redisService.getClient();
-    // await redis.hset('airbridge:event', date, JSON.stringify(postbackEventAirbridge));
+    await redis.hset('airbridge:event', date, JSON.stringify(postbackEventAirbridge));
   }
 
   async installTradingworks(request: any) {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
     console.log(`[ tradingworks ---> mecrosspro ] install : ${originalUrl}`);
 
-    // await this.tradingworksInstallModel.create({
-    //   ...request.query,
-    // });
+    await this.tradingworksInstallModel.create({
+      ...request.query,
+    });
 
     const postbackInstallTradingworks: PostbackInstallTradingworks = this.postbackInstallTradingworksRepository.create({
       viewCode: request.query.publisher_id,
@@ -236,9 +236,9 @@ export class PostbackService {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
     console.log(`[ tradingworks ---> mecrosspro ] event : ${originalUrl}`);
 
-    // await this.tradingworksEventModel.create({
-    //   ...request.query,
-    // });
+    await this.tradingworksEventModel.create({
+      ...request.query,
+    });
 
     const postbackEventTradingworks: PostbackEventTradingworks = this.postbackEventTradingworksRepository.create({
       viewCode: request.query.publisher_id,
