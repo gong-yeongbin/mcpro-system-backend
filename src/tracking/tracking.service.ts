@@ -7,14 +7,20 @@ import { v4 } from 'uuid';
 import * as moment from 'moment';
 import { decodeUnicode } from 'src/util';
 import { TrackingDto } from './dto/tracking.dto';
-import { Campaign } from '../entities/Entity';
+import { Campaign as Campaign1 } from '../entities/Entity';
+import { InjectModel } from '@nestjs/mongoose';
+import { ImpressionCode, ImpressionCodeDocument } from 'src/schema/impressionCode';
+import { Model } from 'mongoose';
+import { Campaign, CampaignDocument } from 'src/schema/campaign';
 
 @Injectable()
 export class TrackingService {
   constructor(
     private readonly redisService: RedisService,
-    @InjectRepository(Campaign)
-    private readonly campaignRepository: Repository<Campaign>,
+    @InjectRepository(Campaign1)
+    private readonly campaignRepository: Repository<Campaign1>,
+    @InjectModel(Campaign.name) private campaignModel: Model<CampaignDocument>,
+    @InjectModel(ImpressionCode.name) private impressionCodeModel: Model<ImpressionCodeDocument>,
   ) {}
   async tracking(request: any, query: TrackingDto): Promise<string> {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
@@ -29,7 +35,7 @@ export class TrackingService {
     redisData = await redis.hgetall(query.token);
 
     if (!Object.keys(redisData).length) {
-      const campaignEntity: Campaign = await this.campaignRepository.findOne({
+      const campaignEntity: Campaign1 = await this.campaignRepository.findOne({
         where: {
           token: query.token,
           status: true,
@@ -55,6 +61,13 @@ export class TrackingService {
 
     let viewCode: string = await redis.hget('view_code', redisKey);
     if (!viewCode) viewCode = await this.isCreateViewCode(redis, redisKey);
+
+    const campaignInstance: Campaign = await this.campaignModel.findOne({ token: query.token });
+    const impressionCodeInstance: ImpressionCode = await this.impressionCodeModel.findOneAndUpdate(
+      { impressionCode: viewCode },
+      { $set: { campaign: campaignInstance, impressionCode: viewCode, pub_id: query.pub_id, sub_id: query.sub_id, updatedAt: Date.now() } },
+      { upsert: true },
+    );
 
     return await this.convertTrackerTrackingUrl(redisData, query, viewCode);
   }

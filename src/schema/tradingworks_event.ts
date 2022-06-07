@@ -43,7 +43,7 @@ export class TradingworksEvent {
   @Prop({ type: String })
   action: string;
 
-  @Prop({ type: Date, default: Date.now, expires: '90d' })
+  @Prop({ type: Date, default: Date.now(), expires: '90d' })
   createdAt: Date;
 }
 

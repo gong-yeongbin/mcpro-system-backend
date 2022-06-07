@@ -151,7 +151,7 @@ export class AirbridgeEvent {
   @Prop({ type: String })
   custom_param5: string;
 
-  @Prop({ type: Date, default: Date.now, expires: '90d' })
+  @Prop({ type: Date, default: Date.now(), expires: '90d' })
   createdAt: Date;
 }
 

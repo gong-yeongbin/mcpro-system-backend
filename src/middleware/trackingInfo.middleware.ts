@@ -1,9 +1,9 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Request, NextFunction } from 'express';
+import { NextFunction } from 'express';
 import { Model } from 'mongoose';
 import { Config, ConfigDocument } from 'src/schema/config';
-import { TrackingInfo, TrackingInfoDocument } from 'src/schema/tracking-info';
+import { TrackingInfo, TrackingInfoDocument } from 'src/schema/trackingInfo';
 
 @Injectable()
 export class TrackingInfoMiddleware implements NestMiddleware {

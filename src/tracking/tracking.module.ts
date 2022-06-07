@@ -1,20 +1,24 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Campaign } from 'src/entities/Entity';
+import { Campaign as Campaign1 } from 'src/entities/Entity';
 import { TrackingMiddleware } from 'src/middleware/tracking.middleware';
 import { TrackingInfoMiddleware } from 'src/middleware/trackingInfo.middleware';
+import { Campaign, CampaignSchema } from 'src/schema/campaign';
 import { Config, ConfigSchema } from 'src/schema/config';
-import { TrackingInfo, TrackingInfoSchema } from 'src/schema/tracking-info';
+import { ImpressionCode, ImpressionCodeSchema } from 'src/schema/impressionCode';
+import { TrackingInfo, TrackingInfoSchema } from 'src/schema/trackingInfo';
 import { TrackingController } from './tracking.controller';
 import { TrackingService } from './tracking.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Campaign]),
+    TypeOrmModule.forFeature([Campaign1]),
     MongooseModule.forFeature([
+      { name: Campaign.name, schema: CampaignSchema },
       { name: Config.name, schema: ConfigSchema },
       { name: TrackingInfo.name, schema: TrackingInfoSchema },
+      { name: ImpressionCode.name, schema: ImpressionCodeSchema },
     ]),
   ],
   controllers: [TrackingController],
