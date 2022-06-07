@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 export type AirbridgeInstallDocument = AirbridgeInstall & Document;
 
-@Schema({ versionKey: false, collection: 'airbridge_install', timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' } })
+@Schema({ versionKey: false, collection: 'airbridge_install' })
 export class AirbridgeInstall {
   @Prop({ type: String })
   click_id: string;
@@ -117,6 +117,9 @@ export class AirbridgeInstall {
 
   @Prop({ type: String })
   custom_param5: string;
+
+  @Prop({ type: Date, default: Date.now, expires: '90d' })
+  createdAt: Date;
 }
 
 export const AirbridgeInstallSchema = SchemaFactory.createForClass(AirbridgeInstall);

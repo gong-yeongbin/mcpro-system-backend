@@ -42,7 +42,6 @@ import { PostbackService } from './postback.service';
       PostbackEventSingular,
       PostbackEventMobiconnect,
     ]),
-    MongooseModule.forRoot(process.env.MONGODB_URL),
     MongooseModule.forFeature([
       { name: AirbridgeInstall.name, schema: AirbridgeInstallSchema },
       { name: AirbridgeEvent.name, schema: AirbridgeEventSchema },
