@@ -18,7 +18,7 @@ export class ImpressionCode {
   @Prop({ type: mongoose.Schema.Types.ObjectId, required: true, ref: 'campaign' })
   campaign: Campaign;
 
-  @Prop({ type: Date, default: Date.now(), expires: '1d' })
+  @Prop({ type: Date, default: Date.now(), expires: '30d' })
   updatedAt: Date;
 }
 
