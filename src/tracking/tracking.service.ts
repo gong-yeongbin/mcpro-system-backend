@@ -25,6 +25,7 @@ export class TrackingService {
   async tracking(request: any, query: TrackingDto): Promise<string> {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
     console.log(`[ media ---> mecrosspro ] ${originalUrl}`);
+    const redis: Redis = this.redisService.getClient();
 
     const token: string = query.token;
     const click_id: string = query.click_id;
@@ -36,13 +37,9 @@ export class TrackingService {
 
     const todayDate: string = moment().tz('Asia/Seoul').format('YYYYMMDD');
 
-    const redis: Redis = this.redisService.getClient();
+    let trackerTrackingUrl = await redis.hget(token, 'trackerTrackingUrl');
 
-    let redisData: any;
-    // eslint-disable-next-line prefer-const
-    redisData = await redis.hgetall(token);
-
-    if (!Object.keys(redisData).length) {
+    if (!trackerTrackingUrl) {
       const campaignEntity: Campaign1 = await this.campaignRepository.findOne({
         where: {
           token: token,
@@ -53,9 +50,7 @@ export class TrackingService {
       if (!campaignEntity) throw new NotFoundException();
       if (campaignEntity.block) return;
 
-      redisData['trackerTrackingUrl'] = campaignEntity.trackerTrackingUrl;
-
-      await redis.hset(token, 'tracker', redisData.tracker, 'trackerTrackingUrl', redisData.trackerTrackingUrl);
+      await redis.hset(token, 'trackerTrackingUrl', campaignEntity.trackerTrackingUrl);
       await redis.expire(token, 60 * 60);
     }
 
@@ -76,7 +71,7 @@ export class TrackingService {
 
     // return await this.convertTrackerTrackingUrl(redisData, query, viewCode);
     return (
-      redisData.trackerTrackingUrl
+      trackerTrackingUrl
         .replace(/{clickid}/gi, click_id)
         .replace(/{af_siteid}/gi, viewCode)
         .replace(/{af_c_id}/gi, token)
