@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RedisService } from 'nestjs-redis';
 import { Repository } from 'typeorm';
@@ -12,15 +12,17 @@ import { InjectModel } from '@nestjs/mongoose';
 import { ImpressionCode, ImpressionCodeDocument } from 'src/schema/impressionCode';
 import { Model } from 'mongoose';
 import { Campaign, CampaignDocument } from 'src/schema/campaign';
+import { CampaignService } from 'src/campaign/campaign.service';
+import { Mode } from 'fs';
 
 @Injectable()
 export class TrackingService {
   constructor(
     private readonly redisService: RedisService,
+    private readonly campaignService: CampaignService,
     @InjectRepository(Campaign1)
     private readonly campaignRepository: Repository<Campaign1>,
-    @InjectModel(Campaign.name) private campaignModel: Model<CampaignDocument>,
-    @InjectModel(ImpressionCode.name) private impressionCodeModel: Model<ImpressionCodeDocument>,
+    @InjectModel(ImpressionCode.name) private readonly impressionCodeModel: Model<ImpressionCodeDocument>,
   ) {}
   async tracking(request: any, query: TrackingDto): Promise<string> {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
@@ -38,16 +40,10 @@ export class TrackingService {
     let trackerTrackingUrl = await redis.hget(token, 'trackerTrackingUrl');
 
     if (!trackerTrackingUrl) {
-      const campaignEntity: Campaign1 = await this.campaignRepository.findOne({
-        where: {
-          token: token,
-          status: true,
-        },
-      });
+      // const campaignInstance: Campaign = await this.campaignService.getCampaign(token);
+      const campaignEntity: Campaign1 = await this.campaignService.getCampaign(token);
 
-      if (!campaignEntity) throw new NotFoundException();
-      if (campaignEntity.block) return;
-
+      // trackerTrackingUrl = campaignInstance.trackerTrackingUrl;
       trackerTrackingUrl = campaignEntity.trackerTrackingUrl;
 
       await redis.hset(token, 'trackerTrackingUrl', trackerTrackingUrl);
@@ -55,7 +51,6 @@ export class TrackingService {
     }
 
     const redisKey: string = `${token}/${pub_id}/${sub_id}` as string;
-
     const viewCode: string = (await redis.hget('view_code', redisKey)) ? await redis.hget('view_code', redisKey) : await this.isCreateViewCode(redis, redisKey);
 
     const todayDate: string = moment().tz('Asia/Seoul').format('YYYYMMDD');

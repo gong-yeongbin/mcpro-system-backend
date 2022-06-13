@@ -8,6 +8,7 @@ import { RedisModule } from 'nestjs-redis';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ClusterService } from './cluster.service';
 import { PostbackModule } from './postback/postback.module';
+import { CampaignModule } from './campaign/campaign.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { PostbackModule } from './postback/postback.module';
     MongooseModule.forRoot(process.env.MONGODB_URL),
     TrackingModule,
     PostbackModule,
+    CampaignModule,
   ],
   controllers: [AppController],
   providers: [AppService, ClusterService],
