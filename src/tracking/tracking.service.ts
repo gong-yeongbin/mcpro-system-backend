@@ -48,7 +48,9 @@ export class TrackingService {
       if (!campaignEntity) throw new NotFoundException();
       if (campaignEntity.block) return;
 
-      await redis.hset(token, 'trackerTrackingUrl', campaignEntity.trackerTrackingUrl);
+      trackerTrackingUrl = campaignEntity.trackerTrackingUrl;
+
+      await redis.hset(token, 'trackerTrackingUrl', trackerTrackingUrl);
       await redis.expire(token, 60 * 60);
     }
 
