@@ -68,11 +68,11 @@ export class TrackingService {
     let viewCode: string = await redis.hget('view_code', redisKey);
     if (!viewCode) viewCode = await this.isCreateViewCode(redis, redisKey);
 
-    await this.impressionCodeModel.findOneAndUpdate(
-      { token: token, pub_id: pub_id, sub_id: sub_id },
-      { $set: { token: token, impressionCode: viewCode, pub_id: pub_id, sub_id: sub_id, updatedAt: Date.now() } },
-      { upsert: true },
-    );
+    // await this.impressionCodeModel.findOneAndUpdate(
+    //   { token: token, pub_id: pub_id, sub_id: sub_id },
+    //   { $set: { token: token, impressionCode: viewCode, pub_id: pub_id, sub_id: sub_id, updatedAt: Date.now() } },
+    //   { upsert: true },
+    // );
 
     // return await this.convertTrackerTrackingUrl(redisData, query, viewCode);
     return (
