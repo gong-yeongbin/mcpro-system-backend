@@ -15,8 +15,8 @@ export class ImpressionCode {
   @Prop({ type: String, required: true })
   impressionCode: string;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, required: true, ref: 'campaign' })
-  campaign: Campaign;
+  @Prop({ type: String, required: true })
+  token: string;
 
   @Prop({ type: Date, default: Date.now(), expires: '30d' })
   updatedAt: Date;

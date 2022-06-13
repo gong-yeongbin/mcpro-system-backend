@@ -26,34 +26,40 @@ export class TrackingService {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
     console.log(`[ media ---> mecrosspro ] ${originalUrl}`);
 
+    const token: string = query.token;
+    const click_id: string = query.click_id;
+    const pub_id: string = query.pub_id;
+    const sub_id: string = query.sub_id;
+    const adid: string = query.adid;
+    const idfa: string = query.idfa;
+    const uuid: string = query.uuid;
+
     const todayDate: string = moment().tz('Asia/Seoul').format('YYYYMMDD');
 
     const redis: Redis = this.redisService.getClient();
 
     let redisData: any;
     // eslint-disable-next-line prefer-const
-    redisData = await redis.hgetall(query.token);
+    redisData = await redis.hgetall(token);
 
     if (!Object.keys(redisData).length) {
       const campaignEntity: Campaign1 = await this.campaignRepository.findOne({
         where: {
-          token: query.token,
+          token: token,
           status: true,
         },
-        relations: ['advertising', 'advertising.tracker'],
       });
 
       if (!campaignEntity) throw new NotFoundException();
       if (campaignEntity.block) return;
 
-      redisData['tracker'] = campaignEntity.advertising.tracker.name;
       redisData['trackerTrackingUrl'] = campaignEntity.trackerTrackingUrl;
 
-      await redis.hset(query.token, 'tracker', redisData.tracker, 'trackerTrackingUrl', redisData.trackerTrackingUrl);
-      await redis.expire(query.token, 21600);
+      await redis.hset(token, 'tracker', redisData.tracker, 'trackerTrackingUrl', redisData.trackerTrackingUrl);
+      await redis.expire(token, 60 * 60);
     }
 
-    const redisKey: string = `${query.token}/${query.pub_id}/${query.sub_id}` as string;
+    const redisKey: string = `${token}/${pub_id}/${sub_id}` as string;
 
     const isClickValidation: number = +(await redis.hget(todayDate, redisKey));
 
@@ -62,14 +68,41 @@ export class TrackingService {
     let viewCode: string = await redis.hget('view_code', redisKey);
     if (!viewCode) viewCode = await this.isCreateViewCode(redis, redisKey);
 
-    // const campaignInstance: Campaign = await this.campaignModel.findOne({ token: query.token });
-    // const impressionCodeInstance: ImpressionCode = await this.impressionCodeModel.findOneAndUpdate(
-    //   { impressionCode: viewCode },
-    //   { $set: { campaign: campaignInstance, impressionCode: viewCode, pub_id: query.pub_id, sub_id: query.sub_id, updatedAt: Date.now() } },
-    //   { upsert: true },
-    // );
+    await this.impressionCodeModel.findOneAndUpdate(
+      { token: token, pub_id: pub_id, sub_id: sub_id },
+      { $set: { token: token, impressionCode: viewCode, pub_id: pub_id, sub_id: sub_id, updatedAt: Date.now() } },
+      { upsert: true },
+    );
 
-    return await this.convertTrackerTrackingUrl(redisData, query, viewCode);
+    // return await this.convertTrackerTrackingUrl(redisData, query, viewCode);
+    return (
+      redisData.trackerTrackingUrl
+        .replace(/{clickid}/gi, click_id)
+        .replace(/{af_siteid}/gi, viewCode)
+        .replace(/{af_c_id}/gi, token)
+        .replace(/{advertising_id}/gi, adid)
+        .replace(/{idfa}/gi, idfa)
+        .replace(/{m_adid}/gi, adid ? adid : idfa)
+        .replace(/{m_publisher}/gi, viewCode)
+        .replace(/{cb_1}/gi, token)
+        .replace(/{cb_2}/gi, viewCode)
+        .replace(/{cb_3}/gi, click_id)
+        .replace(/{cb_5}/gi, uuid)
+        .replace(/{adid}/gi, adid)
+        .replace(/{publisher_id}/gi, viewCode)
+        .replace(/{cp_token}/gi, token)
+        .replace(/{click_id}/gi, click_id)
+        .replace(/{gaid}/gi, adid)
+        .replace(/{token}/gi, token)
+        .replace(/{view_code}/gi, viewCode)
+        .replace(/{psid}/gi, viewCode)
+        .replace(/{sub3}/gi, click_id)
+        .replace(/{transaction_id}/gi, click_id)
+        .replace(/{cb_param1}/gi, token)
+        .replace(/{custom_param1}/gi, token)
+        .replace(/{view_code}}/gi, viewCode)
+        .replace(/{ifa}/gi, idfa) + `&uuid=${uuid}`
+    );
   }
 
   async isCreateViewCode(redis: Redis, redisKey: string): Promise<string> {
