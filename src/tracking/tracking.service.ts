@@ -35,8 +35,6 @@ export class TrackingService {
     const idfa: string = query.idfa;
     const uuid: string = query.uuid;
 
-    const todayDate: string = moment().tz('Asia/Seoul').format('YYYYMMDD');
-
     let trackerTrackingUrl = await redis.hget(token, 'trackerTrackingUrl');
 
     if (!trackerTrackingUrl) {
@@ -56,47 +54,41 @@ export class TrackingService {
 
     const redisKey: string = `${token}/${pub_id}/${sub_id}` as string;
 
+    const viewCode: string = (await redis.hget('view_code', redisKey)) ? await redis.hget('view_code', redisKey) : await this.isCreateViewCode(redis, redisKey);
+
+    const todayDate: string = moment().tz('Asia/Seoul').format('YYYYMMDD');
     const isClickValidation: number = +(await redis.hget(todayDate, redisKey));
-
     !!!isClickValidation ? await redis.hset(todayDate, redisKey, 1) : await redis.hincrby(todayDate, redisKey, 1);
-
-    let viewCode: string = await redis.hget('view_code', redisKey);
-    if (!viewCode) viewCode = await this.isCreateViewCode(redis, redisKey);
-
-    // await this.impressionCodeModel.findOneAndUpdate(
-    //   { token: token, pub_id: pub_id, sub_id: sub_id },
-    //   { $set: { token: token, impressionCode: viewCode, pub_id: pub_id, sub_id: sub_id, updatedAt: Date.now() } },
-    //   { upsert: true },
-    // );
 
     // return await this.convertTrackerTrackingUrl(redisData, query, viewCode);
     return (
       trackerTrackingUrl
         .replace(/{clickid}/gi, click_id)
         .replace(/{af_siteid}/gi, viewCode)
-        .replace(/{af_c_id}/gi, token)
-        .replace(/{advertising_id}/gi, adid)
-        .replace(/{idfa}/gi, idfa)
-        .replace(/{m_adid}/gi, adid ? adid : idfa)
         .replace(/{m_publisher}/gi, viewCode)
-        .replace(/{cb_1}/gi, token)
-        .replace(/{cb_2}/gi, viewCode)
-        .replace(/{cb_3}/gi, click_id)
-        .replace(/{cb_5}/gi, uuid)
-        .replace(/{adid}/gi, adid)
         .replace(/{publisher_id}/gi, viewCode)
-        .replace(/{cp_token}/gi, token)
-        .replace(/{click_id}/gi, click_id)
-        .replace(/{gaid}/gi, adid)
-        .replace(/{token}/gi, token)
         .replace(/{view_code}/gi, viewCode)
         .replace(/{psid}/gi, viewCode)
-        .replace(/{sub3}/gi, click_id)
+        .replace(/{cb_2}/gi, viewCode)
+        .replace(/{view_code}}/gi, viewCode)
+        .replace(/{clickid}/gi, click_id)
+        .replace(/{click_id}/gi, click_id)
         .replace(/{transaction_id}/gi, click_id)
+        .replace(/{cb_3}/gi, click_id)
+        .replace(/{sub3}/gi, click_id)
+        .replace(/{af_c_id}/gi, token)
+        .replace(/{cb_1}/gi, token)
+        .replace(/{cp_token}/gi, token)
         .replace(/{cb_param1}/gi, token)
         .replace(/{custom_param1}/gi, token)
-        .replace(/{view_code}}/gi, viewCode)
-        .replace(/{ifa}/gi, idfa) + `&uuid=${uuid}`
+        .replace(/{token}/gi, token)
+        .replace(/{m_adid}/gi, adid ? adid : idfa)
+        .replace(/{advertising_id}/gi, adid)
+        .replace(/{adid}/gi, adid)
+        .replace(/{gaid}/gi, adid)
+        .replace(/{ifa}/gi, idfa)
+        .replace(/{idfa}/gi, idfa)
+        .replace(/{cb_5}/gi, uuid) + `&uuid=${uuid}`
     );
   }
 
