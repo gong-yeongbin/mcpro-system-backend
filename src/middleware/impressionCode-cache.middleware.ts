@@ -21,11 +21,11 @@ export class ImpressionCodeCacheMiddleware implements NestMiddleware {
       await redis.hset('view_code', `${token}/${pub_id}/${sub_id}`, viewCode);
     }
 
-    const impressionCode: string = await redis.get(`${token}:${pub_id}:${sub_id}`);
+    // const impressionCode: string = await redis.get(`${token}:${pub_id}:${sub_id}`);
 
-    if (!impressionCode) await redis.set(`${token}:${pub_id}:${sub_id}`, viewCode);
+    // if (!impressionCode) await redis.set(`${token}:${pub_id}:${sub_id}`, viewCode);
 
-    await redis.expire(`${token}:${pub_id}:${sub_id}`, 60 * 60 * 24 * 15);
+    // await redis.expire(`${token}:${pub_id}:${sub_id}`, 60 * 60 * 24 * 15);
 
     next();
   }
