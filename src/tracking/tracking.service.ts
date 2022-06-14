@@ -34,7 +34,7 @@ export class TrackingService {
 
     const trackerTrackingUrl = await redis.hget(token, 'trackerTrackingUrl');
 
-    // const impressionCode: string = await redis.get(`${token}:${pub_id}:${sub_id}`);
+    const impressionCode: string = await redis.get(`${token}:${pub_id}:${sub_id}`);
 
     const viewCode: string = await redis.hget('view_code', `${token}/${pub_id}/${sub_id}`);
 
