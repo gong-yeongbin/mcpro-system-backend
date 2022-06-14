@@ -18,7 +18,7 @@ export class ImpressionCode {
   @Prop({ type: String, required: true })
   token: string;
 
-  @Prop({ type: Date, default: Date.now(), expires: '30d' })
+  @Prop({ type: Date, default: Date.now(), expires: '15d' })
   updatedAt: Date;
 }
 
