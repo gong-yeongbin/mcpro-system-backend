@@ -25,12 +25,6 @@ export class ImpressionCodeCacheMiddleware implements NestMiddleware {
     const viewCode: string = await redis.hget('view_code', `${token}/${pub_id}/${sub_id}`);
     if (!viewCode) await redis.hset('view_code', `${token}/${pub_id}/${sub_id}`, v4().replace(/-/g, ''));
 
-    await this.impressionCodeModel.findOneAndUpdate(
-      { token: token, pub_id: pub_id, sub_id: sub_id },
-      { $set: { impressionCode: viewCode, updatedAt: Date.now() } },
-      { upsert: true },
-    );
-
     // const impressionCode: string = await redis.get(`${token}:${pub_id}:${sub_id}`);
 
     // if (!impressionCode) await redis.set(`${token}:${pub_id}:${sub_id}`, v4().replace(/-/g, ''));
