@@ -1,24 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { RedisService } from 'nestjs-redis';
 import { Redis } from 'ioredis';
-import { v4 } from 'uuid';
 import * as moment from 'moment';
 import { decodeUnicode } from 'src/util';
 import { TrackingDto } from './dto/tracking.dto';
-import { Campaign as Campaign1 } from '../entities/Entity';
-import { InjectModel } from '@nestjs/mongoose';
-import { ImpressionCode, ImpressionCodeDocument } from 'src/schema/impressionCode';
-import { Model } from 'mongoose';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
 
 @Injectable()
 export class TrackingService {
-  constructor(
-    private readonly redisService: RedisService,
-    @InjectRepository(Campaign1)
-    @InjectModel(ImpressionCode.name)
-    private readonly impressionCodeModel: Model<ImpressionCodeDocument>,
-  ) {}
+  constructor(private readonly redisService: RedisService, @InjectQueue('tracking') private readonly trackingQueue: Queue) {}
   async tracking(request: any, query: TrackingDto): Promise<string> {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
     console.log(`[ media ---> mecrosspro ] ${originalUrl}`);
@@ -33,8 +24,13 @@ export class TrackingService {
     const uuid: string = query.uuid;
 
     const trackerTrackingUrl = await redis.hget(token, 'trackerTrackingUrl');
-
     const impressionCode: string = await redis.get(`${token}:${pub_id}:${sub_id}`);
+
+    await this.trackingQueue.add(
+      'click',
+      { token: token, pub_id: pub_id, sub_id: sub_id, impressionCode: impressionCode },
+      { removeOnComplete: true, backoff: 1 },
+    );
 
     const viewCode: string = await redis.hget('view_code', `${token}/${pub_id}/${sub_id}`);
 

@@ -9,6 +9,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ClusterService } from './cluster.service';
 import { PostbackModule } from './postback/postback.module';
 import { CampaignModule } from './campaign/campaign.module';
+import { BullModule } from '@nestjs/bull';
 
 @Module({
   imports: [
@@ -29,6 +30,12 @@ import { CampaignModule } from './campaign/campaign.module';
       database: process.env.MYSQL_DATABASE,
       synchronize: false,
       entities: [__dirname + '/**/*{.ts,.js}'],
+    }),
+    BullModule.forRoot({
+      redis: {
+        host: process.env.REDIS_QUEUE_HOST,
+        port: +process.env.REDIS_QUEUE_PORT,
+      },
     }),
     MongooseModule.forRoot(process.env.MONGODB_URL),
     TrackingModule,
