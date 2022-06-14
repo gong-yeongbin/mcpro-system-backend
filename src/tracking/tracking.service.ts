@@ -53,6 +53,12 @@ export class TrackingService {
     const redisKey: string = `${token}/${pub_id}/${sub_id}` as string;
     const viewCode: string = (await redis.hget('view_code', redisKey)) ? await redis.hget('view_code', redisKey) : await this.isCreateViewCode(redis, redisKey);
 
+    const impressionCode: ImpressionCode = await this.impressionCodeModel.findOneAndUpdate(
+      { token: token, pub_id: pub_id, sub_id: sub_id },
+      { $set: { token: token, pub_id: pub_id, sub_id: sub_id, impressionCode: viewCode, updatedAt: Date.now() } },
+      { new: true, upsert: true },
+    );
+
     const todayDate: string = moment().tz('Asia/Seoul').format('YYYYMMDD');
     const isClickValidation: number = +(await redis.hget(todayDate, redisKey));
     !!!isClickValidation ? await redis.hset(todayDate, redisKey, 1) : await redis.hincrby(todayDate, redisKey, 1);

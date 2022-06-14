@@ -16,7 +16,12 @@ export class CampaignService {
   ) {}
 
   async getCampaign(token: string): Promise<Campaign1> {
-    // const campaignInstance: Campaign await this.campaignModel.findOne({ token: token, status: true });
+    // const campaignInstance: Campaign = await this.campaignModel.findOne({ token: token, status: true });
+
+    // if (!campaignInstance) throw new NotFoundException();
+
+    // return campaignInstance;
+
     const campaignEntity: Campaign1 = await this.campaignRepository.findOne({
       where: {
         token: token,
@@ -24,7 +29,6 @@ export class CampaignService {
       },
     });
 
-    // if (!campaignInstance) throw new NotFoundException();
     if (!campaignEntity) throw new NotFoundException();
 
     return campaignEntity;
