@@ -34,20 +34,14 @@ export class TrackingService {
 
     const trackerTrackingUrl = await redis.hget(token, 'trackerTrackingUrl');
 
-    const redisKey: string = `${token}/${pub_id}/${sub_id}` as string;
-    const viewCode: string = (await redis.hget('view_code', redisKey)) ? await redis.hget('view_code', redisKey) : await this.isCreateViewCode(redis, redisKey);
+    // const impressionCode: string = await redis.get(`${token}:${pub_id}:${sub_id}`);
 
-    // const impressionCode: ImpressionCode = await this.impressionCodeModel.findOneAndUpdate(
-    //   { token: token, pub_id: pub_id, sub_id: sub_id },
-    //   { $set: { token: token, pub_id: pub_id, sub_id: sub_id, impressionCode: viewCode, updatedAt: Date.now() } },
-    //   { new: true, upsert: true },
-    // );
+    const viewCode: string = await redis.hget('view_code', `${token}/${pub_id}/${sub_id}`);
 
     const todayDate: string = moment().tz('Asia/Seoul').format('YYYYMMDD');
-    const isClickValidation: number = +(await redis.hget(todayDate, redisKey));
-    !!!isClickValidation ? await redis.hset(todayDate, redisKey, 1) : await redis.hincrby(todayDate, redisKey, 1);
+    const isClickValidation: number = +(await redis.hget(todayDate, `${token}/${pub_id}/${sub_id}`));
+    !!!isClickValidation ? await redis.hset(todayDate, `${token}/${pub_id}/${sub_id}`, 1) : await redis.hincrby(todayDate, `${token}/${pub_id}/${sub_id}`, 1);
 
-    // return await this.convertTrackerTrackingUrl(redisData, query, viewCode);
     return (
       trackerTrackingUrl
         .replace(/{clickid}/gi, click_id)
@@ -77,12 +71,6 @@ export class TrackingService {
         .replace(/{idfa}/gi, idfa)
         .replace(/{cb_5}/gi, uuid) + `&uuid=${uuid}`
     );
-  }
-
-  async isCreateViewCode(redis: Redis, redisKey: string): Promise<string> {
-    const viewCode = v4().replace(/-/g, '');
-    await redis.hset('view_code', redisKey, viewCode);
-    return viewCode;
   }
 }
 
