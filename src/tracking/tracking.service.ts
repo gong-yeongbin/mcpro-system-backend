@@ -37,7 +37,7 @@ export class TrackingService {
       await redis.hincrby(date, `${token}/${pub_id}/${sub_id}`, 1);
     }
 
-    await this.trackingQueue.add('click', { token: token, pub_id: pub_id, sub_id: sub_id, impressionCode: viewCode }, { removeOnComplete: true, backoff: 1 });
+    // await this.trackingQueue.add('click', { token: token, pub_id: pub_id, sub_id: sub_id, impressionCode: viewCode }, { removeOnComplete: true, backoff: 1 });
 
     return (
       trackerTrackingUrl
