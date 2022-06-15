@@ -27,7 +27,7 @@ export class TrackingService {
     // const impressionCode: string = await redis.get(`${token}:${pub_id}:${sub_id}`);
 
     const viewCode: string = await redis.hget('view_code', `${token}/${pub_id}/${sub_id}`);
-    await this.trackingQueue.add('click', { token: token, pub_id: pub_id, sub_id: sub_id, impressionCode: viewCode }, { removeOnComplete: true, backoff: 1 });
+    // await this.trackingQueue.add('click', { token: token, pub_id: pub_id, sub_id: sub_id, impressionCode: viewCode }, { removeOnComplete: true, backoff: 1 });
 
     const todayDate: string = moment().tz('Asia/Seoul').format('YYYYMMDD');
     const isClickValidation: number = +(await redis.hget(todayDate, `${token}/${pub_id}/${sub_id}`));
