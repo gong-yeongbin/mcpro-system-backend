@@ -26,11 +26,18 @@ export class TrackingService {
     const trackerTrackingUrl = await redis.hget(token, 'trackerTrackingUrl');
 
     const viewCode: string = await redis.hget('view_code', `${token}/${pub_id}/${sub_id}`);
-    await this.trackingQueue.add('click', { token: token, pub_id: pub_id, sub_id: sub_id, impressionCode: viewCode }, { removeOnComplete: true, backoff: 1 });
 
-    const todayDate: string = moment().tz('Asia/Seoul').format('YYYYMMDD');
-    const isClickValidation: number = +(await redis.hget(todayDate, `${token}/${pub_id}/${sub_id}`));
-    !!!isClickValidation ? await redis.hset(todayDate, `${token}/${pub_id}/${sub_id}`, 1) : await redis.hincrby(todayDate, `${token}/${pub_id}/${sub_id}`, 1);
+    const date: string = moment().tz('Asia/Seoul').format('YYYYMMDD');
+    const clickCount: number = +(await redis.hget(date, `${token}/${pub_id}/${sub_id}`));
+
+    if (!clickCount) {
+      await redis.hset(date, `${token}/${pub_id}/${sub_id}`, 1);
+      await redis.expire(date, 60 * 60 * 24 * 2);
+    } else {
+      await redis.hincrby(date, `${token}/${pub_id}/${sub_id}`, 1);
+    }
+
+    await this.trackingQueue.add('click', { token: token, pub_id: pub_id, sub_id: sub_id, impressionCode: viewCode }, { removeOnComplete: true, backoff: 1 });
 
     return (
       trackerTrackingUrl

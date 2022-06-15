@@ -16,19 +16,33 @@ export class TrackingQueue {
     const sub_id: string = job.data.sub_id;
     const impressionCode: string = job.data.impressionCode;
 
-    await this.dailyModel.findOneAndUpdate(
-      {
-        token: token,
-        pub_id: pub_id,
-        sub_id: sub_id,
-        impressionCode: impressionCode,
-        createdAt: {
-          $gte: `${moment().format('YYYY-MM-DD')}T00:00:00.000Z`,
-          $lt: `${moment().format('YYYY-MM-DD')}T23:59:59.999Z`,
-        },
+    const daily: Daily = await this.dailyModel.findOne({
+      token: token,
+      pub_id: pub_id,
+      sub_id: sub_id,
+      impressionCode: impressionCode,
+      createdAt: {
+        $gte: moment(moment().startOf('day')).toDate(),
+        $lte: moment(moment().endOf('day')).toDate(),
       },
-      { $inc: { click: 1 } },
-      { upsert: true },
-    );
+    });
+
+    if (!daily) {
+      await this.dailyModel.create({ token: token, pub_id: pub_id, sub_id: sub_id, impressionCode: impressionCode });
+    }
+    await this.dailyModel.updateOne({ token: token, pub_id: pub_id, sub_id: sub_id, impressionCode: impressionCode }, { $inc: { click: 1 } });
+
+    // await this.dailyModel.findOneAndUpdate(
+    //   {
+    //     token: token,
+    //     pub_id: pub_id,
+    //     sub_id: sub_id,
+    //     impressionCode: impressionCode,
+    //   },
+    //   {
+    //     $inc: { click: 1 },
+    //   },
+    //   { upsert: true },
+    // );
   }
 }
