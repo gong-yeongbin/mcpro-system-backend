@@ -31,18 +31,5 @@ export class TrackingQueue {
       await this.dailyModel.create({ token: token, pub_id: pub_id, sub_id: sub_id, impressionCode: impressionCode });
     }
     await this.dailyModel.updateOne({ token: token, pub_id: pub_id, sub_id: sub_id, impressionCode: impressionCode }, { $inc: { click: 1 } });
-
-    // await this.dailyModel.findOneAndUpdate(
-    //   {
-    //     token: token,
-    //     pub_id: pub_id,
-    //     sub_id: sub_id,
-    //     impressionCode: impressionCode,
-    //   },
-    //   {
-    //     $inc: { click: 1 },
-    //   },
-    //   { upsert: true },
-    // );
   }
 }
