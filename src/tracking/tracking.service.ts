@@ -29,7 +29,7 @@ export class TrackingService {
 
     const date: string = moment().tz('Asia/Seoul').format('YYYYMMDD');
     const clickCount: number = +(await redis.hget(date, `${token}/${pub_id}/${sub_id}`));
-    const isClickCount: number = +(await redis.hget(date, `${viewCode}:${token}/${pub_id}/${sub_id}`));
+    const isClickCount: number = +(await redis.hget(`${date}:click`, `${viewCode}:${token}:${pub_id}:${sub_id}`));
 
     if (!isClickCount) {
       await redis.hset(`${date}:click`, `${viewCode}:${token}:${pub_id}:${sub_id}`, 1);
