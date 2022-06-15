@@ -30,7 +30,7 @@ import { TrackingService } from './tracking.service';
     }),
   ],
   controllers: [TrackingController],
-  providers: [TrackingService, CampaignService],
+  providers: [TrackingService, CampaignService, TrackingQueue],
 })
 export class TrackingModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
