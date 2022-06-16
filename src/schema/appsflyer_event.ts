@@ -37,8 +37,8 @@ export class AppsflyerEvent {
   @Prop({ type: String })
   event_revenue_currency: string;
 
-  @Prop({ type: String })
-  event_revenue: string;
+  @Prop({ type: Number })
+  event_revenue: number;
 
   @Prop({ type: Date })
   event_time: Date;

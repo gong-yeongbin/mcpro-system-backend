@@ -276,7 +276,7 @@ export class PostbackService {
       cbParam1: request.query.cb_param1,
       cbParam2: request.query.cb_param2,
       action: request.query.action,
-      originalUrl: request.query.originalUrl,
+      originalUrl: originalUrl,
     });
 
     const date: string = moment().tz('Asia/Seoul').format('YYYY-MM-DD.HH:mm:ss.SSSSS');

@@ -1,15 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { RedisService } from 'nestjs-redis';
 import { Redis } from 'ioredis';
-import * as moment from 'moment';
+import * as moment from 'moment-timezone';
 import { decodeUnicode } from 'src/util';
 import { TrackingDto } from './dto/tracking.dto';
-import { InjectQueue } from '@nestjs/bull';
-import { Queue } from 'bull';
 
 @Injectable()
 export class TrackingService {
-  constructor(private readonly redisService: RedisService, @InjectQueue('tracking') private readonly trackingQueue: Queue) {}
+  constructor(private readonly redisService: RedisService) {}
   async tracking(request: any, query: TrackingDto): Promise<string> {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
     console.log(`[ media ---> mecrosspro ] ${originalUrl}`);
@@ -72,6 +70,8 @@ export class TrackingService {
         .replace(/{gaid}/gi, adid)
         .replace(/{ifa}/gi, idfa)
         .replace(/{idfa}/gi, idfa)
+        .replace(/{m_sub_publisher}/, '')
+        .replace(/{cb_param2}/gi, '')
         .replace(/{cb_5}/gi, uuid) + `&uuid=${uuid}`
     );
   }
