@@ -31,6 +31,12 @@ import { SingularInstall, SingularInstallDocument } from 'src/schema/singular_in
 import { SingularEvent, SingularEventDocument } from 'src/schema/singular_event';
 import { AppsflyerInstall, AppsflyerInstallDocument } from 'src/schema/appsflyer_install';
 import { AppsflyerEvent, AppsflyerEventDocument } from 'src/schema/appsflyer_event';
+import { AdjustEvent, AdjustEventDocument } from 'src/schema/adjust_event';
+import { AdjustInstall, AdjustInstallDocument } from 'src/schema/adjust_install';
+import { MobiconnectInstall, MobiconnectInstallDocument } from 'src/schema/mobiconnect_install';
+import { MobiconnectEvent, MobiconnectEventDocument } from 'src/schema/mobiconnect_event';
+import { AdbrixremasterInstall, AdbrixremasterInstallDocument } from 'src/schema/adbrixremaster_install';
+import { AdbrixremasterEvent, AdbrixremasterEventDocument } from 'src/schema/adbrixremaster_event';
 
 @Injectable()
 export class PostbackService {
@@ -58,6 +64,12 @@ export class PostbackService {
     @InjectModel(SingularEvent.name) private singularEventModel: Model<SingularEventDocument>,
     @InjectModel(AppsflyerInstall.name) private appsflyerInstallModel: Model<AppsflyerInstallDocument>,
     @InjectModel(AppsflyerEvent.name) private appsflyerEventModel: Model<AppsflyerEventDocument>,
+    @InjectModel(AdjustInstall.name) private adjustInstallModel: Model<AdjustInstallDocument>,
+    @InjectModel(AdjustEvent.name) private adjustEventModel: Model<AdjustEventDocument>,
+    @InjectModel(MobiconnectInstall.name) private mobiconnectInstallModel: Model<MobiconnectInstallDocument>,
+    @InjectModel(MobiconnectEvent.name) private mobiconnectEventModel: Model<MobiconnectEventDocument>,
+    @InjectModel(AdbrixremasterInstall.name) private adbrixremasterInstallModel: Model<AdbrixremasterInstallDocument>,
+    @InjectModel(AdbrixremasterEvent.name) private adbrixremasterEventModel: Model<AdbrixremasterEventDocument>,
   ) {}
 
   async installAirbridge(request: any) {
@@ -344,6 +356,12 @@ export class PostbackService {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
     console.log(`[ adbrixremaster ---> mecrosspro ] install : ${originalUrl}`);
 
+    await this.adbrixremasterInstallModel.create({
+      ...request.query,
+      a_server_datetime: request.query.a_server_datetime.replace('+', ' '),
+      event_datetime: request.query.event_datetime.replace('+', ' '),
+    });
+
     const postbackInstallAdbrixremaster: PostbackInstallAdbrixremaster = this.postbackInstallAdbrixremasterRepository.create({
       viewCode: request.query.cb_2,
       token: request.query.cb_1,
@@ -403,6 +421,12 @@ export class PostbackService {
   async eventAdbrixremaster(request: any) {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
     console.log(`[ adbrixremaster ---> mecrosspro ] event : ${originalUrl}`);
+
+    await this.adbrixremasterEventModel.create({
+      ...request.query,
+      attr_event_datetime: request.query.attr_event_datetime.replace('+', ' '),
+      event_datetime: request.query.event_datetime.replace('+', ' '),
+    });
 
     const postbackEventAdbrixremaster: PostbackEventAdbrixremaster = this.postbackEventAdbrixremasterRepository.create({
       viewCode: request.query.cb_2,
@@ -465,6 +489,10 @@ export class PostbackService {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
     console.log(`[ adjust ---> mecrosspro ] install : ${originalUrl}`);
 
+    await this.adjustInstallModel.create({
+      ...request.query,
+    });
+
     const postbackInstallAdjust: PostbackInstallAdjust = this.postbackInstallAdjustRepository.create({
       cpToken: request.query.cp_token,
       publisherId: request.query.publisher_id,
@@ -504,6 +532,10 @@ export class PostbackService {
   async eventAdjust(request: any) {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
     console.log(`[ adjust ---> mecrosspro ] event : ${originalUrl}`);
+
+    await this.adjustEventModel.create({
+      ...request.query,
+    });
 
     const postbackEventAdjust: PostbackEventAdjust = this.postbackEventAdjustRepository.create({
       eventToken: request.query.event_token,
@@ -634,6 +666,10 @@ export class PostbackService {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
     console.log(`[ mobiconnect ---> mecrosspro ] install : ${originalUrl}`);
 
+    await this.mobiconnectInstallModel.create({
+      ...request.query,
+    });
+
     const postbackInstallMobiconnect: PostbackInstallMobiconnect = this.postbackInstallMobiconnectRepository.create({
       viewCode: request.query.pub_id,
       token: request.query.custom1,
@@ -664,6 +700,10 @@ export class PostbackService {
   async eventMobiconnect(request: any) {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
     console.log(`[ mobiconnect ---> mecrosspro ] event : ${originalUrl}`);
+
+    await this.mobiconnectEventModel.create({
+      ...request.query,
+    });
 
     const postbackEventMobiconnect: PostbackEventMobiconnect = this.postbackEventMobiconnectRepository.create({
       viewCode: request.query.pub_id,
