@@ -40,7 +40,7 @@ export class AppsflyerInstall {
   @Prop({ type: String })
   device_ip: string;
 
-  @Prop({ type: Date, default: Date.now(), expires: '180d' })
+  @Prop({ type: Date, default: Date.now(), expires: 60 * 60 * 24 * 30 * 6 })
   createdAt: Date;
 }
 

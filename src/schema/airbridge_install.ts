@@ -118,7 +118,7 @@ export class AirbridgeInstall {
   @Prop({ type: String })
   custom_param5: string;
 
-  @Prop({ type: Date, default: Date.now(), expires: '180d' })
+  @Prop({ type: Date, default: Date.now(), expires: 60 * 60 * 24 * 30 * 6 })
   createdAt: Date;
 }
 

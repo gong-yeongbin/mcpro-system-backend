@@ -40,7 +40,7 @@ export class TradingworksInstall {
   @Prop({ type: String })
   cb_param2: string;
 
-  @Prop({ type: Date, default: Date.now(), expires: '180d' })
+  @Prop({ type: Date, default: Date.now(), expires: 60 * 60 * 24 * 30 * 6 })
   createdAt: Date;
 }
 

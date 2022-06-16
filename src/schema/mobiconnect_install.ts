@@ -52,7 +52,7 @@ export class MobiconnectInstall {
   @Prop({ type: Number })
   install_timestamp: number;
 
-  @Prop({ type: Date, default: Date.now(), expires: '180d' })
+  @Prop({ type: Date, default: Date.now(), expires: 60 * 60 * 24 * 30 * 6 })
   createdAt: Date;
 }
 

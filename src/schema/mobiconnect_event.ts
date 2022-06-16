@@ -64,7 +64,7 @@ export class MobiconnectEvent {
   @Prop({ type: String })
   custom3: string;
 
-  @Prop({ type: Date, default: Date.now(), expires: '180d' })
+  @Prop({ type: Date, default: Date.now(), expires: 60 * 60 * 24 * 30 * 6 })
   createdAt: Date;
 }
 
