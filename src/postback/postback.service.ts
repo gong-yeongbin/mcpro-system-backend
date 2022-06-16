@@ -27,6 +27,10 @@ import { Model } from 'mongoose';
 import { AirbridgeEvent, AirbridgeEventDocument } from 'src/schema/airbridge_event';
 import { TradingworksInstall, TradingworksInstallDocument } from 'src/schema/tradingworks_install';
 import { TradingworksEvent, TradingworksEventDocument } from 'src/schema/tradingworks_event';
+import { SingularInstall, SingularInstallDocument } from 'src/schema/singular_install';
+import { SingularEvent, SingularEventDocument } from 'src/schema/singular_event';
+import { AppsflyerInstall, AppsflyerInstallDocument } from 'src/schema/appsflyer_install';
+import { AppsflyerEvent, AppsflyerEventDocument } from 'src/schema/appsflyer_event';
 
 @Injectable()
 export class PostbackService {
@@ -50,6 +54,10 @@ export class PostbackService {
     @InjectModel(AirbridgeEvent.name) private airbridgeEventModel: Model<AirbridgeEventDocument>,
     @InjectModel(TradingworksInstall.name) private tradingworksInstallModel: Model<TradingworksInstallDocument>,
     @InjectModel(TradingworksEvent.name) private tradingworksEventModel: Model<TradingworksEventDocument>,
+    @InjectModel(SingularInstall.name) private singularInstallModel: Model<SingularInstallDocument>,
+    @InjectModel(SingularEvent.name) private singularEventModel: Model<SingularEventDocument>,
+    @InjectModel(AppsflyerInstall.name) private appsflyerInstallModel: Model<AppsflyerInstallDocument>,
+    @InjectModel(AppsflyerEvent.name) private appsflyerEventModel: Model<AppsflyerEventDocument>,
   ) {}
 
   async installAirbridge(request: any) {
@@ -269,6 +277,10 @@ export class PostbackService {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
     console.log(`[ appsflyer ---> mecrosspro ] install : ${originalUrl}`);
 
+    await this.appsflyerInstallModel.create({
+      ...request.query,
+    });
+
     const postbackInstallAppsflyer: PostbackInstallAppsflyer = this.postbackInstallAppsflyerRepository.create({
       viewCode: request.query.af_siteid,
       token: request.query.af_c_id,
@@ -295,6 +307,11 @@ export class PostbackService {
   async eventAppsflyer(request: any) {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
     console.log(`[ appsflyer ---> mecrosspro ] event : ${originalUrl}`);
+
+    await this.appsflyerEventModel.create({
+      ...request.query,
+      event_revenue: request.query.event_revenue == 'N/A' ? 0 : request.query.event_revenue,
+    });
 
     const postbackEventAppsflyer: PostbackEventAppsflyer = this.postbackEventAppsflyerRepository.create({
       viewCode: request.query.af_siteid,
@@ -540,6 +557,10 @@ export class PostbackService {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
     console.log(`[ singular ---> mecrosspro ] install : ${originalUrl}`);
 
+    await this.singularInstallModel.create({
+      ...request.query,
+    });
+
     const postbackIntallSingular: PostbackInstallSingular = this.postbackInstallSingularRepository.create({
       viewCode: request.query.sub2,
       token: request.query.sub1,
@@ -571,6 +592,10 @@ export class PostbackService {
   async eventSingular(request: any) {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
     console.log(`[ singular ---> mecrosspro ] event : ${originalUrl}`);
+
+    await this.singularEventModel.create({
+      ...request.query,
+    });
 
     const postbackEventSingular: PostbackEventSingular = this.postbackEventSingularRepository.create({
       viewCode: request.query.sub2,
