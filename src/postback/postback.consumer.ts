@@ -49,7 +49,7 @@ export class PostbackConsumer {
           $lte: moment().endOf('day').toISOString(),
         },
       },
-      { token: token, impressionCode: impressionCode, $inc: inc },
+      { $inc: inc },
       { upsert: true, new: true },
     );
 
