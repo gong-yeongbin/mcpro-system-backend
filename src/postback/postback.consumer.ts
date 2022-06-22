@@ -44,12 +44,13 @@ export class PostbackConsumer {
     const daily: Daily = await this.dailyModel.findOneAndUpdate(
       {
         impressionCode: impressionCode,
+        token: token,
         createdAt: {
           $gte: moment().startOf('day').toISOString(),
           $lte: moment().endOf('day').toISOString(),
         },
       },
-      { $inc: inc },
+      { $set: { $inc: inc } },
       { upsert: true, new: true },
     );
 
