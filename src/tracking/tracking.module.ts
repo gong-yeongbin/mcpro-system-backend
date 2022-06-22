@@ -14,7 +14,6 @@ import { Daily, DailySchema } from 'src/schema/daily';
 import { ImpressionCode, ImpressionCodeSchema } from 'src/schema/impressionCode';
 import { TrackingInfo, TrackingInfoSchema } from 'src/schema/trackingInfo';
 import { TrackingController } from './tracking.controller';
-import { TrackingQueue } from './tracking.queue';
 import { TrackingService } from './tracking.service';
 
 @Module({
@@ -27,12 +26,9 @@ import { TrackingService } from './tracking.service';
       { name: ImpressionCode.name, schema: ImpressionCodeSchema },
       { name: TrackingInfo.name, schema: TrackingInfoSchema },
     ]),
-    BullModule.registerQueue({
-      name: 'tracking',
-    }),
   ],
   controllers: [TrackingController],
-  providers: [TrackingService, CampaignService, TrackingQueue],
+  providers: [TrackingService, CampaignService],
 })
 export class TrackingModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

@@ -36,6 +36,7 @@ export class ImpressionCodeCacheMiddleware implements NestMiddleware {
       { token: token, pub_id: pub_id, sub_id: sub_id, impressionCode: viewCode },
       { upsert: true },
     );
+
     next();
   }
 }

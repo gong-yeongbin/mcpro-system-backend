@@ -28,6 +28,7 @@ import { AppsflyerEvent, AppsflyerEventSchema } from 'src/schema/appsflyer_event
 import { AppsflyerInstall, AppsflyerInstallSchema } from 'src/schema/appsflyer_install';
 import { Daily, DailySchema } from 'src/schema/daily';
 import { Event, EventSchema } from 'src/schema/event';
+import { ImpressionCode, ImpressionCodeSchema } from 'src/schema/impressionCode';
 import { MobiconnectEvent, MobiconnectEventSchema } from 'src/schema/mobiconnect_event';
 import { MobiconnectInstall, MobiconnectInstallSchema } from 'src/schema/mobiconnect_install';
 import { Postback, PostbackSchema } from 'src/schema/postback';
@@ -75,6 +76,7 @@ import { PostbackService } from './postback.service';
       { name: Daily.name, schema: DailySchema },
       { name: Postback.name, schema: PostbackSchema },
       { name: Event.name, schema: EventSchema },
+      { name: ImpressionCode.name, schema: ImpressionCodeSchema },
     ]),
     BullModule.registerQueue({
       name: 'postback',
