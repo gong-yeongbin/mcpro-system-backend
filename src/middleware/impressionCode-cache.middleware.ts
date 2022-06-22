@@ -3,10 +3,16 @@ import { NextFunction } from 'express';
 import { RedisService } from 'nestjs-redis';
 import { Redis } from 'ioredis';
 import { v4 } from 'uuid';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { ImpressionCode, ImpressionCodeDocument } from 'src/schema/impressionCode';
 
 @Injectable()
 export class ImpressionCodeCacheMiddleware implements NestMiddleware {
-  constructor(private readonly redisService: RedisService) {}
+  constructor(
+    private readonly redisService: RedisService,
+    @InjectModel(ImpressionCode.name) private readonly impressionCodeModel: Model<ImpressionCodeDocument>,
+  ) {}
 
   async use(request: any, response: any, next: NextFunction): Promise<void> {
     const token: string = request.query.token;
@@ -21,12 +27,15 @@ export class ImpressionCodeCacheMiddleware implements NestMiddleware {
       await redis.hset('view_code', `${token}/${pub_id}/${sub_id}`, viewCode);
     }
 
-    // const impressionCode: string = await redis.get(`${token}:${pub_id}:${sub_id}`);
-
-    // if (!impressionCode) await redis.set(`${token}:${pub_id}:${sub_id}`, viewCode);
-
-    // await redis.expire(`${token}:${pub_id}:${sub_id}`, 60 * 60 * 24 * 15);
-
+    await this.impressionCodeModel.findOneAndUpdate(
+      {
+        token: token,
+        pub_id: pub_id,
+        sub_id: sub_id,
+      },
+      { token: token, pub_id: pub_id, sub_id: sub_id, impressionCode: viewCode },
+      { upsert: true },
+    );
     next();
   }
 }
