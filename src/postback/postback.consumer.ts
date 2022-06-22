@@ -50,7 +50,7 @@ export class PostbackConsumer {
           $lte: moment().endOf('day').toISOString(),
         },
       },
-      { $set: { $inc: inc } },
+      { $inc: inc },
       { upsert: true, new: true },
     );
 
