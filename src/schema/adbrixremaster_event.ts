@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 export type AdbrixremasterEventDocument = AdbrixremasterEvent & Document;
 
-@Schema({ versionKey: false, collection: 'adbrixremaster_event' })
+@Schema({ versionKey: false, collection: 'adbrixremaster_event', timestamps: { createdAt: 'createdAt', updatedAt: false } })
 export class AdbrixremasterEvent {
   @Prop({ type: String })
   a_key: string;
@@ -135,9 +135,7 @@ export class AdbrixremasterEvent {
 
   @Prop({ type: String })
   cb_5: string;
-
-  @Prop({ type: Date, default: Date.now(), expires: 60 * 60 * 24 * 30 * 6 })
-  createdAt: Date;
 }
 
 export const AdbrixremasterEventSchema = SchemaFactory.createForClass(AdbrixremasterEvent);
+AdbrixremasterEventSchema.index({ createdAt: 1 }, { expires: 60 * 60 * 24 * 30 * 12 });

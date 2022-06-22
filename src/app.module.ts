@@ -33,8 +33,8 @@ import { BullModule } from '@nestjs/bull';
     }),
     BullModule.forRoot({
       redis: {
-        host: process.env.REDIS_QUEUE_HOST,
-        port: +process.env.REDIS_QUEUE_PORT,
+        host: process.env.REDIS_HOST,
+        port: +process.env.REDIS_PORT,
       },
     }),
     MongooseModule.forRoot(process.env.MONGODB_URL),

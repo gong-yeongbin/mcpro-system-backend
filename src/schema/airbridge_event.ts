@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 export type AirbridgeEventDocument = AirbridgeEvent & Document;
 
-@Schema({ versionKey: false, collection: 'airbridge_event' })
+@Schema({ versionKey: false, collection: 'airbridge_event', timestamps: { createdAt: 'createdAt', updatedAt: false } })
 export class AirbridgeEvent {
   @Prop({ type: String })
   click_id: string;
@@ -150,9 +150,7 @@ export class AirbridgeEvent {
 
   @Prop({ type: String })
   custom_param5: string;
-
-  @Prop({ type: Date, default: Date.now(), expires: 60 * 60 * 24 * 30 * 6 })
-  createdAt: Date;
 }
 
 export const AirbridgeEventSchema = SchemaFactory.createForClass(AirbridgeEvent);
+AirbridgeEventSchema.index({ createdAt: 1 }, { expires: 60 * 60 * 24 * 30 * 12 });

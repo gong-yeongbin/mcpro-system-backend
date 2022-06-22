@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 export type AppsflyerInstallDocument = AppsflyerInstall & Document;
 
-@Schema({ versionKey: false, collection: 'appsflyer_install' })
+@Schema({ versionKey: false, collection: 'appsflyer_install', timestamps: { createdAt: 'createdAt', updatedAt: false } })
 export class AppsflyerInstall {
   @Prop({ type: String })
   clickid: string;
@@ -39,9 +39,7 @@ export class AppsflyerInstall {
 
   @Prop({ type: String })
   device_ip: string;
-
-  @Prop({ type: Date, default: Date.now(), expires: 60 * 60 * 24 * 30 * 6 })
-  createdAt: Date;
 }
 
 export const AppsflyerInstallSchema = SchemaFactory.createForClass(AppsflyerInstall);
+AppsflyerInstallSchema.index({ createdAt: 1 }, { expires: 60 * 60 * 24 * 30 * 12 });

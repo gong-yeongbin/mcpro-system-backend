@@ -18,8 +18,8 @@ export class Event {
   @Prop({ type: Boolean, default: true })
   status: boolean;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, required: true, ref: 'campaign' })
-  campaign: Campaign;
+  @Prop({ type: String, required: true })
+  token: string;
 }
 
 export const EventSchema = SchemaFactory.createForClass(Event);

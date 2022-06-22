@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 export type AdjustEventDocument = AdjustEvent & Document;
 
-@Schema({ versionKey: false, collection: 'adjust_event' })
+@Schema({ versionKey: false, collection: 'adjust_event', timestamps: { createdAt: 'createdAt', updatedAt: false } })
 export class AdjustEvent {
   @Prop({ type: String })
   event_token: string;
@@ -75,9 +75,7 @@ export class AdjustEvent {
 
   @Prop({ type: String })
   os_version: string;
-
-  @Prop({ type: Date, default: Date.now(), expires: 60 * 60 * 24 * 30 * 6 })
-  createdAt: Date;
 }
 
 export const AdjustEventSchema = SchemaFactory.createForClass(AdjustEvent);
+AdjustEventSchema.index({ createdAt: 1 }, { expires: 60 * 60 * 24 * 30 * 12 });

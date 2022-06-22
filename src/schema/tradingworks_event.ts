@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 export type TradingworksEventDocument = TradingworksEvent & Document;
 
-@Schema({ versionKey: false, collection: 'tradingworks_event' })
+@Schema({ versionKey: false, collection: 'tradingworks_event', timestamps: { createdAt: 'createdAt', updatedAt: false } })
 export class TradingworksEvent {
   @Prop({ type: String })
   transaction_id: string;
@@ -42,9 +42,7 @@ export class TradingworksEvent {
 
   @Prop({ type: String })
   action: string;
-
-  @Prop({ type: Date, default: Date.now(), expires: 60 * 60 * 24 * 30 * 6 })
-  createdAt: Date;
 }
 
 export const TradingworksEventSchema = SchemaFactory.createForClass(TradingworksEvent);
+TradingworksEventSchema.index({ createdAt: 1 }, { expires: 60 * 60 * 24 * 30 * 12 });

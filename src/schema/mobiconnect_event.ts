@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 export type MobiconnectEventDocument = MobiconnectEvent & Document;
 
-@Schema({ versionKey: false, collection: 'mobiconnect_event' })
+@Schema({ versionKey: false, collection: 'mobiconnect_event', timestamps: { createdAt: 'createdAt', updatedAt: false } })
 export class MobiconnectEvent {
   @Prop({ type: String })
   pub_id: string;
@@ -63,9 +63,7 @@ export class MobiconnectEvent {
 
   @Prop({ type: String })
   custom3: string;
-
-  @Prop({ type: Date, default: Date.now(), expires: 60 * 60 * 24 * 30 * 6 })
-  createdAt: Date;
 }
 
 export const MobiconnectEventSchema = SchemaFactory.createForClass(MobiconnectEvent);
+MobiconnectEventSchema.index({ createdAt: 1 }, { expires: 60 * 60 * 24 * 30 * 12 });

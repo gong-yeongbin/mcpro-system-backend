@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 export type TrackingInfoDocument = TrackingInfo & Document;
 
-@Schema({ versionKey: false, collection: 'trackingInfo' })
+@Schema({ versionKey: false, collection: 'trackingInfo', timestamps: { createdAt: 'createdAt', updatedAt: false } })
 export class TrackingInfo {
   @Prop({ type: String, required: true })
   token: string;
@@ -21,9 +21,7 @@ export class TrackingInfo {
 
   @Prop({ type: String, default: '' })
   adid: string;
-
-  @Prop({ type: Date, default: Date.now(), expires: '3d' })
-  createdAt: Date;
 }
 
 export const TrackingInfoSchema = SchemaFactory.createForClass(TrackingInfo);
+TrackingInfoSchema.index({ createdAt: 1 }, { expires: 60 * 60 * 24 * 10 });

@@ -37,6 +37,6 @@ export class TrackingModule implements NestModule {
     consumer.apply(TrackingMiddleware).forRoutes(TrackingController);
     consumer.apply(CampaignCacheMiddleware).forRoutes(TrackingController);
     consumer.apply(ImpressionCodeCacheMiddleware).forRoutes(TrackingController);
-    consumer.apply(TrackingInfoMiddleware).forRoutes(TrackingController);
+    // consumer.apply(TrackingInfoMiddleware).forRoutes(TrackingController);
   }
 }

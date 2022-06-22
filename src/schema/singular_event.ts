@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 export type SingularEventDocument = SingularEvent & Document;
 
-@Schema({ versionKey: false, collection: 'singular_event' })
+@Schema({ versionKey: false, collection: 'singular_event', timestamps: { createdAt: 'createdAt', updatedAt: false } })
 export class SingularEvent {
   @Prop({ type: String })
   attribution_ip: string;
@@ -66,9 +66,7 @@ export class SingularEvent {
 
   @Prop({ type: String })
   sub5: string;
-
-  @Prop({ type: Date, default: Date.now(), expires: 60 * 60 * 24 * 30 * 6 })
-  createdAt: Date;
 }
 
 export const SingularEventSchema = SchemaFactory.createForClass(SingularEvent);
+SingularEventSchema.index({ createdAt: 1 }, { expires: 60 * 60 * 24 * 30 * 12 });

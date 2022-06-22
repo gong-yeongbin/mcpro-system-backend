@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 export type MobiconnectInstallDocument = MobiconnectInstall & Document;
 
-@Schema({ versionKey: false, collection: 'mobiconnect_install' })
+@Schema({ versionKey: false, collection: 'mobiconnect_install', timestamps: { createdAt: 'createdAt', updatedAt: false } })
 export class MobiconnectInstall {
   @Prop({ type: String })
   pub_id: string;
@@ -51,9 +51,7 @@ export class MobiconnectInstall {
 
   @Prop({ type: Number })
   install_timestamp: number;
-
-  @Prop({ type: Date, default: Date.now(), expires: 60 * 60 * 24 * 30 * 6 })
-  createdAt: Date;
 }
 
 export const MobiconnectInstallSchema = SchemaFactory.createForClass(MobiconnectInstall);
+MobiconnectInstallSchema.index({ createdAt: 1 }, { expires: 60 * 60 * 24 * 30 * 12 });

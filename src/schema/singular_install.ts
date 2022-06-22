@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 export type SingularInstallDocument = SingularInstall & Document;
 
-@Schema({ versionKey: false, collection: 'singular_install' })
+@Schema({ versionKey: false, collection: 'singular_install', timestamps: { createdAt: 'createdAt', updatedAt: false } })
 export class SingularInstall {
   @Prop({ type: String })
   attribution_ip: string;
@@ -54,9 +54,7 @@ export class SingularInstall {
 
   @Prop({ type: String })
   sub5: string;
-
-  @Prop({ type: Date, default: Date.now(), expires: 60 * 60 * 24 * 30 * 6 })
-  createdAt: Date;
 }
 
 export const SingularInstallSchema = SchemaFactory.createForClass(SingularInstall);
+SingularInstallSchema.index({ createdAt: 1 }, { expires: 60 * 60 * 24 * 30 * 12 });

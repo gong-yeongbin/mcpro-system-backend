@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 export type AdjustInstallDocument = AdjustInstall & Document;
 
-@Schema({ versionKey: false, collection: 'adjust_install' })
+@Schema({ versionKey: false, collection: 'adjust_install', timestamps: { createdAt: 'createdAt', updatedAt: false } })
 export class AdjustInstall {
   @Prop({ type: String })
   cp_token: string;
@@ -69,9 +69,7 @@ export class AdjustInstall {
 
   @Prop({ type: String })
   os_version: string;
-
-  @Prop({ type: Date, default: Date.now(), expires: 60 * 60 * 24 * 30 * 6 })
-  createdAt: Date;
 }
 
 export const AdjustInstallSchema = SchemaFactory.createForClass(AdjustInstall);
+AdjustInstallSchema.index({ createdAt: 1 }, { expires: 60 * 60 * 24 * 30 * 12 });

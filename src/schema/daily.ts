@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 export type DailyDocument = Daily & Document;
 
-@Schema({ versionKey: false, collection: 'daily', timestamps: { createdAt: false, updatedAt: 'updatedAt' } })
+@Schema({ versionKey: false, collection: 'daily', timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' } })
 export class Daily {
   @Prop({ type: String, required: true })
   token: string;
@@ -51,12 +51,8 @@ export class Daily {
 
   @Prop({ type: Number, default: 0 })
   unregistered: number;
-
-  @Prop({ type: Date, default: Date.now(), expires: '365d' })
-  createdAt: Date;
-
-  @Prop({ type: Date, default: Date.now() })
-  updatedAt: Date;
 }
 
 export const DailySchema = SchemaFactory.createForClass(Daily);
+DailySchema.index({ createdAt: 1 }, { expires: 60 * 60 * 24 * 30 * 12 });
+DailySchema.index({ createdAt: -1, impressionCode: 1 });

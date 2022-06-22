@@ -14,6 +14,7 @@ import {
   PostbackInstallSingular,
   PostbackInstallTradingworks,
 } from '@entities/Entity';
+import { BullModule } from '@nestjs/bull';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -25,12 +26,16 @@ import { AirbridgeEvent, AirbridgeEventSchema } from 'src/schema/airbridge_event
 import { AirbridgeInstall, AirbridgeInstallSchema } from 'src/schema/airbridge_install';
 import { AppsflyerEvent, AppsflyerEventSchema } from 'src/schema/appsflyer_event';
 import { AppsflyerInstall, AppsflyerInstallSchema } from 'src/schema/appsflyer_install';
+import { Daily, DailySchema } from 'src/schema/daily';
+import { Event, EventSchema } from 'src/schema/event';
 import { MobiconnectEvent, MobiconnectEventSchema } from 'src/schema/mobiconnect_event';
 import { MobiconnectInstall, MobiconnectInstallSchema } from 'src/schema/mobiconnect_install';
+import { Postback, PostbackSchema } from 'src/schema/postback';
 import { SingularEvent, SingularEventSchema } from 'src/schema/singular_event';
 import { SingularInstall, SingularInstallSchema } from 'src/schema/singular_install';
 import { TradingworksEvent, TradingworksEventSchema } from 'src/schema/tradingworks_event';
 import { TradingworksInstall, TradingworksInstallSchema } from 'src/schema/tradingworks_install';
+import { PostbackConsumer } from './postback.consumer';
 import { PostbackController } from './postback.controller';
 import { PostbackService } from './postback.service';
 
@@ -67,9 +72,15 @@ import { PostbackService } from './postback.service';
       { name: MobiconnectEvent.name, schema: MobiconnectEventSchema },
       { name: AdbrixremasterInstall.name, schema: AdbrixremasterInstallSchema },
       { name: AdbrixremasterEvent.name, schema: AdbrixremasterEventSchema },
+      { name: Daily.name, schema: DailySchema },
+      { name: Postback.name, schema: PostbackSchema },
+      { name: Event.name, schema: EventSchema },
     ]),
+    BullModule.registerQueue({
+      name: 'postback',
+    }),
   ],
   controllers: [PostbackController],
-  providers: [PostbackService],
+  providers: [PostbackService, PostbackConsumer],
 })
 export class PostbackModule {}
