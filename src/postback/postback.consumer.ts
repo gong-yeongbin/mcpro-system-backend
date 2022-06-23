@@ -47,20 +47,20 @@ export class PostbackConsumer {
     else if (eventInstance.admin == 'etc5') inc = { etc5: 1 };
     else if (eventInstance.admin == 'purchase') inc = { purchase: 1, revenue: revenue };
 
-    // const daily: Daily = await this.dailyModel.findOne(
-    //   {
-    //     impressionCode: impressionCode,
-    //     token: token,
-    //     createdAt: {
-    //       $gte: moment().startOf('day').toISOString(),
-    //       $lte: moment().endOf('day').toISOString(),
-    //     },
-    //   },
-    //   { pub_id: pub_id, sub_id: sub_id, $inc: inc },
-    //   { upsert: true, new: true },
-    // );
+    const daily: Daily = await this.dailyModel.findOne(
+      {
+        impressionCode: impressionCode,
+        token: token,
+        createdAt: {
+          $gte: moment().startOf('day').toISOString(),
+          $lte: moment().endOf('day').toISOString(),
+        },
+      },
+      { pub_id: pub_id, sub_id: sub_id, $inc: inc },
+      { upsert: true, new: true },
+    );
 
-    // data.daily = daily;
-    // await this.postbackModel.create(data);
+    data.daily = daily;
+    await this.postbackModel.create(data);
   }
 }
