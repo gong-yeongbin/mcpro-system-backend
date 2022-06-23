@@ -25,9 +25,9 @@ export class PostbackConsumer {
     const event_name: string = data.event_name;
     const revenue: number = data.revenue;
 
-    // const impressionCodeInstance: ImpressionCode = await this.impressionCodeModel.findOne({ impressionCode: impressionCode });
-    // const pub_id: string = impressionCodeInstance.pub_id;
-    // const sub_id: string = impressionCodeInstance.sub_id;
+    const impressionCodeInstance: ImpressionCode = await this.impressionCodeModel.findOne({ impressionCode: impressionCode });
+    const pub_id: string = impressionCodeInstance.pub_id;
+    const sub_id: string = impressionCodeInstance.sub_id;
 
     const eventInstance: Event = await this.eventModel.findOne({
       token: token,
