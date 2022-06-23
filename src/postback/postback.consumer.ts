@@ -57,7 +57,7 @@ export class PostbackConsumer {
         },
       },
       { $inc: inc },
-      { upsert: true, new: true },
+      { pub_id: pub_id, sub_id: sub_id, upsert: true, new: true },
     );
 
     data.daily = daily;
