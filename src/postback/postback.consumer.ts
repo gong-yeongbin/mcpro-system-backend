@@ -56,8 +56,8 @@ export class PostbackConsumer {
           $lte: moment().endOf('day').toISOString(),
         },
       },
-      { $inc: inc },
-      { pub_id: pub_id, sub_id: sub_id, upsert: true, new: true },
+      { pub_id: pub_id, sub_id: sub_id, $inc: inc },
+      { upsert: true, new: true },
     );
 
     data.daily = daily;

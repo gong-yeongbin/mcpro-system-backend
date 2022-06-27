@@ -74,6 +74,7 @@ export class PostbackService {
     @InjectModel(AdbrixremasterInstall.name) private adbrixremasterInstallModel: Model<AdbrixremasterInstallDocument>,
     @InjectModel(AdbrixremasterEvent.name) private adbrixremasterEventModel: Model<AdbrixremasterEventDocument>,
     @InjectModel(Postback.name) private postbackModel: Model<PostbackDocument>,
+    @InjectQueue('postback') private readonly postbackQueue: Queue,
   ) {}
 
   async installAirbridge(request: any) {
@@ -365,6 +366,23 @@ export class PostbackService {
       a_server_datetime: request.query.a_server_datetime.replace('+', ' '),
       event_datetime: request.query.event_datetime.replace('+', ' '),
     });
+
+    await this.postbackQueue.add(
+      {
+        token: request.query.cb_1,
+        impressionCode: request.query.cb_2,
+        click_id: request.query.cb_3,
+        event_name: 'install',
+        carrier: request.query.device_carrier,
+        country: request.query.device_country,
+        language: request.query.device_language,
+        ip: request.query.a_ip,
+        adid: request.query.adid ? request.query.adid : request.query.idfv,
+        click_time: request.query.a_server_datetime.replace('+', ' '),
+        install_time: request.query.event_datetime.replace('+', ' '),
+      },
+      { removeOnComplete: true },
+    );
 
     const postbackInstallAdbrixremaster: PostbackInstallAdbrixremaster = this.postbackInstallAdbrixremasterRepository.create({
       viewCode: request.query.cb_2,
