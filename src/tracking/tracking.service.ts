@@ -4,10 +4,13 @@ import { Redis } from 'ioredis';
 import * as moment from 'moment-timezone';
 import { decodeUnicode } from 'src/util';
 import { TrackingDto } from './dto/tracking.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Daily, DailyDocument } from 'src/schema/daily';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class TrackingService {
-  constructor(private readonly redisService: RedisService) {}
+  constructor(private readonly redisService: RedisService, @InjectModel(Daily.name) private readonly dailyModel: Model<DailyDocument>) {}
   async tracking(request: any, query: TrackingDto): Promise<string> {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
     console.log(`[ media ---> mecrosspro ] ${originalUrl}`);
@@ -27,14 +30,27 @@ export class TrackingService {
 
     const date: string = moment().tz('Asia/Seoul').format('YYYYMMDD');
     const clickCount: number = +(await redis.hget(date, `${token}/${pub_id}/${sub_id}`));
-    const isClickCount: number = +(await redis.hget(`${date}:click`, `${viewCode}:${token}:${pub_id}:${sub_id}`));
 
-    if (!isClickCount) {
-      await redis.hset(`${date}:click`, `${viewCode}:${token}:${pub_id}:${sub_id}`, 1);
-      await redis.expire(`${date}:click`, 60 * 60 * 24 * 1);
-    } else {
-      await redis.hincrby(`${date}:click`, `${viewCode}:${token}:${pub_id}:${sub_id}`, 1);
-    }
+    await this.dailyModel.updateOne(
+      {
+        token: token,
+        pub_id: pub_id,
+        sub_id: sub_id,
+        createdAt: {
+          $gte: moment().startOf('day').toISOString(),
+          $lte: moment().endOf('day').toISOString(),
+        },
+      },
+      { $inc: { click: 1 } },
+    );
+    // const isClickCount: number = +(await redis.hget(`${date}:click`, `${viewCode}:${token}:${pub_id}:${sub_id}`));
+
+    // if (!isClickCount) {
+    //   await redis.hset(`${date}:click`, `${viewCode}:${token}:${pub_id}:${sub_id}`, 1);
+    //   await redis.expire(`${date}:click`, 60 * 60 * 24 * 1);
+    // } else {
+    //   await redis.hincrby(`${date}:click`, `${viewCode}:${token}:${pub_id}:${sub_id}`, 1);
+    // }
 
     if (!clickCount) {
       await redis.hset(date, `${token}/${pub_id}/${sub_id}`, 1);
