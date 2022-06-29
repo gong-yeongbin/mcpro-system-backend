@@ -31,26 +31,14 @@ export class TrackingService {
     const date: string = moment().tz('Asia/Seoul').format('YYYYMMDD');
     const clickCount: number = +(await redis.hget(date, `${token}/${pub_id}/${sub_id}`));
 
-    // await this.dailyModel.updateOne(
-    //   {
-    //     token: token,
-    //     pub_id: pub_id,
-    //     sub_id: sub_id,
-    //     createdAt: {
-    //       $gte: moment().startOf('day').toISOString(),
-    //       $lte: moment().endOf('day').toISOString(),
-    //     },
-    //   },
-    //   { $inc: { click: 1 } },
-    // );
-    // const isClickCount: number = +(await redis.hget(`${date}:click`, `${viewCode}:${token}:${pub_id}:${sub_id}`));
+    const isClickCount: number = +(await redis.hget(`${date}:click`, `${viewCode}:${token}:${pub_id}:${sub_id}`));
 
-    // if (!isClickCount) {
-    //   await redis.hset(`${date}:click`, `${viewCode}:${token}:${pub_id}:${sub_id}`, 1);
-    //   await redis.expire(`${date}:click`, 60 * 60 * 24 * 1);
-    // } else {
-    //   await redis.hincrby(`${date}:click`, `${viewCode}:${token}:${pub_id}:${sub_id}`, 1);
-    // }
+    if (!isClickCount) {
+      await redis.hset(`${date}:click`, `${viewCode}:${token}:${pub_id}:${sub_id}`, 1);
+      await redis.expire(`${date}:click`, 60 * 60 * 24 * 1);
+    } else {
+      await redis.hincrby(`${date}:click`, `${viewCode}:${token}:${pub_id}:${sub_id}`, 1);
+    }
 
     if (!clickCount) {
       await redis.hset(date, `${token}/${pub_id}/${sub_id}`, 1);
