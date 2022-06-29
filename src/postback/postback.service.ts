@@ -381,7 +381,7 @@ export class PostbackService {
         click_time: request.query.a_server_datetime.replace('+', ' '),
         install_time: request.query.event_datetime.replace('+', ' '),
       },
-      { removeOnComplete: true, attempts: 5 },
+      { removeOnComplete: true, removeOnFail: true, attempts: 5 },
     );
 
     const postbackInstallAdbrixremaster: PostbackInstallAdbrixremaster = this.postbackInstallAdbrixremasterRepository.create({

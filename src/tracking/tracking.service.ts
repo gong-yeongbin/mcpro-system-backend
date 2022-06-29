@@ -7,13 +7,20 @@ import { TrackingDto } from './dto/tracking.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Daily, DailyDocument } from 'src/schema/daily';
 import { Model } from 'mongoose';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
 
 @Injectable()
 export class TrackingService {
-  constructor(private readonly redisService: RedisService, @InjectModel(Daily.name) private readonly dailyModel: Model<DailyDocument>) {}
+  constructor(
+    private readonly redisService: RedisService,
+    @InjectModel(Daily.name) private readonly dailyModel: Model<DailyDocument>,
+    @InjectQueue('tracking') private readonly trackingQueue: Queue,
+  ) {}
   async tracking(request: any, query: TrackingDto): Promise<string> {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
     console.log(`[ media ---> mecrosspro ] ${originalUrl}`);
+
     const redis: Redis = this.redisService.getClient();
 
     const token: string = query.token;
@@ -27,6 +34,16 @@ export class TrackingService {
     const trackerTrackingUrl = await redis.hget(token, 'trackerTrackingUrl');
 
     const viewCode: string = await redis.hget('view_code', `${token}/${pub_id}/${sub_id}`);
+
+    await this.trackingQueue.add(
+      {
+        token: token,
+        pub_id: pub_id,
+        sub_id: sub_id,
+        view_code: viewCode,
+      },
+      { removeOnComplete: true, removeOnFail: true, attempts: 5 },
+    );
 
     const date: string = moment().tz('Asia/Seoul').format('YYYYMMDD');
     const clickCount: number = +(await redis.hget(date, `${token}/${pub_id}/${sub_id}`));

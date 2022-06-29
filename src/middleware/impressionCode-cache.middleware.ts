@@ -3,14 +3,10 @@ import { NextFunction } from 'express';
 import { RedisService } from 'nestjs-redis';
 import { Redis } from 'ioredis';
 import { v4 } from 'uuid';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Daily, DailyDocument } from 'src/schema/daily';
-import * as moment from 'moment-timezone';
 
 @Injectable()
 export class ImpressionCodeCacheMiddleware implements NestMiddleware {
-  constructor(private readonly redisService: RedisService, @InjectModel(Daily.name) private readonly dailyModel: Model<DailyDocument>) {}
+  constructor(private readonly redisService: RedisService) {}
 
   async use(request: any, response: any, next: NextFunction): Promise<void> {
     const token: string = request.query.token;
@@ -24,30 +20,6 @@ export class ImpressionCodeCacheMiddleware implements NestMiddleware {
       viewCode = v4().replace(/-/g, '');
       await redis.hset('view_code', `${token}/${pub_id}/${sub_id}`, viewCode);
     }
-
-    await this.dailyModel.findOneAndUpdate(
-      {
-        token: token,
-        pub_id: pub_id,
-        sub_id: sub_id,
-        createdAt: {
-          $gte: moment().startOf('day').toISOString(),
-          $lte: moment().endOf('day').toISOString(),
-        },
-      },
-      { $set: { impressionCode: viewCode } },
-      { upsert: true },
-    );
-
-    // await this.impressionCodeModel.findOneAndUpdate(
-    //   {
-    //     token: token,
-    //     pub_id: pub_id,
-    //     sub_id: sub_id,
-    //   },
-    //   { token: token, pub_id: pub_id, sub_id: sub_id, impressionCode: viewCode },
-    //   { upsert: true },
-    // );
 
     next();
   }

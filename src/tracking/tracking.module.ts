@@ -1,3 +1,4 @@
+import { BullModule } from '@nestjs/bull';
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -12,6 +13,7 @@ import { Config, ConfigSchema } from 'src/schema/config';
 import { Daily, DailySchema } from 'src/schema/daily';
 import { ImpressionCode, ImpressionCodeSchema } from 'src/schema/impressionCode';
 import { TrackingInfo, TrackingInfoSchema } from 'src/schema/trackingInfo';
+import { TrackingConsumer } from './tracking.consumer';
 import { TrackingController } from './tracking.controller';
 import { TrackingService } from './tracking.service';
 
@@ -25,9 +27,12 @@ import { TrackingService } from './tracking.service';
       { name: ImpressionCode.name, schema: ImpressionCodeSchema },
       { name: TrackingInfo.name, schema: TrackingInfoSchema },
     ]),
+    BullModule.registerQueue({
+      name: 'tracking',
+    }),
   ],
   controllers: [TrackingController],
-  providers: [TrackingService, CampaignService],
+  providers: [TrackingService, CampaignService, TrackingConsumer],
 })
 export class TrackingModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
