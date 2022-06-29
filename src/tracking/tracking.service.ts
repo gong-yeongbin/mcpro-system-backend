@@ -31,18 +31,18 @@ export class TrackingService {
     const date: string = moment().tz('Asia/Seoul').format('YYYYMMDD');
     const clickCount: number = +(await redis.hget(date, `${token}/${pub_id}/${sub_id}`));
 
-    await this.dailyModel.updateOne(
-      {
-        token: token,
-        pub_id: pub_id,
-        sub_id: sub_id,
-        createdAt: {
-          $gte: moment().startOf('day').toISOString(),
-          $lte: moment().endOf('day').toISOString(),
-        },
-      },
-      { $inc: { click: 1 } },
-    );
+    // await this.dailyModel.updateOne(
+    //   {
+    //     token: token,
+    //     pub_id: pub_id,
+    //     sub_id: sub_id,
+    //     createdAt: {
+    //       $gte: moment().startOf('day').toISOString(),
+    //       $lte: moment().endOf('day').toISOString(),
+    //     },
+    //   },
+    //   { $inc: { click: 1 } },
+    // );
     // const isClickCount: number = +(await redis.hget(`${date}:click`, `${viewCode}:${token}:${pub_id}:${sub_id}`));
 
     // if (!isClickCount) {

@@ -55,4 +55,5 @@ export class Daily {
 
 export const DailySchema = SchemaFactory.createForClass(Daily);
 DailySchema.index({ createdAt: 1 }, { expires: 60 * 60 * 24 * 30 * 12 });
+DailySchema.index({ token: 1, pub_id: 1, sub_id: 1 });
 DailySchema.index({ createdAt: -1, impressionCode: 1 });
