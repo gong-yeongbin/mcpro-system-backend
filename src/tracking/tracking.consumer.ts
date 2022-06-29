@@ -16,6 +16,7 @@ export class TrackingConsumer {
     const pub_id: string = data.pub_id;
     const sub_id: string = data.sub_id;
     const view_code: string = data.view_code;
+
     await this.dailyModel.findOneAndUpdate(
       {
         token: token,

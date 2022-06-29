@@ -35,16 +35,6 @@ export class TrackingService {
 
     const viewCode: string = await redis.hget('view_code', `${token}/${pub_id}/${sub_id}`);
 
-    await this.trackingQueue.add(
-      {
-        token: token,
-        pub_id: pub_id,
-        sub_id: sub_id,
-        view_code: viewCode,
-      },
-      { removeOnComplete: true, removeOnFail: true, attempts: 5 },
-    );
-
     const date: string = moment().tz('Asia/Seoul').format('YYYYMMDD');
     const clickCount: number = +(await redis.hget(date, `${token}/${pub_id}/${sub_id}`));
 
