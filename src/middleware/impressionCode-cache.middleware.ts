@@ -25,19 +25,19 @@ export class ImpressionCodeCacheMiddleware implements NestMiddleware {
       await redis.hset('view_code', `${token}/${pub_id}/${sub_id}`, viewCode);
     }
 
-    // await this.dailyModel.findOneAndUpdate(
-    //   {
-    //     token: token,
-    //     pub_id: pub_id,
-    //     sub_id: sub_id,
-    //     createdAt: {
-    //       $gte: moment().startOf('day').toISOString(),
-    //       $lte: moment().endOf('day').toISOString(),
-    //     },
-    //   },
-    //   { imporessionCode: viewCode },
-    //   { upsert: true },
-    // );
+    await this.dailyModel.findOneAndUpdate(
+      {
+        token: token,
+        pub_id: pub_id,
+        sub_id: sub_id,
+        createdAt: {
+          $gte: moment().startOf('day').toISOString(),
+          $lte: moment().endOf('day').toISOString(),
+        },
+      },
+      { imporessionCode: viewCode },
+      { upsert: true },
+    );
 
     // await this.impressionCodeModel.findOneAndUpdate(
     //   {
