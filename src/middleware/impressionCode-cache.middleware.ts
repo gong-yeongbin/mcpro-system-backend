@@ -35,7 +35,7 @@ export class ImpressionCodeCacheMiddleware implements NestMiddleware {
           $lte: moment().endOf('day').toISOString(),
         },
       },
-      { impressionCode: viewCode },
+      { $set: { impressionCode: viewCode } },
       { upsert: true },
     );
 
