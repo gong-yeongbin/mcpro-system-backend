@@ -52,6 +52,7 @@ export class PostbackConsumer {
         },
       },
       { $inc: inc },
+      { upsert: true, new: true },
     );
 
     data.daily = daily;

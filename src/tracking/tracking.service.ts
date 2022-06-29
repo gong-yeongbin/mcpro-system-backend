@@ -4,19 +4,10 @@ import { Redis } from 'ioredis';
 import * as moment from 'moment-timezone';
 import { decodeUnicode } from 'src/util';
 import { TrackingDto } from './dto/tracking.dto';
-import { InjectModel } from '@nestjs/mongoose';
-import { Daily, DailyDocument } from 'src/schema/daily';
-import { Model } from 'mongoose';
-import { InjectQueue } from '@nestjs/bull';
-import { Queue } from 'bull';
 
 @Injectable()
 export class TrackingService {
-  constructor(
-    private readonly redisService: RedisService,
-    @InjectModel(Daily.name) private readonly dailyModel: Model<DailyDocument>,
-    @InjectQueue('tracking') private readonly trackingQueue: Queue,
-  ) {}
+  constructor(private readonly redisService: RedisService) {}
   async tracking(request: any, query: TrackingDto): Promise<string> {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
     console.log(`[ media ---> mecrosspro ] ${originalUrl}`);
