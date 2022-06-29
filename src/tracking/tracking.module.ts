@@ -26,9 +26,6 @@ import { TrackingService } from './tracking.service';
       { name: ImpressionCode.name, schema: ImpressionCodeSchema },
       { name: TrackingInfo.name, schema: TrackingInfoSchema },
     ]),
-    BullModule.registerQueue({
-      name: 'tracking',
-    }),
   ],
   controllers: [TrackingController],
   providers: [TrackingService, CampaignService],

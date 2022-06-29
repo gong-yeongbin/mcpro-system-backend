@@ -14,7 +14,6 @@ export class PostbackConsumer {
     @InjectModel(Daily.name) private readonly dailyModel: Model<DailyDocument>,
     @InjectModel(Event.name) private readonly eventModel: Model<EventDocument>,
     @InjectModel(Postback.name) private readonly postbackModel: Model<PostbackDocument>,
-    @InjectModel(ImpressionCode.name) private readonly impressionCodeModel: Model<ImpressionCodeDocument>,
   ) {}
 
   @Process()
@@ -24,6 +23,8 @@ export class PostbackConsumer {
     const impressionCode: string = data.impressionCode;
     const event_name: string = data.event_name;
     const revenue: number = data.revenue;
+
+    const dailyInfo: Daily = await this.dailyModel.findOne({ impressionCode: impressionCode });
 
     const eventInstance: Event = await this.eventModel.findOne({
       token: token,
@@ -46,6 +47,9 @@ export class PostbackConsumer {
     const daily: Daily = await this.dailyModel.findOneAndUpdate(
       {
         impressionCode: impressionCode,
+        token: token,
+        pub_id: dailyInfo.pub_id,
+        sub_id: dailyInfo.sub_id,
         createdAt: {
           $gte: moment().startOf('day').toISOString(),
           $lte: moment().endOf('day').toISOString(),
