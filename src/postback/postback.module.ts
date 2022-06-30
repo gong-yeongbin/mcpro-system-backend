@@ -78,9 +78,9 @@ import { PostbackService } from './postback.service';
       { name: Event.name, schema: EventSchema },
       { name: ImpressionCode.name, schema: ImpressionCodeSchema },
     ]),
-    BullModule.registerQueue({
-      name: 'postback',
-    }),
+    // BullModule.registerQueue({
+    //   name: 'postback',
+    // }),
   ],
   controllers: [PostbackController],
   providers: [PostbackService, PostbackConsumer],
