@@ -6,7 +6,6 @@ import { Daily, DailyDocument } from 'src/schema/daily';
 import { Postback, PostbackDocument } from 'src/schema/postback';
 import * as moment from 'moment-timezone';
 import { Event, EventDocument } from 'src/schema/event';
-import { ImpressionCode, ImpressionCodeDocument } from 'src/schema/impressionCode';
 
 @Processor('postback')
 export class PostbackConsumer {
@@ -25,6 +24,8 @@ export class PostbackConsumer {
     const revenue: number = data.revenue;
 
     const dailyInfo: Daily = await this.dailyModel.findOne({ impressionCode: impressionCode });
+
+    if (!dailyInfo) return;
 
     const eventInstance: Event = await this.eventModel.findOne({
       token: token,
