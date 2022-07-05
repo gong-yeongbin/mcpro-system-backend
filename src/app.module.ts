@@ -21,12 +21,12 @@ import { BullModule } from '@nestjs/bull';
       host: process.env.REDIS_HOST,
       port: +process.env.REDIS_PORT,
     }),
-    // BullModule.forRoot({
-    //   redis: {
-    //     host: process.env.REDIS_QUEUE_HOST,
-    //     port: 6379,
-    //   },
-    // }),
+    BullModule.forRoot({
+      redis: {
+        host: process.env.REDIS_QUEUE_HOST,
+        port: 6379,
+      },
+    }),
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: process.env.MYSQL_HOST,
