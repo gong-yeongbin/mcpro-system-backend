@@ -547,10 +547,7 @@ export class PostbackService {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
     console.log(`[ adjust ---> mecrosspro ] install : ${originalUrl}`);
 
-    await this.adjustInstallModel.create({
-      ...request.query,
-    });
-
+    //-------------------------------------------------------------------------------------------------------
     const postbackInstallAdjust: PostbackInstallAdjust = this.postbackInstallAdjustRepository.create({
       cpToken: request.query.cp_token,
       publisherId: request.query.publisher_id,
@@ -586,6 +583,27 @@ export class PostbackService {
 
     const redis: Redis = this.redisService.getClient();
     await redis.hset('adjust:install', date, JSON.stringify(postbackInstallAdjust));
+    //-------------------------------------------------------------------------------------------------------
+    await this.adjustInstallModel.create({
+      ...request.query,
+    });
+
+    await this.postbackQueue.add(
+      {
+        token: request.query.cp_token,
+        impressionCode: request.query.publisher_id,
+        click_id: request.query.click_id,
+        event_name: 'install',
+        carrier: request.query.isp,
+        country: request.query.country,
+        language: request.query.language,
+        ip: request.query.ip_address,
+        adid: request.query.adid,
+        click_time: moment.unix(request.query.click_time).format('YYYY-MM-DD HH:mm:ss'),
+        install_time: moment.unix(request.query.installed_at).format('YYYY-MM-DD HH:mm:ss'),
+      },
+      { removeOnComplete: true, removeOnFail: true, attempts: 3 },
+    );
   }
   async eventAdjust(request: any) {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
@@ -650,7 +668,7 @@ export class PostbackService {
     await this.singularInstallModel.create({
       ...request.query,
     });
-
+    //-------------------------------------------------------------------------------------------------------
     const postbackIntallSingular: PostbackInstallSingular = this.postbackInstallSingularRepository.create({
       viewCode: request.query.sub2,
       token: request.query.sub1,
@@ -678,6 +696,7 @@ export class PostbackService {
 
     const redis: Redis = this.redisService.getClient();
     await redis.hset('singular:install', date, JSON.stringify(postbackIntallSingular));
+    //-------------------------------------------------------------------------------------------------------
   }
   async eventSingular(request: any) {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
@@ -727,7 +746,7 @@ export class PostbackService {
     await this.mobiconnectInstallModel.create({
       ...request.query,
     });
-
+    //-------------------------------------------------------------------------------------------------------
     const postbackInstallMobiconnect: PostbackInstallMobiconnect = this.postbackInstallMobiconnectRepository.create({
       viewCode: request.query.pub_id,
       token: request.query.custom1,
@@ -754,6 +773,7 @@ export class PostbackService {
 
     const redis: Redis = this.redisService.getClient();
     await redis.hset('mobiconnect:install', date, JSON.stringify(postbackInstallMobiconnect));
+    //-------------------------------------------------------------------------------------------------------
   }
   async eventMobiconnect(request: any) {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);

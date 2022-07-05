@@ -1,4 +1,3 @@
-import { BullModule } from '@nestjs/bull';
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -11,7 +10,6 @@ import { TrackingInfoMiddleware } from 'src/middleware/trackingInfo.middleware';
 import { Campaign, CampaignSchema } from 'src/schema/campaign';
 import { Config, ConfigSchema } from 'src/schema/config';
 import { Daily, DailySchema } from 'src/schema/daily';
-import { ImpressionCode, ImpressionCodeSchema } from 'src/schema/impressionCode';
 import { TrackingInfo, TrackingInfoSchema } from 'src/schema/trackingInfo';
 import { TrackingController } from './tracking.controller';
 import { TrackingService } from './tracking.service';
@@ -23,7 +21,6 @@ import { TrackingService } from './tracking.service';
       { name: Campaign.name, schema: CampaignSchema },
       { name: Config.name, schema: ConfigSchema },
       { name: Daily.name, schema: DailySchema },
-      { name: ImpressionCode.name, schema: ImpressionCodeSchema },
       { name: TrackingInfo.name, schema: TrackingInfoSchema },
     ]),
   ],
