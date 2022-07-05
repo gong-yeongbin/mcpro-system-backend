@@ -80,13 +80,7 @@ export class PostbackService {
   async installAirbridge(request: any) {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
     console.log(`[ airbridge ---> mecrosspro ] install : ${originalUrl}`);
-
-    await this.airbridgeInstallModel.create({
-      ...request.query,
-      limitAdTracking: Boolean(request.query.limitAdTracking),
-      isUnique: Boolean(request.query.isUnique),
-    });
-
+    //-------------------------------------------------------------------------------------------------------
     const postbackInstallAirbridge: PostbackInstallAirbridge = this.postBackInstallAirbridgeRepository.create({
       clickId: request.query.click_id,
       subId2: request.query.sub_id,
@@ -135,6 +129,30 @@ export class PostbackService {
 
     const redis: Redis = this.redisService.getClient();
     await redis.hset('airbridge:install', date, JSON.stringify(postbackInstallAirbridge));
+    //-------------------------------------------------------------------------------------------------------
+
+    await this.airbridgeInstallModel.create({
+      ...request.query,
+      limitAdTracking: Boolean(request.query.limitAdTracking),
+      isUnique: Boolean(request.query.isUnique),
+    });
+
+    await this.postbackQueue.add(
+      {
+        token: request.query.custom_param1,
+        impressionCode: request.query.sub_id,
+        click_id: request.query.click_id,
+        event_name: 'install',
+        carrier: request.query.device_carrier,
+        country: request.query.country,
+        language: request.query.language,
+        ip: request.query.device_ip,
+        adid: request.query.uuid,
+        click_time: moment(request.query.click_datetime).format('YYYY-MM-DD HH:mm:ss'),
+        install_time: moment(request.query.event_datetime).format('YYYY-MM-DD HH:mm:ss'),
+      },
+      { removeOnComplete: true, removeOnFail: true, attempts: 3 },
+    );
   }
   async eventAirbridge(request: any) {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
