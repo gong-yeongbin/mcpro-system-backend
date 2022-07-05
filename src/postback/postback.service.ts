@@ -311,11 +311,7 @@ export class PostbackService {
   async installAppsflyer(request: any) {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
     console.log(`[ appsflyer ---> mecrosspro ] install : ${originalUrl}`);
-
-    await this.appsflyerInstallModel.create({
-      ...request.query,
-    });
-
+    //-------------------------------------------------------------------------------------------------------
     const postbackInstallAppsflyer: PostbackInstallAppsflyer = this.postbackInstallAppsflyerRepository.create({
       viewCode: request.query.af_siteid,
       token: request.query.af_c_id,
@@ -338,6 +334,28 @@ export class PostbackService {
 
     const redis: Redis = this.redisService.getClient();
     await redis.hset('appsflyer:install', date, JSON.stringify(postbackInstallAppsflyer));
+    //-------------------------------------------------------------------------------------------------------
+
+    await this.appsflyerInstallModel.create({
+      ...request.query,
+    });
+
+    await this.postbackQueue.add(
+      {
+        token: request.query.af_c_id,
+        impressionCode: request.query.af_siteid,
+        click_id: request.query.clickid,
+        event_name: 'install',
+        carrier: request.query.device_carrier,
+        country: request.query.country_code,
+        language: request.query.language,
+        ip: request.query.device_ip,
+        adid: request.query.idfa ? request.query.idfa : request.query.idfv,
+        click_time: moment(moment.utc(request.query.click_time).toDate()).format('YYYY-MM-DD HH:mm:ss'),
+        install_time: moment(moment.utc(request.query.install_time).toDate()).format('YYYY-MM-DD HH:mm:ss'),
+      },
+      { removeOnComplete: true, removeOnFail: true, attempts: 3 },
+    );
   }
   async eventAppsflyer(request: any) {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
