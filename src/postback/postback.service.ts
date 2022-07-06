@@ -665,9 +665,6 @@ export class PostbackService {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
     console.log(`[ singular ---> mecrosspro ] install : ${originalUrl}`);
 
-    await this.singularInstallModel.create({
-      ...request.query,
-    });
     //-------------------------------------------------------------------------------------------------------
     const postbackIntallSingular: PostbackInstallSingular = this.postbackInstallSingularRepository.create({
       viewCode: request.query.sub2,
@@ -697,6 +694,24 @@ export class PostbackService {
     const redis: Redis = this.redisService.getClient();
     await redis.hset('singular:install', date, JSON.stringify(postbackIntallSingular));
     //-------------------------------------------------------------------------------------------------------
+    await this.singularInstallModel.create({
+      ...request.query,
+    });
+
+    await this.postbackQueue.add(
+      {
+        token: request.query.sub1,
+        impressionCode: request.query.sub2,
+        click_id: request.query.sub3,
+        event_name: 'install',
+        country: request.query.attribution_country,
+        ip: request.query.attribution_ip,
+        adid: request.query.gaid ? request.query.gaid : request.query.idfv,
+        click_time: request.query.click_time.replace('_', ' '),
+        install_time: request.query.time.replace('_', ' '),
+      },
+      { removeOnComplete: true, removeOnFail: true, attempts: 3 },
+    );
   }
   async eventSingular(request: any) {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
