@@ -28,7 +28,7 @@ export class DailyCacheMiddleware implements NestMiddleware {
     const isMakeDailyCache: boolean = Boolean(await redis.get(`${token}:${pub_id}:${sub_id}:${moment().tz('Asia/Seoul').format('YYYYMMDD')}`));
 
     if (!isMakeDailyCache) {
-      this.dailyModel.findOne(
+      await this.dailyModel.findOneAndUpdate(
         {
           token: token,
           pub_id: pub_id,
@@ -38,9 +38,8 @@ export class DailyCacheMiddleware implements NestMiddleware {
             $lte: moment().endOf('day').toISOString(),
           },
         },
-        async (err, daily) => {
-          if (!daily) await this.dailyModel.create({ token: token, pub_id: pub_id, sub_id: sub_id, impressionCode: viewCode });
-        },
+        { $set: { impressionCode: viewCode } },
+        { upsert: true },
       );
       await redis.set(`${token}:${pub_id}:${sub_id}:${moment().tz('Asia/Seoul').format('YYYYMMDD')}`, 'true');
       await redis.expire(`${token}:${pub_id}:${sub_id}:${moment().tz('Asia/Seoul').format('YYYYMMDD')}`, 60 * 30);
