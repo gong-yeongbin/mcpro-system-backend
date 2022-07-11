@@ -8,14 +8,14 @@ import * as _ from 'lodash';
 import { RedisService } from 'nestjs-redis';
 import { Redis } from 'ioredis';
 
-@Processor('adbrixremaster')
+@Processor('adbrixremasterEvent')
 export class AdbrixremasterEventConsumer {
   constructor(
     private readonly redisService: RedisService,
     @InjectRepository(PostbackEventAdbrixremaster) private readonly postbackEventAdbrixremasterRepository: Repository<PostbackEventAdbrixremaster>,
   ) {}
 
-  @Process('event')
+  @Process()
   async eventHandler(job: Job) {
     const redis: Redis = this.redisService.getClient();
 

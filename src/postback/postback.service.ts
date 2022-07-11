@@ -75,7 +75,7 @@ export class PostbackService {
     @InjectModel(AdbrixremasterEvent.name) private adbrixremasterEventModel: Model<AdbrixremasterEventDocument>,
     @InjectModel(Postback.name) private postbackModel: Model<PostbackDocument>,
     @InjectQueue('postback') private readonly postbackQueue: Queue,
-    @InjectQueue('adbrixremaster') private readonly adbrixremasterQueue: Queue,
+    @InjectQueue('adbrixremasterEvent') private readonly adbrixremasterEventQueue: Queue,
   ) {}
 
   async installAirbridge(request: any) {
@@ -538,7 +538,7 @@ export class PostbackService {
       revenue: 0,
     });
 
-    await this.adbrixremasterQueue.add('event', postbackEventAdbrixremaster, { removeOnComplete: true, removeOnFail: true, attempts: 3 });
+    await this.adbrixremasterEventQueue.add(postbackEventAdbrixremaster, { removeOnComplete: true, removeOnFail: true, attempts: 3 });
 
     // const date: string = moment().tz('Asia/Seoul').format('YYYY-MM-DD.HH:mm:ss.SSSSS');
 

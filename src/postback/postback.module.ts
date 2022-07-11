@@ -85,7 +85,10 @@ import { PostbackService } from './postback.service';
       name: 'postback',
     }),
     BullModule.registerQueue({
-      name: 'adbrixremaster',
+      name: 'adbrixremasterEvent',
+    }),
+    BullModule.registerQueue({
+      name: 'adbrixremasterInstall',
     }),
   ],
   controllers: [PostbackController],
