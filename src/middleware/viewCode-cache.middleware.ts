@@ -3,13 +3,12 @@ import { NextFunction } from 'express';
 import { RedisService } from 'nestjs-redis';
 import { Redis } from 'ioredis';
 import { v4 } from 'uuid';
-import { InjectModel } from '@nestjs/mongoose';
-import { Daily, DailyDocument } from 'src/schema/daily';
-import { Model } from 'mongoose';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
 
 @Injectable()
 export class ViewCodeCacheMiddleware implements NestMiddleware {
-  constructor(private readonly redisService: RedisService, @InjectModel(Daily.name) private readonly dailyModel: Model<DailyDocument>) {}
+  constructor(private readonly redisService: RedisService, @InjectQueue('daily') private readonly dailyQueue: Queue) {}
 
   async use(request: any, response: any, next: NextFunction): Promise<void> {
     const token: string = request.query.token;
@@ -27,10 +26,9 @@ export class ViewCodeCacheMiddleware implements NestMiddleware {
     const daily: string = await redis.get(`${token}:${pub_id}:${sub_id}:createdDaily`);
 
     if (!daily) {
-      await this.dailyModel.findOneAndUpdate(
-        { token: token, pub_id: pub_id, sub_id: sub_id },
-        { $set: { impressionCode: viewCode } },
-        { upsert: true, lean: true },
+      await this.dailyQueue.add(
+        { token: token, pub_id: pub_id, sub_id: sub_id, impressionCode: viewCode },
+        { removeOnComplete: true, removeOnFail: true, attempts: 3 },
       );
 
       await redis.set(`${token}:${pub_id}:${sub_id}:createdDaily`, viewCode);

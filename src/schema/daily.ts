@@ -1,8 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 export type DailyDocument = Daily & Document;
-
-@Schema({ versionKey: false, collection: 'daily', timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' } })
+// timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' }
+@Schema({ versionKey: false, collection: 'daily' })
 export class Daily {
   @Prop({ type: String, required: true })
   token: string;
@@ -51,6 +51,12 @@ export class Daily {
 
   @Prop({ type: Number, default: 0 })
   unregistered: number;
+
+  @Prop({ type: Date, default: Date.now() })
+  createdAt: Date;
+
+  @Prop({ type: Date, default: Date.now() })
+  updatedAt: Date;
 }
 
 export const DailySchema = SchemaFactory.createForClass(Daily);

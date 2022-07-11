@@ -12,6 +12,8 @@ import { Daily, DailySchema } from 'src/schema/daily';
 import { TrackingInfo, TrackingInfoSchema } from 'src/schema/trackingInfo';
 import { TrackingController } from './tracking.controller';
 import { TrackingService } from './tracking.service';
+import { BullModule } from '@nestjs/bull';
+import { DailyConsumer } from './daily.consumer';
 
 @Module({
   imports: [
@@ -22,9 +24,12 @@ import { TrackingService } from './tracking.service';
       { name: Daily.name, schema: DailySchema },
       { name: TrackingInfo.name, schema: TrackingInfoSchema },
     ]),
+    BullModule.registerQueue({
+      name: 'daily',
+    }),
   ],
   controllers: [TrackingController],
-  providers: [TrackingService],
+  providers: [TrackingService, DailyConsumer],
 })
 export class TrackingModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
