@@ -3,7 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Campaign as Campaign1 } from 'src/entities/Entity';
 import { CampaignCacheMiddleware } from 'src/middleware/campaign-cache.middleware';
-import { DailyCacheMiddleware } from 'src/middleware/daily-cache.middleware';
+import { ViewCodeCacheMiddleware } from 'src/middleware/viewCode-cache.middleware';
 import { TrackingMiddleware } from 'src/middleware/tracking.middleware';
 import { TrackingInfoMiddleware } from 'src/middleware/trackingInfo.middleware';
 import { Campaign, CampaignSchema } from 'src/schema/campaign';
@@ -30,7 +30,7 @@ export class TrackingModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(TrackingMiddleware).forRoutes(TrackingController);
     consumer.apply(CampaignCacheMiddleware).forRoutes(TrackingController);
-    consumer.apply(DailyCacheMiddleware).forRoutes(TrackingController);
+    consumer.apply(ViewCodeCacheMiddleware).forRoutes(TrackingController);
     // consumer.apply(TrackingInfoMiddleware).forRoutes(TrackingController);
   }
 }
