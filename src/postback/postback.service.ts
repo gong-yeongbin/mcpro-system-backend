@@ -537,7 +537,7 @@ export class PostbackService {
       revenue: 0,
     });
 
-    await this.postbackQueue.add('adbrixremaster-event', { removeOnComplete: true, removeOnFail: true, attempts: 3 });
+    await this.postbackQueue.add('adbrixremaster-event', postbackEventAdbrixremaster, { removeOnComplete: true, removeOnFail: true, attempts: 3 });
 
     // const date: string = moment().tz('Asia/Seoul').format('YYYY-MM-DD.HH:mm:ss.SSSSS');
 
