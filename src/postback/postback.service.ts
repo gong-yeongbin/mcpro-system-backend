@@ -537,10 +537,12 @@ export class PostbackService {
       revenue: 0,
     });
 
-    const date: string = moment().tz('Asia/Seoul').format('YYYY-MM-DD.HH:mm:ss.SSSSS');
+    await this.postbackQueue.add('adbrixremaster-event', { removeOnComplete: true, removeOnFail: true, attempts: 3 });
 
-    const redis: Redis = this.redisService.getClient();
-    await redis.hset('adbrixremaster:event', date, JSON.stringify(postbackEventAdbrixremaster));
+    // const date: string = moment().tz('Asia/Seoul').format('YYYY-MM-DD.HH:mm:ss.SSSSS');
+
+    // const redis: Redis = this.redisService.getClient();
+    // await redis.hset('adbrixremaster:event', date, JSON.stringify(postbackEventAdbrixremaster));
   }
 
   async installAdjust(request: any) {

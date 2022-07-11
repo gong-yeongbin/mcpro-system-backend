@@ -1,4 +1,5 @@
 import {
+  PostbackDaily,
   PostbackEventAdbrixremaster,
   PostbackEventAdjust,
   PostbackEventAirbridge,
@@ -13,6 +14,7 @@ import {
   PostbackInstallMobiconnect,
   PostbackInstallSingular,
   PostbackInstallTradingworks,
+  PostbackRegisteredEvent,
 } from '@entities/Entity';
 import { BullModule } from '@nestjs/bull';
 import { Module } from '@nestjs/common';
@@ -42,6 +44,8 @@ import { PostbackService } from './postback.service';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
+      PostbackRegisteredEvent,
+      PostbackDaily,
       PostbackInstallAirbridge,
       PostbackInstallTradingworks,
       PostbackInstallAppsflyer,
