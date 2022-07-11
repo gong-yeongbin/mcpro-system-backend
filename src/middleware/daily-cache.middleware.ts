@@ -29,11 +29,12 @@ export class DailyCacheMiddleware implements NestMiddleware {
       await redis.hset('view_code', `${token}/${pub_id}/${sub_id}`, viewCode);
     }
 
-    const isMakeDailyCache: boolean = Boolean(await redis.get(`${token}:${pub_id}:${sub_id}:${moment().tz('Asia/Seoul').format('YYYYMMDD')}`));
+    const session: mongoose.ClientSession = await this.connection.startSession();
 
-    if (!isMakeDailyCache) {
-      const session: mongoose.ClientSession = await this.connection.startSession();
-      await session.withTransaction(async () => {
+    await session.withTransaction(async () => {
+      const isMakeDailyCache: boolean = Boolean(await redis.get(`${token}:${pub_id}:${sub_id}:${moment().tz('Asia/Seoul').format('YYYYMMDD')}`));
+
+      if (!isMakeDailyCache) {
         await this.dailyModel
           .findOneAndUpdate(
             {
@@ -51,9 +52,9 @@ export class DailyCacheMiddleware implements NestMiddleware {
           .session(session);
         await redis.set(`${token}:${pub_id}:${sub_id}:${moment().tz('Asia/Seoul').format('YYYYMMDD')}`, 'true');
         await redis.expire(`${token}:${pub_id}:${sub_id}:${moment().tz('Asia/Seoul').format('YYYYMMDD')}`, 60 * 30);
-      });
-      session.endSession();
-    }
+        session.endSession();
+      }
+    });
     next();
   }
 }
