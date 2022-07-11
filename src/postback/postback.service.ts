@@ -76,6 +76,7 @@ export class PostbackService {
     @InjectModel(Postback.name) private postbackModel: Model<PostbackDocument>,
     @InjectQueue('postback') private readonly postbackQueue: Queue,
     @InjectQueue('adbrixremasterEvent') private readonly adbrixremasterEventQueue: Queue,
+    @InjectQueue('adbrixremasterInstall') private readonly adbrixremasterInstallQueue: Queue,
   ) {}
 
   async installAirbridge(request: any) {
@@ -449,10 +450,11 @@ export class PostbackService {
       aServerDatetime: moment.utc(request.query.a_server_datetime.replace('+', ' ')).tz('Asia/Seoul').format('YYYY-MM-DD HH:mm:ss'),
     });
 
-    const date: string = moment().tz('Asia/Seoul').format('YYYY-MM-DD.HH:mm:ss.SSSSS');
+    await this.adbrixremasterInstallQueue.add(postbackInstallAdbrixremaster, { removeOnComplete: true, removeOnFail: true, attempts: 3 });
+    // const date: string = moment().tz('Asia/Seoul').format('YYYY-MM-DD.HH:mm:ss.SSSSS');
 
-    const redis: Redis = this.redisService.getClient();
-    await redis.hset('adbrixremaster:install', date, JSON.stringify(postbackInstallAdbrixremaster));
+    // const redis: Redis = this.redisService.getClient();
+    // await redis.hset('adbrixremaster:install', date, JSON.stringify(postbackInstallAdbrixremaster));
     //-------------------------------------------------------------------------------------------------------
     await this.adbrixremasterInstallModel.create({
       ...request.query,
