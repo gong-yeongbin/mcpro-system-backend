@@ -31,30 +31,29 @@ export class DailyCacheMiddleware implements NestMiddleware {
 
     const session: mongoose.ClientSession = await this.connection.startSession();
 
-    await session.withTransaction(async () => {
-      const isMakeDailyCache: boolean = Boolean(await redis.get(`${token}:${pub_id}:${sub_id}:${moment().tz('Asia/Seoul').format('YYYYMMDD')}`));
+    // await session.withTransaction(async () => {
+    const isMakeDailyCache: boolean = Boolean(await redis.get(`${token}:${pub_id}:${sub_id}:${moment().tz('Asia/Seoul').format('YYYYMMDD')}`));
 
-      if (!isMakeDailyCache) {
-        await this.dailyModel
-          .findOneAndUpdate(
-            {
-              token: token,
-              pub_id: pub_id,
-              sub_id: sub_id,
-              createdAt: {
-                $gte: moment().startOf('day').toISOString(),
-                $lte: moment().endOf('day').toISOString(),
-              },
-            },
-            { $set: { impressionCode: viewCode } },
-            { upsert: true },
-          )
-          .session(session);
-        await redis.set(`${token}:${pub_id}:${sub_id}:${moment().tz('Asia/Seoul').format('YYYYMMDD')}`, 'true');
-        await redis.expire(`${token}:${pub_id}:${sub_id}:${moment().tz('Asia/Seoul').format('YYYYMMDD')}`, 60 * 30);
-        session.endSession();
-      }
-    });
+    if (!isMakeDailyCache) {
+      await this.dailyModel.findOneAndUpdate(
+        {
+          token: token,
+          pub_id: pub_id,
+          sub_id: sub_id,
+          createdAt: {
+            $gte: moment().startOf('day').toISOString(),
+            $lte: moment().endOf('day').toISOString(),
+          },
+        },
+        { $set: { impressionCode: viewCode } },
+        { upsert: true },
+      );
+      // .session(session);
+      await redis.set(`${token}:${pub_id}:${sub_id}:${moment().tz('Asia/Seoul').format('YYYYMMDD')}`, 'true');
+      await redis.expire(`${token}:${pub_id}:${sub_id}:${moment().tz('Asia/Seoul').format('YYYYMMDD')}`, 60 * 30);
+      // session.endSession();
+    }
+    // });
     next();
   }
 }
