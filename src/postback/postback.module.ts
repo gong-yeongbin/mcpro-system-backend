@@ -37,6 +37,7 @@ import { SingularEvent, SingularEventSchema } from 'src/schema/singular_event';
 import { SingularInstall, SingularInstallSchema } from 'src/schema/singular_install';
 import { TradingworksEvent, TradingworksEventSchema } from 'src/schema/tradingworks_event';
 import { TradingworksInstall, TradingworksInstallSchema } from 'src/schema/tradingworks_install';
+import { AdbrixremasterEventConsumer } from './adbrixremasterEvent.consumer';
 import { PostbackConsumer } from './postback.consumer';
 import { PostbackController } from './postback.controller';
 import { PostbackService } from './postback.service';
@@ -83,8 +84,11 @@ import { PostbackService } from './postback.service';
     BullModule.registerQueue({
       name: 'postback',
     }),
+    BullModule.registerQueue({
+      name: 'adbrixremaster',
+    }),
   ],
   controllers: [PostbackController],
-  providers: [PostbackService, PostbackConsumer],
+  providers: [PostbackService, PostbackConsumer, AdbrixremasterEventConsumer],
 })
 export class PostbackModule {}
