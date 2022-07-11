@@ -1,7 +1,6 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { CampaignService } from 'src/campaign/campaign.service';
 import { Campaign as Campaign1 } from 'src/entities/Entity';
 import { CampaignCacheMiddleware } from 'src/middleware/campaign-cache.middleware';
 import { DailyCacheMiddleware } from 'src/middleware/daily-cache.middleware';
@@ -25,7 +24,7 @@ import { TrackingService } from './tracking.service';
     ]),
   ],
   controllers: [TrackingController],
-  providers: [TrackingService, CampaignService],
+  providers: [TrackingService],
 })
 export class TrackingModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

@@ -3,18 +3,10 @@ import { NextFunction } from 'express';
 import { RedisService } from 'nestjs-redis';
 import { Redis } from 'ioredis';
 import { v4 } from 'uuid';
-import * as moment from 'moment-timezone';
-import { InjectConnection, InjectModel } from '@nestjs/mongoose';
-import { Daily, DailyDocument } from 'src/schema/daily';
-import * as mongoose from 'mongoose';
 
 @Injectable()
 export class DailyCacheMiddleware implements NestMiddleware {
-  constructor(
-    private readonly redisService: RedisService,
-    @InjectModel(Daily.name) private readonly dailyModel: mongoose.Model<DailyDocument>,
-    @InjectConnection() private readonly connection: mongoose.Connection,
-  ) {}
+  constructor(private readonly redisService: RedisService) {}
 
   async use(request: any, response: any, next: NextFunction): Promise<void> {
     const token: string = request.query.token;
@@ -29,31 +21,6 @@ export class DailyCacheMiddleware implements NestMiddleware {
       await redis.hset('view_code', `${token}/${pub_id}/${sub_id}`, viewCode);
     }
 
-    // const session: mongoose.ClientSession = await this.connection.startSession();
-
-    // await session.withTransaction(async () => {
-    // const isMakeDailyCache: boolean = Boolean(await redis.get(`${token}:${pub_id}:${sub_id}:${moment().tz('Asia/Seoul').format('YYYYMMDD')}`));
-
-    // if (!isMakeDailyCache) {
-    //   await this.dailyModel.findOneAndUpdate(
-    //     {
-    //       token: token,
-    //       pub_id: pub_id,
-    //       sub_id: sub_id,
-    //       createdAt: {
-    //         $gte: moment().startOf('day').toISOString(),
-    //         $lte: moment().endOf('day').toISOString(),
-    //       },
-    //     },
-    //     { $set: { impressionCode: viewCode } },
-    //     { upsert: true },
-    //   );
-    // .session(session);
-    // await redis.set(`${token}:${pub_id}:${sub_id}:${moment().tz('Asia/Seoul').format('YYYYMMDD')}`, 'true');
-    // await redis.expire(`${token}:${pub_id}:${sub_id}:${moment().tz('Asia/Seoul').format('YYYYMMDD')}`, 60 * 30);
-    // session.endSession();
-    // }
-    // });
     next();
   }
 }
