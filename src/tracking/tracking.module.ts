@@ -8,7 +8,6 @@ import { TrackingMiddleware } from 'src/middleware/tracking.middleware';
 import { Campaign, CampaignSchema } from 'src/schema/campaign';
 import { Config, ConfigSchema } from 'src/schema/config';
 import { Daily, DailySchema } from 'src/schema/daily';
-import { TrackingInfo, TrackingInfoSchema } from 'src/schema/trackingInfo';
 import { TrackingController } from './tracking.controller';
 import { TrackingService } from './tracking.service';
 import { BullModule } from '@nestjs/bull';
@@ -24,7 +23,6 @@ import { DailyConsumer } from './daily.consumer';
       { name: Campaign.name, schema: CampaignSchema },
       { name: Config.name, schema: ConfigSchema },
       { name: Daily.name, schema: DailySchema },
-      { name: TrackingInfo.name, schema: TrackingInfoSchema },
       { name: ImpressionCode.name, schema: ImpressionCodeSchema },
     ]),
     BullModule.registerQueue({
