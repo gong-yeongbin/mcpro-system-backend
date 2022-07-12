@@ -6,6 +6,7 @@ import { Daily, DailyDocument } from 'src/schema/daily';
 import { Postback, PostbackDocument } from 'src/schema/postback';
 import * as moment from 'moment-timezone';
 import { Event, EventDocument } from 'src/schema/event';
+import { ImpressionCode, ImpressionCodeDocument } from 'src/schema/impressionCode';
 
 @Processor('postback')
 export class PostbackConsumer {
@@ -13,6 +14,7 @@ export class PostbackConsumer {
     @InjectModel(Daily.name) private readonly dailyModel: Model<DailyDocument>,
     @InjectModel(Event.name) private readonly eventModel: Model<EventDocument>,
     @InjectModel(Postback.name) private readonly postbackModel: Model<PostbackDocument>,
+    @InjectModel(ImpressionCode.name) private readonly impressionCodeModel: Model<ImpressionCodeDocument>,
   ) {}
 
   @Process()
@@ -23,9 +25,7 @@ export class PostbackConsumer {
     const event_name: string = data.event_name;
     const revenue: number = data.revenue;
 
-    const dailyInfo: Daily = await this.dailyModel.findOne({ impressionCode: impressionCode });
-
-    if (!dailyInfo) return;
+    const impressionCodeInstance: ImpressionCode = await this.impressionCodeModel.findOne({ impressionCode: impressionCode });
 
     const eventInstance: Event = await this.eventModel.findOne({
       token: token,
@@ -45,7 +45,7 @@ export class PostbackConsumer {
     else if (eventInstance.admin == 'etc5') inc = { etc5: 1 };
     else if (eventInstance.admin == 'purchase') inc = { purchase: 1, revenue: revenue };
 
-    const daily: Daily = await this.dailyModel.findOneAndUpdate(
+    this.dailyModel.findOne(
       {
         impressionCode: impressionCode,
         createdAt: {
@@ -53,10 +53,29 @@ export class PostbackConsumer {
           $lte: moment().endOf('day').toISOString(),
         },
       },
-      { $inc: inc },
-    );
+      async (err, daily) => {
+        if (!daily) {
+          await this.dailyModel.create({
+            impressionCode: impressionCode,
+            token: token,
+            pub_id: impressionCodeInstance.pub_id,
+            sub_id: impressionCodeInstance.sub_id,
+          });
+        }
 
-    data.daily = daily;
-    await this.postbackModel.create(data);
+        data.daily = await this.dailyModel.findOneAndUpdate(
+          {
+            impressionCode: impressionCode,
+            createdAt: {
+              $gte: moment().startOf('day').toISOString(),
+              $lte: moment().endOf('day').toISOString(),
+            },
+          },
+          { $inc: inc },
+        );
+
+        await this.postbackModel.create(data);
+      },
+    );
   }
 }
