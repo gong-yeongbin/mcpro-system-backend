@@ -6,25 +6,13 @@ import { Daily, DailyDocument } from 'src/schema/daily';
 import { Postback, PostbackDocument } from 'src/schema/postback';
 import * as moment from 'moment-timezone';
 import { Event, EventDocument } from 'src/schema/event';
-import { InjectRepository } from '@nestjs/typeorm';
-import PostbackInstallAdbrixremaster from '@entities/PostbackInstallAdbrixremaster';
-import { Repository } from 'typeorm';
-import { PostbackDaily, PostbackEventAdbrixremaster, PostbackRegisteredEvent } from '@entities/Entity';
-import * as _ from 'lodash';
-import { RedisService } from 'nestjs-redis';
-import { Redis } from 'ioredis';
 
 @Processor('postback')
 export class PostbackConsumer {
   constructor(
-    private readonly redisService: RedisService,
     @InjectModel(Daily.name) private readonly dailyModel: Model<DailyDocument>,
     @InjectModel(Event.name) private readonly eventModel: Model<EventDocument>,
     @InjectModel(Postback.name) private readonly postbackModel: Model<PostbackDocument>,
-    @InjectRepository(PostbackDaily) private readonly postbackDailyRepository: Repository<PostbackDaily>,
-    @InjectRepository(PostbackInstallAdbrixremaster) private readonly postbackInstallAdbrixremasterRepository: Repository<PostbackInstallAdbrixremaster>,
-    @InjectRepository(PostbackEventAdbrixremaster) private readonly postbackEventAdbrixremasterRepository: Repository<PostbackEventAdbrixremaster>,
-    @InjectRepository(PostbackRegisteredEvent) private readonly postbackRegisteredEventRepository: Repository<PostbackRegisteredEvent>,
   ) {}
 
   @Process()

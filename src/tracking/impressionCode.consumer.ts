@@ -2,7 +2,6 @@ import { Process, Processor } from '@nestjs/bull';
 import { InjectModel } from '@nestjs/mongoose';
 import { Job } from 'bull';
 import { Model } from 'mongoose';
-import * as moment from 'moment-timezone';
 import { ImpressionCode, ImpressionCodeDocument } from 'src/schema/impressionCode';
 
 @Processor('impressionCode')

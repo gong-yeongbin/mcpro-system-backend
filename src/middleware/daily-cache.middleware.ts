@@ -2,12 +2,8 @@ import { Injectable, NestMiddleware } from '@nestjs/common';
 import { NextFunction } from 'express';
 import { RedisService } from 'nestjs-redis';
 import { Redis } from 'ioredis';
-import { v4 } from 'uuid';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
-import { InjectModel } from '@nestjs/mongoose';
-import { ImpressionCode, ImpressionCodeDocument } from 'src/schema/impressionCode';
-import { Model } from 'mongoose';
 
 @Injectable()
 export class DailyCacheMiddleware implements NestMiddleware {
