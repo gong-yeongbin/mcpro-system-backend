@@ -15,6 +15,8 @@ import { TrackingService } from './tracking.service';
 import { BullModule } from '@nestjs/bull';
 import { ImpressionCodeConsumer } from './impressionCode.consumer';
 import { ImpressionCode, ImpressionCodeSchema } from 'src/schema/impressionCode';
+import { DailyCacheMiddleware } from 'src/middleware/daily-cache.middleware';
+import { DailyConsumer } from './daily.consumer';
 
 @Module({
   imports: [
@@ -27,17 +29,21 @@ import { ImpressionCode, ImpressionCodeSchema } from 'src/schema/impressionCode'
       { name: ImpressionCode.name, schema: ImpressionCodeSchema },
     ]),
     BullModule.registerQueue({
+      name: 'daily',
+    }),
+    BullModule.registerQueue({
       name: 'impressionCode',
     }),
   ],
   controllers: [TrackingController],
-  providers: [TrackingService, ImpressionCodeConsumer],
+  providers: [TrackingService, ImpressionCodeConsumer, DailyConsumer],
 })
 export class TrackingModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(TrackingMiddleware).forRoutes(TrackingController);
     consumer.apply(CampaignCacheMiddleware).forRoutes(TrackingController);
     consumer.apply(ImpressionCodeCacheMiddleware).forRoutes(TrackingController);
+    consumer.apply(DailyCacheMiddleware).forRoutes(TrackingController);
     // consumer.apply(TrackingInfoMiddleware).forRoutes(TrackingController);
   }
 }
