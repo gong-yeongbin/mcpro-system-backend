@@ -67,7 +67,6 @@ export class PostbackConsumer {
       },
       { $inc: inc },
     );
-    console.log(daily);
 
     data.daily = daily;
     await this.postbackModel.create(data);
