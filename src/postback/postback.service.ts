@@ -282,10 +282,6 @@ export class PostbackService {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
     console.log(`[ tradingworks ---> mecrosspro ] install : ${originalUrl}`);
 
-    await this.tradingworksInstallModel.create({
-      ...request.query,
-    });
-
     const postbackInstallTradingworks: PostbackInstallTradingworks = this.postbackInstallTradingworksRepository.create({
       viewCode: request.query.publisher_id,
       token: request.query.cb_param1,
@@ -308,14 +304,29 @@ export class PostbackService {
 
     const redis: Redis = this.redisService.getClient();
     await redis.hset('tradingworks:install', date, JSON.stringify(postbackInstallTradingworks));
+
+    //-------------------------------------------------------------------------------------------------------
+    await this.tradingworksInstallModel.create({
+      ...request.query,
+    });
+
+    await this.postbackQueue.add(
+      {
+        token: request.query.cb_param1,
+        impressionCode: request.query.publisher_id,
+        click_id: request.query.transaction_id,
+        event_name: 'install',
+        carrier: request.query.device_carrier,
+        country: request.query.country_code,
+        ip: request.query.device_ip,
+        adid: request.query.adid ? request.query.adid : request.query.idfa,
+      },
+      { removeOnComplete: true, removeOnFail: true, attempts: 3 },
+    );
   }
   async eventTradingworks(request: any) {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
     console.log(`[ tradingworks ---> mecrosspro ] event : ${originalUrl}`);
-
-    await this.tradingworksEventModel.create({
-      ...request.query,
-    });
 
     const postbackEventTradingworks: PostbackEventTradingworks = this.postbackEventTradingworksRepository.create({
       viewCode: request.query.publisher_id,
@@ -340,6 +351,25 @@ export class PostbackService {
 
     const redis: Redis = this.redisService.getClient();
     await redis.hset('tradingworks:event', date, JSON.stringify(postbackEventTradingworks));
+
+    //-------------------------------------------------------------------------------------------------------
+    await this.tradingworksEventModel.create({
+      ...request.query,
+    });
+
+    await this.postbackQueue.add(
+      {
+        token: request.query.cb_param1,
+        impressionCode: request.query.publisher_id,
+        click_id: request.query.transaction_id,
+        event_name: request.query.action,
+        carrier: request.query.device_carrier,
+        country: request.query.country_code,
+        ip: request.query.device_ip,
+        adid: request.query.adid ? request.query.adid : request.query.idfa,
+      },
+      { removeOnComplete: true, removeOnFail: true, attempts: 3 },
+    );
   }
 
   async installAppsflyer(request: any) {
