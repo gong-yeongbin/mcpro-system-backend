@@ -160,13 +160,6 @@ export class PostbackService {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
     console.log(`[ airbridge ---> mecrosspro ] event : ${originalUrl}`);
 
-    await this.airbridgeEventModel.create({
-      ...request.query,
-      limitAdTracking: Boolean(request.query.limitAdTracking),
-      isUnique: Boolean(request.query.isUnique),
-      inAppPurchased: Boolean(request.query.inAppPurchased),
-    });
-
     const postbackEventAirbridge: PostbackEventAirbridge = this.postBackEventAirbridgeRepository.create({
       clickId: request.query.click_id,
       subId2: request.query.sub_id,
@@ -244,6 +237,45 @@ export class PostbackService {
 
     const redis: Redis = this.redisService.getClient();
     await redis.hset('airbridge:event', date, JSON.stringify(postbackEventAirbridge));
+
+    //-------------------------------------------------------------------------------------------------------
+    await this.airbridgeEventModel.create({
+      ...request.query,
+      limitAdTracking: Boolean(request.query.limitAdTracking),
+      isUnique: Boolean(request.query.isUnique),
+      inAppPurchased: Boolean(request.query.inAppPurchased),
+    });
+
+    let revenue: number = 0;
+    let currency: string;
+
+    if (request.query.product_info) {
+      const productInfo: any = JSON.parse(postbackEventAirbridge.productInfo);
+
+      for (let i = 0; i < productInfo.length; i++) {
+        revenue += +productInfo[i].productPrice;
+        currency = productInfo[i].currency;
+      }
+    }
+
+    await this.postbackQueue.add(
+      {
+        token: request.query.custom_param1,
+        carrier: request.query.device_carrier,
+        country: request.query.country,
+        language: request.query.language,
+        ip: request.query.device_ip,
+        adid: request.query.uuid,
+        click_id: request.query.click_id,
+        impressionCode: request.query.sub_id,
+        event_name: request.query.eventName,
+        click_time: moment(request.query.click_datetime).format('YYYY-MM-DD HH:mm:ss'),
+        event_time: moment(request.query.event_datetime).format('YYYY-MM-DD HH:mm:ss'),
+        revenue: revenue,
+        currency: currency,
+      },
+      { removeOnComplete: true, removeOnFail: true, attempts: 3 },
+    );
   }
 
   async installTradingworks(request: any) {
