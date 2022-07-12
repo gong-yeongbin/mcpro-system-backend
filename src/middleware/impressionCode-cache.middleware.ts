@@ -7,8 +7,8 @@ import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 
 @Injectable()
-export class ViewCodeCacheMiddleware implements NestMiddleware {
-  constructor(private readonly redisService: RedisService, @InjectQueue('daily') private readonly dailyQueue: Queue) {}
+export class ImpressionCodeCacheMiddleware implements NestMiddleware {
+  constructor(private readonly redisService: RedisService, @InjectQueue('impressionCode') private readonly impressionCodeQueue: Queue) {}
 
   async use(request: any, response: any, next: NextFunction): Promise<void> {
     const token: string = request.query.token;
@@ -23,16 +23,15 @@ export class ViewCodeCacheMiddleware implements NestMiddleware {
       await redis.hset('view_code', `${token}/${pub_id}/${sub_id}`, viewCode);
     }
 
-    const daily: string = await redis.get(`${token}:${pub_id}:${sub_id}:createdDaily`);
+    const impressionCode: string = await redis.get(`${token}:${pub_id}:${sub_id}`);
 
-    if (!daily) {
-      await this.dailyQueue.add(
-        { token: token, pub_id: pub_id, sub_id: sub_id, impressionCode: viewCode },
+    if (!impressionCode) {
+      await redis.set(`${token}:${pub_id}:${sub_id}`, viewCode);
+      await redis.expire(`${token}:${pub_id}:${sub_id}`, 60 * 15);
+      await this.impressionCodeQueue.add(
+        { impressionCode: viewCode, token: token, pub_id: pub_id, sub_id: sub_id },
         { removeOnComplete: true, removeOnFail: true, attempts: 3 },
       );
-
-      await redis.set(`${token}:${pub_id}:${sub_id}:createdDaily`, viewCode);
-      await redis.expire(`${token}:${pub_id}:${sub_id}:createdDaily`, 60 * 30);
     }
 
     next();

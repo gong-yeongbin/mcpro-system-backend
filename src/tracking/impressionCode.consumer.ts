@@ -2,12 +2,12 @@ import { Process, Processor } from '@nestjs/bull';
 import { InjectModel } from '@nestjs/mongoose';
 import { Job } from 'bull';
 import { Model } from 'mongoose';
-import { Daily, DailyDocument } from 'src/schema/daily';
 import * as moment from 'moment-timezone';
+import { ImpressionCode, ImpressionCodeDocument } from 'src/schema/impressionCode';
 
-@Processor('daily')
-export class DailyConsumer {
-  constructor(@InjectModel(Daily.name) private readonly dailyModel: Model<DailyDocument>) {}
+@Processor('impressionCode')
+export class ImpressionCodeConsumer {
+  constructor(@InjectModel(ImpressionCode.name) private readonly impressionCodeModel: Model<ImpressionCodeDocument>) {}
 
   @Process()
   async eventHandler(job: Job) {
@@ -17,16 +17,12 @@ export class DailyConsumer {
     const sub_id: string = data.sub_id;
     const impressionCode: string = data.impressionCode;
 
-    await this.dailyModel.findOneAndUpdate(
+    await this.impressionCodeModel.findOneAndUpdate(
       {
         token: token,
         pub_id: pub_id,
         sub_id: sub_id,
         impressionCode: impressionCode,
-        createdAt: {
-          $gte: moment().startOf('day').toISOString(),
-          $lte: moment().endOf('day').toISOString(),
-        },
       },
       {},
       { upsert: true, lean: true },
