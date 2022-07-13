@@ -7,10 +7,10 @@ export type CampaignDocument = Campaign & Document;
 
 @Schema({ versionKey: false, collection: 'campaign', timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' } })
 export class Campaign {
-  @Prop({ type: String, require: true, trim: true, unique: true })
+  @Prop({ type: String, require: true, unique: true })
   token: string;
 
-  @Prop({ type: String, require: true, trim: true })
+  @Prop({ type: String, require: true })
   name: string;
 
   @Prop({ type: String, require: true, enum: ['CPI', 'CPA'] })

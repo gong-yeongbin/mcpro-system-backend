@@ -4,6 +4,7 @@ import { RedisService } from 'nestjs-redis';
 import { Redis } from 'ioredis';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
+import * as moment from 'moment-timezone';
 
 @Injectable()
 export class DailyCacheMiddleware implements NestMiddleware {
@@ -16,7 +17,7 @@ export class DailyCacheMiddleware implements NestMiddleware {
 
     const redis: Redis = this.redisService.getClient();
 
-    const isDailyCache: string = await redis.get(`${token}:${pub_id}:${sub_id}:create`);
+    const isDailyCache: string = await redis.get(`${token}:${pub_id}:${sub_id}:${moment().tz('Asia/Seoul').format('YYYYMMDD')}:create`);
 
     if (!isDailyCache) {
       const impressionCode: string = await redis.get(`${token}:${pub_id}:${sub_id}`);
@@ -24,8 +25,8 @@ export class DailyCacheMiddleware implements NestMiddleware {
         { impressionCode: impressionCode, token: token, pub_id: pub_id, sub_id: sub_id },
         { removeOnComplete: true, removeOnFail: true, attempts: 3 },
       );
-      await redis.set(`${token}:${pub_id}:${sub_id}:create`, impressionCode);
-      await redis.expire(`${token}:${pub_id}:${sub_id}:create`, 60 * 30);
+      await redis.set(`${token}:${pub_id}:${sub_id}:${moment().tz('Asia/Seoul').format('YYYYMMDD')}:create`, impressionCode);
+      await redis.expire(`${token}:${pub_id}:${sub_id}:${moment().tz('Asia/Seoul').format('YYYYMMDD')}:create`, 60 * 30);
     }
 
     next();

@@ -4,7 +4,7 @@ export type TrackerDocument = Tracker & Document;
 
 @Schema({ versionKey: false, collection: 'tracker', timestamps: { createdAt: 'createdAt', updatedAt: false } })
 export class Tracker {
-  @Prop({ type: String, required: true, trim: true, unique: true })
+  @Prop({ type: String, required: true, unique: true })
   name: string;
 
   @Prop({ type: String, required: true })
