@@ -425,11 +425,6 @@ export class PostbackService {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
     console.log(`[ appsflyer ---> mecrosspro ] event : ${originalUrl}`);
 
-    await this.appsflyerEventModel.create({
-      ...request.query,
-      event_revenue: request.query.event_revenue == 'N/A' ? 0 : request.query.event_revenue,
-    });
-
     const postbackEventAppsflyer: PostbackEventAppsflyer = this.postbackEventAppsflyerRepository.create({
       viewCode: request.query.af_siteid,
       token: request.query.af_c_id,
@@ -455,6 +450,31 @@ export class PostbackService {
 
     const redis: Redis = this.redisService.getClient();
     await redis.hset('appsflyer:event', date, JSON.stringify(postbackEventAppsflyer));
+
+    //-------------------------------------------------------------------------------------------------------
+    await this.appsflyerEventModel.create({
+      ...request.query,
+      event_revenue: request.query.event_revenue == 'N/A' ? 0 : request.query.event_revenue,
+    });
+
+    await this.postbackQueue.add(
+      {
+        token: request.query.af_c_id,
+        carrier: request.query.device_carrier,
+        country: request.query.country_code,
+        language: request.query.language,
+        ip: request.query.device_ip,
+        adid: request.query.idfa ? request.query.idfa : request.query.idfv,
+        click_id: request.query.clickid,
+        impressionCode: request.query.af_siteid,
+        event_name: request.query.event_name,
+        click_time: moment(request.query.click_datetime).format('YYYY-MM-DD HH:mm:ss'),
+        event_time: moment(request.query.event_datetime).format('YYYY-MM-DD HH:mm:ss'),
+        revenue: request.query.event_revenue == 'N/A' ? 0 : request.query.event_revenue,
+        currency: request.query.event_revenue_currency == 'N/A' ? '' : request.query.event_revenue_currency,
+      },
+      { removeOnComplete: true, removeOnFail: true, attempts: 3 },
+    );
   }
 
   async installAdbrixremaster(request: any) {
