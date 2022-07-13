@@ -900,7 +900,6 @@ export class PostbackService {
       {
         token: request.query.sub1,
         country: request.query.attribution_country,
-        language: request.query.language,
         ip: request.query.attribution_ip,
         adid: request.query.gaid ? request.query.gaid : request.query.idfa,
         click_id: request.query.sub3,
@@ -919,9 +918,6 @@ export class PostbackService {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
     console.log(`[ mobiconnect ---> mecrosspro ] install : ${originalUrl}`);
 
-    await this.mobiconnectInstallModel.create({
-      ...request.query,
-    });
     //-------------------------------------------------------------------------------------------------------
     const postbackInstallMobiconnect: PostbackInstallMobiconnect = this.postbackInstallMobiconnectRepository.create({
       viewCode: request.query.pub_id,
@@ -950,14 +946,30 @@ export class PostbackService {
     const redis: Redis = this.redisService.getClient();
     await redis.hset('mobiconnect:install', date, JSON.stringify(postbackInstallMobiconnect));
     //-------------------------------------------------------------------------------------------------------
+    await this.mobiconnectInstallModel.create({
+      ...request.query,
+    });
+
+    await this.postbackQueue.add(
+      {
+        token: request.query.custom1,
+        country: request.query.country_code,
+        language: request.query.language,
+        carrier: request.query.carrier,
+        ip: request.query.ip,
+        adid: request.query.gaid ? request.query.gaid : request.query.idfa,
+        click_id: request.query.click_id,
+        impressionCode: request.query.pub_id,
+        event_name: request.query.event_id,
+        click_time: moment.unix(request.query.click_timestamp).format('YYYY-MM-DD HH:mm:ss'),
+        install_time: moment.unix(request.query.install_timestamp).format('YYYY-MM-DD HH:mm:ss'),
+      },
+      { removeOnComplete: true, removeOnFail: true, attempts: 3 },
+    );
   }
   async eventMobiconnect(request: any) {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
     console.log(`[ mobiconnect ---> mecrosspro ] event : ${originalUrl}`);
-
-    await this.mobiconnectEventModel.create({
-      ...request.query,
-    });
 
     const postbackEventMobiconnect: PostbackEventMobiconnect = this.postbackEventMobiconnectRepository.create({
       viewCode: request.query.pub_id,
@@ -988,5 +1000,29 @@ export class PostbackService {
 
     const redis: Redis = this.redisService.getClient();
     await redis.hset('mobiconnect:event', date, JSON.stringify(postbackEventMobiconnect));
+
+    //-------------------------------------------------------------------------------------------------------
+    await this.mobiconnectEventModel.create({
+      ...request.query,
+    });
+
+    await this.postbackQueue.add(
+      {
+        token: request.query.custom1,
+        country: request.query.country_code,
+        language: request.query.language,
+        carrier: request.query.carrier,
+        ip: request.query.ip,
+        adid: request.query.gaid ? request.query.gaid : request.query.idfa,
+        click_id: request.query.click_id,
+        impressionCode: request.query.pub_id,
+        event_name: request.query.event_id,
+        install_time: moment.unix(request.query.install_timestamp).format('YYYY-MM-DD HH:mm:ss'),
+        event_time: moment.unix(request.query.event_timestamp).format('YYYY-MM-DD HH:mm:ss'),
+        revenue: request.query.revenue,
+        currency: request.query.currency,
+      },
+      { removeOnComplete: true, removeOnFail: true, attempts: 3 },
+    );
   }
 }
