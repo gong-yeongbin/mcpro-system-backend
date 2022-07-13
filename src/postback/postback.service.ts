@@ -783,6 +783,25 @@ export class PostbackService {
 
     const redis: Redis = this.redisService.getClient();
     await redis.hset('adjust:event', date, JSON.stringify(postbackEventAdjust));
+    //-------------------------------------------------------------------------------------------------------
+    await this.postbackQueue.add(
+      {
+        token: request.query.cp_token,
+        carrier: request.query.isp,
+        country: request.query.country,
+        language: request.query.language,
+        ip: request.query.ip_address,
+        adid: request.query.adid ? request.query.adid : request.query.idfv,
+        click_id: request.query.click_id,
+        impressionCode: request.query.publisher_id,
+        event_name: request.query.event_type,
+        install_time: moment.unix(request.query.installed_at).format('YYYY-MM-DD HH:mm:ss'),
+        event_time: moment.unix(request.query.created_at).format('YYYY-MM-DD HH:mm:ss'),
+        revenue: request.query.revenue,
+        currency: request.query.currency,
+      },
+      { removeOnComplete: true, removeOnFail: true, attempts: 3 },
+    );
   }
 
   async installSingular(request: any) {
