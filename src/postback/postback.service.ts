@@ -468,8 +468,8 @@ export class PostbackService {
         click_id: request.query.clickid,
         impressionCode: request.query.af_siteid,
         event_name: request.query.event_name,
-        click_time: moment(request.query.click_datetime).format('YYYY-MM-DD HH:mm:ss'),
-        event_time: moment(request.query.event_datetime).format('YYYY-MM-DD HH:mm:ss'),
+        install_time: moment(moment.utc(request.query.install_time).toDate()).format('YYYY-MM-DD HH:mm:ss'),
+        event_time: moment(moment.utc(request.query.event_time).toDate()).format('YYYY-MM-DD HH:mm:ss'),
         revenue: request.query.event_revenue == 'N/A' ? 0 : request.query.event_revenue,
         currency: request.query.event_revenue_currency == 'N/A' ? '' : request.query.event_revenue_currency,
       },
@@ -565,12 +565,6 @@ export class PostbackService {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
     console.log(`[ adbrixremaster ---> mecrosspro ] event : ${originalUrl}`);
 
-    await this.adbrixremasterEventModel.create({
-      ...request.query,
-      attr_event_datetime: request.query.attr_event_datetime.replace('+', ' '),
-      event_datetime: request.query.event_datetime.replace('+', ' '),
-    });
-
     const postbackEventAdbrixremaster: PostbackEventAdbrixremaster = this.postbackEventAdbrixremasterRepository.create({
       viewCode: request.query.cb_2,
       token: request.query.cb_1,
@@ -628,6 +622,49 @@ export class PostbackService {
 
     // const redis: Redis = this.redisService.getClient();
     // await redis.hset('adbrixremaster:event', date, JSON.stringify(postbackEventAdbrixremaster));
+
+    //-------------------------------------------------------------------------------------------------------
+    await this.adbrixremasterEventModel.create({
+      ...request.query,
+      attr_event_datetime: request.query.attr_event_datetime.replace('+', ' '),
+      event_datetime: request.query.event_datetime.replace('+', ' '),
+    });
+
+    let revenue: number = 0;
+    let currency: string = '';
+
+    if (request.query.param_json != 'null' && request.query.param_json != '' && request.query.param_json != null) {
+      const jsonData: any = JSON.parse(request.query.param_json);
+
+      if (jsonData['abx:item.abx:sales']) {
+        revenue = +jsonData['abx:item.abx:sales'];
+        currency = jsonData['abx:item.abx:currency'];
+      } else if (jsonData['abx:items']) {
+        for (const item of jsonData['abx:items']) {
+          revenue += +item['abx:sales'] ? +item['abx:sales'] : 0;
+          currency = item['abx:currency'];
+        }
+      }
+    }
+
+    await this.postbackQueue.add(
+      {
+        token: request.query.cb_1,
+        carrier: request.query.device_carrier,
+        country: request.query.device_country,
+        language: request.query.device_language,
+        ip: request.query.a_ip,
+        adid: request.query.adid ? request.query.adid : request.query.idfv,
+        click_id: request.query.cb_3,
+        impressionCode: request.query.cb_2,
+        event_name: request.query.event_name,
+        install_time: moment.utc(request.query.attr_event_datetime.replace('+', ' ')).tz('Asia/Seoul').format('YYYY-MM-DD HH:mm:ss'),
+        event_time: moment.utc(request.query.event_datetime.replace('+', ' ')).tz('Asia/Seoul').format('YYYY-MM-DD HH:mm:ss'),
+        revenue: revenue,
+        currency: currency,
+      },
+      { removeOnComplete: true, removeOnFail: true, attempts: 3 },
+    );
   }
 
   async installAdjust(request: any) {
