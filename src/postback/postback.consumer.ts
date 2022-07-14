@@ -7,6 +7,7 @@ import { Postback, PostbackDocument } from 'src/schema/postback';
 import * as moment from 'moment-timezone';
 import { Event, EventDocument } from 'src/schema/event';
 import { ImpressionCode, ImpressionCodeDocument } from 'src/schema/impressionCode';
+import { Campaign, CampaignDocument } from 'src/schema/campaign';
 
 @Processor('postback')
 export class PostbackConsumer {
@@ -15,6 +16,7 @@ export class PostbackConsumer {
     @InjectModel(Event.name) private readonly eventModel: Model<EventDocument>,
     @InjectModel(Postback.name) private readonly postbackModel: Model<PostbackDocument>,
     @InjectModel(ImpressionCode.name) private readonly impressionCodeModel: Model<ImpressionCodeDocument>,
+    @InjectModel(Campaign.name) private readonly campaignModel: Model<CampaignDocument>,
   ) {}
 
   @Process()
@@ -26,10 +28,10 @@ export class PostbackConsumer {
     const revenue: number = data.revenue;
 
     const impressionCodeInstance: ImpressionCode = await this.impressionCodeModel.findOne({ impressionCode: impressionCode });
-
+    const campaignInstance: Campaign = await this.campaignModel.findOne({ token: token });
     const eventInstance: Event = await this.eventModel.findOne({
-      token: token,
       tracker: event_name,
+      campaign: campaignInstance,
     });
 
     let inc = {};

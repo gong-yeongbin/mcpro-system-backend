@@ -28,6 +28,7 @@ import { AirbridgeEvent, AirbridgeEventSchema } from 'src/schema/airbridge_event
 import { AirbridgeInstall, AirbridgeInstallSchema } from 'src/schema/airbridge_install';
 import { AppsflyerEvent, AppsflyerEventSchema } from 'src/schema/appsflyer_event';
 import { AppsflyerInstall, AppsflyerInstallSchema } from 'src/schema/appsflyer_install';
+import { Campaign, CampaignSchema } from 'src/schema/campaign';
 import { Daily, DailySchema } from 'src/schema/daily';
 import { Event, EventSchema } from 'src/schema/event';
 import { ImpressionCode, ImpressionCodeSchema } from 'src/schema/impressionCode';
@@ -83,6 +84,7 @@ import { PostbackService } from './postback.service';
       { name: Postback.name, schema: PostbackSchema },
       { name: Event.name, schema: EventSchema },
       { name: ImpressionCode.name, schema: ImpressionCodeSchema },
+      { name: Campaign.name, schema: CampaignSchema },
     ]),
     BullModule.registerQueue({
       name: 'postback',
