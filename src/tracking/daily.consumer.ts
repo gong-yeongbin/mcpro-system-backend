@@ -29,7 +29,7 @@ export class DailyConsumer {
         },
       },
       {},
-      { upsert: true, lean: true },
+      { upsert: true },
     );
   }
 }
