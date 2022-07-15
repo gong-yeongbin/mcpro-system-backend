@@ -47,15 +47,15 @@ export class PostbackConsumer {
     else if (eventInstance.admin == 'etc5') inc = { etc5: 1 };
     else if (eventInstance.admin == 'purchase') inc = { purchase: 1, revenue: revenue };
 
-    this.dailyModel.findOne(
-      {
+    this.dailyModel
+      .findOne({
         impressionCode: impressionCode,
         createdAt: {
           $gte: moment().startOf('day').toISOString(),
           $lte: moment().endOf('day').toISOString(),
         },
-      },
-      async (err, daily) => {
+      })
+      .then(async (daily) => {
         if (!daily) {
           await this.dailyModel.create({
             impressionCode: impressionCode,
@@ -64,20 +64,19 @@ export class PostbackConsumer {
             sub_id: impressionCodeInstance.sub_id,
           });
         }
+      });
 
-        data.daily = await this.dailyModel.findOneAndUpdate(
-          {
-            impressionCode: impressionCode,
-            createdAt: {
-              $gte: moment().startOf('day').toISOString(),
-              $lte: moment().endOf('day').toISOString(),
-            },
-          },
-          { $inc: inc },
-        );
-
-        await this.postbackModel.create(data);
+    data.daily = await this.dailyModel.findOneAndUpdate(
+      {
+        impressionCode: impressionCode,
+        createdAt: {
+          $gte: moment().startOf('day').toISOString(),
+          $lte: moment().endOf('day').toISOString(),
+        },
       },
+      { $inc: inc },
+      { new: true },
     );
+    await this.postbackModel.create(data);
   }
 }
