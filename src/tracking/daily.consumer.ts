@@ -17,19 +17,23 @@ export class DailyConsumer {
     const sub_id: string = data.sub_id;
     const impressionCode: string = data.impressionCode;
 
-    await this.dailyModel.findOneAndUpdate(
-      {
-        token: token,
-        pub_id: pub_id,
-        sub_id: sub_id,
+    this.dailyModel
+      .findOne({
         impressionCode: impressionCode,
         createdAt: {
           $gte: moment().startOf('day').toISOString(),
           $lte: moment().endOf('day').toISOString(),
         },
-      },
-      {},
-      { upsert: true },
-    );
+      })
+      .then(async (daily) => {
+        if (!daily) {
+          await this.dailyModel.create({
+            impressionCode: impressionCode,
+            token: token,
+            pub_id: pub_id,
+            sub_id: sub_id,
+          });
+        }
+      });
   }
 }
