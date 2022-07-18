@@ -47,11 +47,20 @@ export class PostbackConsumer {
     else if (eventInstance.admin == 'etc5') inc = { etc5: 1 };
     else if (eventInstance.admin == 'purchase') inc = { purchase: 1, revenue: revenue };
 
-    data.daily = await this.dailyModel.findOneAndUpdate(
+    await this.dailyModel.findOneAndUpdate(
       {
         token: token,
         pub_id: impressionCodeInstance.pub_id,
         sub_id: impressionCodeInstance.sub_id,
+        impressionCode: impressionCode,
+        createdAt: { $gte: new Date(moment().startOf('day').toString()), $lte: new Date(moment().endOf('day').toString()) },
+      },
+      {},
+      { upsert: true, lean: true },
+    );
+
+    data.daily = await this.dailyModel.findOneAndUpdate(
+      {
         impressionCode: impressionCode,
         createdAt: { $gte: new Date(moment().startOf('day').toString()), $lte: new Date(moment().endOf('day').toString()) },
       },
