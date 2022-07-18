@@ -16,8 +16,9 @@ export class ImpressionCode {
   @Prop({ type: String, required: true })
   sub_id: string;
 
-  @Prop({ type: Date, default: Date.now(), expires: 60 * 60 * 24 * 30 * 3 })
+  @Prop({ type: Date, default: Date.now() })
   createdAt: Date;
 }
 
 export const ImpressionCodeSchema = SchemaFactory.createForClass(ImpressionCode);
+ImpressionCodeSchema.index({ createdAt: 1 }, { expires: 60 * 60 * 24 * 30 * 3 });

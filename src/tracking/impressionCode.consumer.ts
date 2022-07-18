@@ -16,15 +16,19 @@ export class ImpressionCodeConsumer {
     const sub_id: string = data.sub_id;
     const impressionCode: string = data.impressionCode;
 
-    await this.impressionCodeModel.findOneAndUpdate(
-      {
-        token: token,
-        pub_id: pub_id,
-        sub_id: sub_id,
+    this.impressionCodeModel
+      .findOne({
         impressionCode: impressionCode,
-      },
-      {},
-      { upsert: true, lean: true },
-    );
+      })
+      .then(async (impressionCode) => {
+        if (!impressionCode) {
+          await this.impressionCodeModel.create({
+            impressionCode: impressionCode,
+            token: token,
+            pub_id: pub_id,
+            sub_id: sub_id,
+          });
+        }
+      });
   }
 }
