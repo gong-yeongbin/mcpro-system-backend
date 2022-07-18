@@ -50,10 +50,7 @@ export class PostbackConsumer {
     this.dailyModel
       .findOne({
         impressionCode: impressionCode,
-        createdAt: {
-          $gte: moment().startOf('day').toISOString(),
-          $lte: moment().endOf('day').toISOString(),
-        },
+        createdAt: { $gte: new Date(moment().startOf('day').toString()), $lte: new Date(moment().endOf('day').toString()) },
       })
       .then(async (daily) => {
         if (!daily) {
@@ -69,10 +66,7 @@ export class PostbackConsumer {
     data.daily = await this.dailyModel.findOneAndUpdate(
       {
         impressionCode: impressionCode,
-        createdAt: {
-          $gte: moment().startOf('day').toISOString(),
-          $lte: moment().endOf('day').toISOString(),
-        },
+        createdAt: { $gte: new Date(moment().startOf('day').toString()), $lte: new Date(moment().endOf('day').toString()) },
       },
       { $inc: inc },
       { new: true },
