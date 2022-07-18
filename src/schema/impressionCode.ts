@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 export type ImpressionCodeDocument = ImpressionCode & Document;
 
-@Schema({ versionKey: false, collection: 'impressionCode', timestamps: { createdAt: 'createdAt', updatedAt: false } })
+@Schema({ versionKey: false, collection: 'impressionCode' })
 export class ImpressionCode {
   @Prop({ type: String, required: true, unique: true })
   impressionCode: string;
@@ -15,7 +15,9 @@ export class ImpressionCode {
 
   @Prop({ type: String, required: true })
   sub_id: string;
+
+  @Prop({ type: Date, default: Date.now(), index: 1, expires: 60 * 60 * 24 * 30 * 3 })
+  createdAt: Date;
 }
 
 export const ImpressionCodeSchema = SchemaFactory.createForClass(ImpressionCode);
-ImpressionCodeSchema.index({ createdAt: 1 }, { expires: 60 * 60 * 24 * 30 * 3 });
