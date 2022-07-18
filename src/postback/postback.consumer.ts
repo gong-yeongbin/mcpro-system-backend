@@ -27,7 +27,8 @@ export class PostbackConsumer {
     const event_name: string = data.event_name;
     const revenue: number = data.revenue;
 
-    const impressionCodeInstance: ImpressionCode = await this.impressionCodeModel.findOne({ impressionCode: impressionCode });
+    const daily: Daily = await this.dailyModel.findOne({ impressionCode: impressionCode });
+
     const campaignInstance: Campaign = await this.campaignModel.findOne({ token: token });
     const eventInstance: Event = await this.eventModel.findOne({
       tracker: event_name,
@@ -50,8 +51,8 @@ export class PostbackConsumer {
     await this.dailyModel.findOneAndUpdate(
       {
         token: token,
-        pub_id: impressionCodeInstance.pub_id,
-        sub_id: impressionCodeInstance.sub_id,
+        pub_id: daily.pub_id,
+        sub_id: daily.sub_id,
         impressionCode: impressionCode,
         createdAt: { $gte: new Date(moment().startOf('day').toString()), $lte: new Date(moment().endOf('day').toString()) },
       },
