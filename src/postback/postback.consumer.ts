@@ -66,7 +66,7 @@ export class PostbackConsumer {
         createdAt: { $gte: new Date(moment().startOf('day').toString()), $lte: new Date(moment().endOf('day').toString()) },
       },
       { $inc: inc },
-      { upsert: true, new: true },
+      { new: true },
     );
 
     await this.postbackModel.create(data);
