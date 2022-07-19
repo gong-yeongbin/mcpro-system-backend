@@ -23,7 +23,7 @@ export class DailyConsumer {
         pub_id: pub_id,
         sub_id: sub_id,
         impressionCode: impressionCode,
-        createdAt: { $gte: new Date(moment().startOf('day').toString()), $lte: new Date(moment().endOf('day').toString()) },
+        createdAt: { $gte: moment().startOf('day').toDate(), $lte: moment().endOf('day').toDate() },
       },
       {},
       { upsert: true, lean: true },

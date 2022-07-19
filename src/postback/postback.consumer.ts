@@ -54,7 +54,7 @@ export class PostbackConsumer {
         pub_id: daily.pub_id,
         sub_id: daily.sub_id,
         impressionCode: impressionCode,
-        createdAt: { $gte: new Date(moment().startOf('day').toString()), $lte: new Date(moment().endOf('day').toString()) },
+        createdAt: { $gte: moment().startOf('day').toDate(), $lte: moment().endOf('day').toDate() },
       },
       {},
       { upsert: true, lean: true },
@@ -63,7 +63,7 @@ export class PostbackConsumer {
     data.daily = await this.dailyModel.findOneAndUpdate(
       {
         impressionCode: impressionCode,
-        createdAt: { $gte: new Date(moment().startOf('day').toString()), $lte: new Date(moment().endOf('day').toString()) },
+        createdAt: { $gte: moment().startOf('day').toDate(), $lte: moment().endOf('day').toDate() },
       },
       { $inc: inc },
       { new: true },
