@@ -17,16 +17,14 @@ export class DailyConsumer {
     const sub_id: string = data.sub_id;
     const impressionCode: string = data.impressionCode;
 
-    await this.dailyModel.findOneAndUpdate(
-      {
-        token: token,
-        pub_id: pub_id,
-        sub_id: sub_id,
-        impressionCode: impressionCode,
-        createdAt: { $gte: moment().startOf('day').toDate(), $lte: moment().endOf('day').toDate() },
-      },
-      {},
-      { upsert: true, lean: true },
-    );
+    const dailyInstance: Daily = await this.dailyModel.findOne({
+      token: token,
+      pub_id: pub_id,
+      sub_id: sub_id,
+      impressionCode: impressionCode,
+      createdAt: { $gte: moment().startOf('day').toDate(), $lte: moment().endOf('day').toDate() },
+    });
+
+    if (!dailyInstance) await this.dailyModel.create({ token: token, pub_id: pub_id, sub_id: sub_id, impressionCode: impressionCode });
   }
 }

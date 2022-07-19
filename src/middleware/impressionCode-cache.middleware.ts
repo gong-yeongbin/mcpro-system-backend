@@ -44,7 +44,7 @@ export class ImpressionCodeCacheMiddleware implements NestMiddleware {
       await redis.expire(`${token}:${pub_id}:${sub_id}`, 60 * 15);
       await this.impressionCodeQueue.add(
         { impressionCode: viewCode, token: token, pub_id: pub_id, sub_id: sub_id },
-        { removeOnComplete: true, removeOnFail: true },
+        { removeOnComplete: true, removeOnFail: true, delay: 1000 },
       );
     }
 
