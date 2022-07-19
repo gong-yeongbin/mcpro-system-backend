@@ -153,7 +153,7 @@ export class PostbackService {
         click_time: moment(request.query.click_datetime).format('YYYY-MM-DD HH:mm:ss'),
         install_time: moment(request.query.event_datetime).format('YYYY-MM-DD HH:mm:ss'),
       },
-      { removeOnComplete: true, removeOnFail: true, attempts: 3 },
+      { removeOnComplete: true, removeOnFail: true, attempts: 2 },
     );
   }
   async eventAirbridge(request: any) {
@@ -274,7 +274,7 @@ export class PostbackService {
         revenue: revenue,
         currency: currency,
       },
-      { removeOnComplete: true, removeOnFail: true, attempts: 3 },
+      { removeOnComplete: true, removeOnFail: true, attempts: 2 },
     );
   }
 
@@ -321,7 +321,7 @@ export class PostbackService {
         ip: request.query.device_ip,
         adid: request.query.adid ? request.query.adid : request.query.idfa,
       },
-      { removeOnComplete: true, removeOnFail: true, attempts: 3 },
+      { removeOnComplete: true, removeOnFail: true, attempts: 2 },
     );
   }
   async eventTradingworks(request: any) {
@@ -368,7 +368,7 @@ export class PostbackService {
         ip: request.query.device_ip,
         adid: request.query.adid ? request.query.adid : request.query.idfa,
       },
-      { removeOnComplete: true, removeOnFail: true, attempts: 3 },
+      { removeOnComplete: true, removeOnFail: true, attempts: 2 },
     );
   }
 
@@ -418,7 +418,7 @@ export class PostbackService {
         click_time: moment(moment.utc(request.query.click_time).toDate()).format('YYYY-MM-DD HH:mm:ss'),
         install_time: moment(moment.utc(request.query.install_time).toDate()).format('YYYY-MM-DD HH:mm:ss'),
       },
-      { removeOnComplete: true, removeOnFail: true, attempts: 3 },
+      { removeOnComplete: true, removeOnFail: true, attempts: 2 },
     );
   }
   async eventAppsflyer(request: any) {
@@ -473,7 +473,7 @@ export class PostbackService {
         revenue: request.query.event_revenue == 'N/A' ? 0 : request.query.event_revenue,
         currency: request.query.event_revenue_currency == 'N/A' ? '' : request.query.event_revenue_currency,
       },
-      { removeOnComplete: true, removeOnFail: true, attempts: 3 },
+      { removeOnComplete: true, removeOnFail: true, attempts: 2 },
     );
   }
 
@@ -532,7 +532,7 @@ export class PostbackService {
       aServerDatetime: moment.utc(request.query.a_server_datetime.replace('+', ' ')).tz('Asia/Seoul').format('YYYY-MM-DD HH:mm:ss'),
     });
 
-    await this.adbrixremasterInstallQueue.add(postbackInstallAdbrixremaster, { removeOnComplete: true, removeOnFail: true, attempts: 3 });
+    await this.adbrixremasterInstallQueue.add(postbackInstallAdbrixremaster, { removeOnComplete: true, removeOnFail: true, attempts: 2 });
     // const date: string = moment().tz('Asia/Seoul').format('YYYY-MM-DD.HH:mm:ss.SSSSS');
 
     // const redis: Redis = this.redisService.getClient();
@@ -558,7 +558,7 @@ export class PostbackService {
         click_time: request.query.a_server_datetime.replace('+', ' '),
         install_time: request.query.event_datetime.replace('+', ' '),
       },
-      { removeOnComplete: true, removeOnFail: true, attempts: 3 },
+      { removeOnComplete: true, removeOnFail: true, attempts: 2 },
     );
   }
   async eventAdbrixremaster(request: any) {
@@ -616,7 +616,7 @@ export class PostbackService {
       revenue: 0,
     });
 
-    await this.adbrixremasterEventQueue.add(postbackEventAdbrixremaster, { removeOnComplete: true, removeOnFail: true, attempts: 3 });
+    await this.adbrixremasterEventQueue.add(postbackEventAdbrixremaster, { removeOnComplete: true, removeOnFail: true, attempts: 2 });
 
     // const date: string = moment().tz('Asia/Seoul').format('YYYY-MM-DD.HH:mm:ss.SSSSS');
 
@@ -663,7 +663,7 @@ export class PostbackService {
         revenue: revenue,
         currency: currency,
       },
-      { removeOnComplete: true, removeOnFail: true, attempts: 3 },
+      { removeOnComplete: true, removeOnFail: true, attempts: 2 },
     );
   }
 
@@ -726,7 +726,7 @@ export class PostbackService {
         click_time: moment.unix(request.query.click_time).format('YYYY-MM-DD HH:mm:ss'),
         install_time: moment.unix(request.query.installed_at).format('YYYY-MM-DD HH:mm:ss'),
       },
-      { removeOnComplete: true, removeOnFail: true, attempts: 3 },
+      { removeOnComplete: true, removeOnFail: true, attempts: 2 },
     );
   }
   async eventAdjust(request: any) {
@@ -800,7 +800,7 @@ export class PostbackService {
         revenue: request.query.revenue,
         currency: request.query.currency,
       },
-      { removeOnComplete: true, removeOnFail: true, attempts: 3 },
+      { removeOnComplete: true, removeOnFail: true, attempts: 2 },
     );
   }
 
@@ -853,7 +853,7 @@ export class PostbackService {
         click_time: moment.unix(request.query.click_utc).format('YYYY-MM-DD HH:mm:ss'),
         install_time: moment.unix(request.query.utc).format('YYYY-MM-DD HH:mm:ss'),
       },
-      { removeOnComplete: true, removeOnFail: true, attempts: 3 },
+      { removeOnComplete: true, removeOnFail: true, attempts: 2 },
     );
   }
   async eventSingular(request: any) {
@@ -910,7 +910,7 @@ export class PostbackService {
         revenue: request.query.amount,
         currency: request.query.currency,
       },
-      { removeOnComplete: true, removeOnFail: true, attempts: 3 },
+      { removeOnComplete: true, removeOnFail: true, attempts: 2 },
     );
   }
 
@@ -964,7 +964,7 @@ export class PostbackService {
         click_time: moment.unix(request.query.click_timestamp).format('YYYY-MM-DD HH:mm:ss'),
         install_time: moment.unix(request.query.install_timestamp).format('YYYY-MM-DD HH:mm:ss'),
       },
-      { removeOnComplete: true, removeOnFail: true, attempts: 3 },
+      { removeOnComplete: true, removeOnFail: true, attempts: 2 },
     );
   }
   async eventMobiconnect(request: any) {
@@ -1022,7 +1022,7 @@ export class PostbackService {
         revenue: request.query.revenue,
         currency: request.query.currency,
       },
-      { removeOnComplete: true, removeOnFail: true, attempts: 3 },
+      { removeOnComplete: true, removeOnFail: true, attempts: 2 },
     );
   }
 }
