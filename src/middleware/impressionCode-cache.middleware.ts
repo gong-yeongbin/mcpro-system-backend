@@ -41,7 +41,7 @@ export class ImpressionCodeCacheMiddleware implements NestMiddleware {
       // const ImpressionCode: string = impressionCodeInstance ? impressionCodeInstance.impressionCode : viewCode;
 
       await redis.set(`${token}:${pub_id}:${sub_id}`, viewCode);
-      await redis.expire(`${token}:${pub_id}:${sub_id}`, 60 * 60 * 6);
+      await redis.expire(`${token}:${pub_id}:${sub_id}`, 60 * 60 * 24);
       await this.impressionCodeQueue.add(
         { impressionCode: viewCode, token: token, pub_id: pub_id, sub_id: sub_id },
         { removeOnComplete: true, removeOnFail: true },
