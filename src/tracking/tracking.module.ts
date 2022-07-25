@@ -11,7 +11,6 @@ import { Daily, DailySchema } from 'src/schema/daily';
 import { TrackingController } from './tracking.controller';
 import { TrackingService } from './tracking.service';
 import { BullModule } from '@nestjs/bull';
-import { ImpressionCodeConsumer } from './impressionCode.consumer';
 import { ImpressionCode, ImpressionCodeSchema } from 'src/schema/impressionCode';
 import { DailyCacheMiddleware } from 'src/middleware/daily-cache.middleware';
 import { DailyConsumer } from './daily.consumer';
@@ -33,7 +32,7 @@ import { DailyConsumer } from './daily.consumer';
     }),
   ],
   controllers: [TrackingController],
-  providers: [TrackingService, ImpressionCodeConsumer, DailyConsumer],
+  providers: [TrackingService, DailyConsumer],
 })
 export class TrackingModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
