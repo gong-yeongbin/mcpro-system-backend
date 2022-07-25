@@ -30,13 +30,13 @@ export class TrackingService {
     const date: string = moment().tz('Asia/Seoul').format('YYYYMMDD');
     const clickCount: number = +(await redis.hget(date, `${token}/${pub_id}/${sub_id}`));
 
-    const isClickValidation: number = +(await redis.hget(`${date}:click`, `${impressionCode}`));
+    const isClickValidation: number = +(await redis.hget(`${date}:click`, `${token}:${pub_id}:${sub_id}`));
 
     if (!isClickValidation) {
-      await redis.hset(`${date}:click`, `${impressionCode}`, 1);
+      await redis.hset(`${date}:click`, `${token}:${pub_id}:${sub_id}`, 1);
       await redis.expire(`${date}:click`, 60 * 60 * 24 * 1);
     } else {
-      await redis.hincrby(`${date}:click`, `${impressionCode}`, 1);
+      await redis.hincrby(`${date}:click`, `${token}:${pub_id}:${sub_id}`, 1);
     }
 
     if (!clickCount) {
