@@ -16,12 +16,18 @@ export class ImpressionCodeConsumer {
     const sub_id: string = data.sub_id;
     const impressionCode: string = data.impressionCode;
 
-    const impressionCodeInstance: ImpressionCode = await this.impressionCodeModel.findOne({
-      token: token,
-      pub_id: pub_id,
-      sub_id: sub_id,
-    });
-
-    if (!impressionCodeInstance) await this.impressionCodeModel.create({ impressionCode: impressionCode, token: token, pub_id: pub_id, sub_id: sub_id });
+    this.impressionCodeModel
+      .findOne({
+        token: token,
+        pub_id: pub_id,
+        sub_id: sub_id,
+      })
+      .exec()
+      .then((result) => {
+        if (!result) this.impressionCodeModel.create({ impressionCode: impressionCode, token: token, pub_id: pub_id, sub_id: sub_id });
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   }
 }

@@ -27,21 +27,6 @@ export class PostbackConsumer {
     const event_name: string = data.event_name;
     const revenue: number = data.revenue;
 
-    const impressionCodeInstance: ImpressionCode = await this.impressionCodeModel.findOne({ impressionCode: impressionCode });
-    const dailyInstance: Daily = await this.dailyModel.findOne({
-      impressionCode: impressionCode,
-      createdAt: { $gte: moment().startOf('day').toDate(), $lte: moment().endOf('day').toDate() },
-    });
-
-    if (!dailyInstance) {
-      await this.dailyModel.create({
-        token: token,
-        pub_id: impressionCodeInstance.pub_id,
-        sub_id: impressionCodeInstance.sub_id,
-        impressionCode: impressionCode,
-      });
-    }
-
     const campaignInstance: Campaign = await this.campaignModel.findOne({ token: token });
     const eventInstance: Event = await this.eventModel.findOne({
       tracker: event_name,
@@ -60,15 +45,6 @@ export class PostbackConsumer {
     else if (eventInstance.admin == 'etc4') inc = { etc4: 1 };
     else if (eventInstance.admin == 'etc5') inc = { etc5: 1 };
     else if (eventInstance.admin == 'purchase') inc = { purchase: 1, revenue: revenue };
-
-    data.daily = await this.dailyModel.findOneAndUpdate(
-      {
-        impressionCode: impressionCode,
-        createdAt: { $gte: moment().startOf('day').toDate(), $lte: moment().endOf('day').toDate() },
-      },
-      { $inc: inc },
-      { new: true },
-    );
 
     await this.postbackModel.create(data);
   }
