@@ -6,7 +6,7 @@ export default class Advertiser {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
   idx: number;
 
-  @Column({ type: 'varchar', name: 'name', nullable: false, unique: true })
+  @Column({ type: 'varchar', name: 'name', unique: true })
   name: string;
 
   @CreateDateColumn({ type: 'timestamp', name: 'created_at', default: () => 'CURRENT_TIMESTAMP' })

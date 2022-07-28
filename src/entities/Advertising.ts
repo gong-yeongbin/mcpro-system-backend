@@ -15,7 +15,7 @@ export default class Advertising {
   @Column({ type: 'varchar', name: 'image_url', nullable: true })
   imageUrl: string;
 
-  @Column('tinyint', { name: 'status', default: true })
+  @Column({ type: 'boolean', name: 'status', default: true })
   status: boolean;
 
   @CreateDateColumn({ type: 'timestamp', name: 'created_at', default: () => 'CURRENT_TIMESTAMP' })

@@ -1,41 +1,35 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { Advertising } from '@entities/Entity';
 
 @Entity('tracker', { schema: 'mcpro' })
 export default class Tracker {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
-  public idx: number;
+  idx: number;
 
-  @Column('varchar', { name: 'name', nullable: true, length: 255 })
-  public name: string | null;
+  @Column({ type: 'varchar', name: 'name' })
+  name: string;
 
-  @Column('varchar', { name: 'type', length: 255, default: () => "'tracker'" })
-  public type: string;
+  @Column({ type: 'varchar', name: 'type', default: 'tracker' })
+  type: string;
 
-  @Column('text', { name: 'trackerTrackingUrlTemplate' })
-  public trackerTrackingUrlTemplate: string;
+  @Column({ type: 'text', name: 'trackerTrackingUrlTemplate' })
+  trackerTrackingUrlTemplate: string;
 
-  @Column('text', { name: 'mecrossPostbackInstallUrlTemplate' })
-  public mecrossPostbackInstallUrlTemplate: string;
+  @Column({ type: 'text', name: 'mecrossPostbackInstallUrlTemplate' })
+  mecrossPostbackInstallUrlTemplate: string;
 
-  @Column('text', { name: 'mecrossPostbackEventUrlTemplate' })
-  public mecrossPostbackEventUrlTemplate: string;
+  @Column({ type: 'text', name: 'mecrossPostbackEventUrlTemplate' })
+  mecrossPostbackEventUrlTemplate: string;
 
-  @Column('tinyint', { name: 'status', default: () => "'1'" })
-  public status: number;
+  @Column({ type: 'boolean', name: 'status', default: true })
+  status: number;
 
-  @Column('datetime', {
-    name: 'created_At',
-    default: () => "'CURRENT_TIMESTAMP(6)'",
-  })
-  public createdAt: Date;
+  @CreateDateColumn({ type: 'timestamp', name: 'created_at', default: () => 'CURRENT_TIMESTAMP' })
+  createdAt: Date;
 
-  @Column('datetime', {
-    name: 'updated_At',
-    default: () => "'CURRENT_TIMESTAMP(6)'",
-  })
-  public updatedAt: Date;
+  @UpdateDateColumn({ type: 'timestamp', name: 'updated_at', default: () => 'CURRENT_TIMESTAMP' })
+  updatedAt: Date;
 
   @OneToMany(() => Advertising, (advertising) => advertising.tracker)
-  public advertising: Advertising[];
+  advertising: Advertising[];
 }

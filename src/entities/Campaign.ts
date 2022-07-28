@@ -1,81 +1,58 @@
-import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { Advertising, Media, PostbackRegisteredEvent, Reservation } from '@entities/Entity';
 
-@Index('IDX_1ab622056fec78ded2dccbf2ce', ['token'], { unique: true })
 @Entity('campaign', { schema: 'mcpro' })
 export default class Campaign {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
-  public idx: number;
+  idx: number;
 
-  @Column('varchar', {
-    name: 'token',
-    nullable: true,
-    unique: true,
-    length: 255,
-  })
-  public token: string | null;
+  @Column({ type: 'varchar', name: 'token' })
+  token: string;
 
-  @Column('varchar', { name: 'appkey', length: 255 })
-  public appkey: string;
+  @Column({ type: 'varchar', name: 'appkey', nullable: true })
+  appkey: string;
 
-  @Column('varchar', { name: 'name', nullable: true, length: 255 })
-  public name: string | null;
+  @Column({ type: 'varchar', name: 'name' })
+  name: string;
 
-  @Column('varchar', { name: 'type', length: 255 })
-  public type: string;
+  @Column({ type: 'varchar', name: 'type' })
+  type: string;
 
-  @Column('tinyint', { name: 'trackerTrackingStatus', default: () => "'0'" })
-  public trackerTrackingStatus: number;
-
-  @Column('tinyint', { name: 'mecrossTrackingStatus', default: () => "'0'" })
-  public mecrossTrackingStatus: number;
-
-  @Column('tinyint', { name: 'status', default: () => "'1'" })
-  public status: boolean;
+  @Column({ type: 'boolean', name: 'status', default: true })
+  status: boolean;
 
   @Column('text', { name: 'trackerTrackingUrl' })
-  public trackerTrackingUrl: string;
+  trackerTrackingUrl: string;
 
   @Column('text', { name: 'mecrossTrackingUrl' })
-  public mecrossTrackingUrl: string;
+  mecrossTrackingUrl: string;
 
-  @Column('tinyint', {
-    name: 'block',
-    nullable: true,
-    width: 1,
-    default: () => "'0'",
-  })
-  public block: boolean | null;
+  @Column({ type: 'boolean', name: 'block', default: false })
+  block: boolean;
 
-  @Column('datetime', {
-    name: 'updated_at',
-    default: () => "'CURRENT_TIMESTAMP(6)'",
-  })
-  public updatedAt: Date;
+  @CreateDateColumn({ type: 'timestamp', name: 'created_at', default: () => 'CURRENT_TIMESTAMP' })
+  createdAt: Date;
 
-  @Column('datetime', {
-    name: 'created_at',
-    default: () => "'CURRENT_TIMESTAMP(6)'",
-  })
-  public createdAt: Date;
+  @UpdateDateColumn({ type: 'timestamp', name: 'updated_at', default: () => 'CURRENT_TIMESTAMP' })
+  updatedAt: Date;
 
   @ManyToOne(() => Advertising, (advertising) => advertising.campaign, {
     onDelete: 'NO ACTION',
     onUpdate: 'NO ACTION',
   })
   @JoinColumn([{ name: 'advertising', referencedColumnName: 'idx' }])
-  public advertising: Advertising;
+  advertising: Advertising;
 
   @OneToMany(() => Reservation, (reservation) => reservation.campaign)
-  public reservation: Reservation[];
+  reservation: Reservation[];
 
   @ManyToOne(() => Media, (media) => media.campaign, {
     onDelete: 'NO ACTION',
     onUpdate: 'CASCADE',
   })
   @JoinColumn([{ name: 'media', referencedColumnName: 'idx' }])
-  public media: Media;
+  media: Media;
 
   @OneToMany(() => PostbackRegisteredEvent, (postbackRegisteredEvent) => postbackRegisteredEvent.token)
-  public postbackRegisteredEvent: PostbackRegisteredEvent[];
+  postbackRegisteredEvent: PostbackRegisteredEvent[];
 }

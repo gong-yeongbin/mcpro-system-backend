@@ -1,42 +1,36 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { Campaign } from '@entities/Entity';
 
 @Entity('reservation', { schema: 'mcpro' })
 export default class Reservation {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
-  public idx: number;
+  idx: number;
 
-  @Column('varchar', { name: 'oldCampaignName', length: 255 })
-  public oldCampaignName: string;
+  @Column({ type: 'varchar', name: 'oldCampaignName' })
+  oldCampaignName: string;
 
-  @Column('varchar', { name: 'newCampaignName', length: 255 })
-  public newCampaignName: string;
+  @Column({ type: 'varchar', name: 'newCampaignName' })
+  newCampaignName: string;
 
-  @Column('tinyint', { name: 'status', default: () => "'0'" })
-  public status: boolean;
+  @Column({ type: 'boolean', name: 'status', default: false })
+  status: boolean;
 
-  @Column('datetime', {
-    name: 'reserved_at',
-    default: () => "'CURRENT_TIMESTAMP(6)'",
-  })
-  public reservedAt: Date;
+  @Column({ type: 'timestamp', name: 'reserved_at', default: () => 'CURRENT_TIMESTAMP' })
+  reservedAt: Date;
 
-  @Column('datetime', {
-    name: 'updated_at',
-    default: () => "'CURRENT_TIMESTAMP(6)'",
-  })
-  public updatedAt: Date;
+  @UpdateDateColumn({ type: 'timestamp', name: 'updated_at', default: () => 'CURRENT_TIMESTAMP' })
+  updatedAt: Date;
 
-  @Column('text', { name: 'oldTrackerTrackingUrl' })
-  public oldTrackerTrackingUrl: string;
+  @Column({ type: 'text', name: 'oldTrackerTrackingUrl' })
+  oldTrackerTrackingUrl: string;
 
-  @Column('text', { name: 'newTrackerTrackingUrl' })
-  public newTrackerTrackingUrl: string;
+  @Column({ type: 'text', name: 'newTrackerTrackingUrl' })
+  newTrackerTrackingUrl: string;
 
   @ManyToOne(() => Campaign, (campaign) => campaign.reservation, {
     onDelete: 'NO ACTION',
     onUpdate: 'NO ACTION',
   })
   @JoinColumn([{ name: 'campaign', referencedColumnName: 'idx' }])
-  public campaign: Campaign;
+  campaign: Campaign;
 }

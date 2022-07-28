@@ -1,35 +1,29 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { Campaign } from '@entities/Entity';
 
 @Entity('media', { schema: 'mcpro' })
 export default class Media {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
-  public idx: number;
+  idx: number;
 
-  @Column('varchar', { name: 'name', nullable: true, length: 255 })
-  public name: string | null;
+  @Column({ type: 'varchar', name: 'name' })
+  name: string;
 
-  @Column('tinyint', { name: 'status', default: () => "'1'" })
-  public status: number;
+  @Column({ type: 'boolean', name: 'status', default: true })
+  status: number;
 
-  @Column('varchar', { name: 'mediaPostbackInstallUrlTemplate', length: 255 })
-  public mediaPostbackInstallUrlTemplate: string;
+  @Column({ type: 'text', name: 'mediaPostbackInstallUrlTemplate' })
+  mediaPostbackInstallUrlTemplate: string;
 
-  @Column('varchar', { name: 'mediaPostbackEventUrlTemplate', length: 255 })
-  public mediaPostbackEventUrlTemplate: string;
+  @Column({ type: 'text', name: 'mediaPostbackEventUrlTemplate' })
+  mediaPostbackEventUrlTemplate: string;
 
-  @Column('datetime', {
-    name: 'created_at',
-    default: () => "'CURRENT_TIMESTAMP(6)'",
-  })
-  public createdAt: Date;
+  @CreateDateColumn({ type: 'timestamp', name: 'created_at', default: () => 'CURRENT_TIMESTAMP' })
+  createdAt: Date;
 
-  @Column('datetime', {
-    name: 'updated_at',
-    default: () => "'CURRENT_TIMESTAMP(6)'",
-  })
-  public updatedAt: Date;
+  @UpdateDateColumn({ type: 'timestamp', name: 'updated_at', default: () => 'CURRENT_TIMESTAMP' })
+  updatedAt: Date;
 
   @OneToMany(() => Campaign, (campaign) => campaign.media)
-  public campaign: Campaign[];
+  campaign: Campaign[];
 }
