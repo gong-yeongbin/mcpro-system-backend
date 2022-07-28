@@ -1,49 +1,43 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { Advertiser, Campaign, Tracker } from '@entities/Entity';
 
 @Entity('advertising', { schema: 'mcpro' })
 export default class Advertising {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
-  public idx: number;
+  idx: number;
 
-  @Column('varchar', { name: 'name', nullable: true, length: 255 })
-  public name: string | null;
+  @Column({ type: 'varchar', name: 'name', nullable: true })
+  name: string;
 
-  @Column('varchar', { name: 'platform', length: 255 })
-  public platform: string;
+  @Column({ type: 'varchar', name: 'platform' })
+  platform: string;
 
-  @Column('varchar', { name: 'image_url', nullable: true, length: 255 })
-  public imageUrl: string | null;
+  @Column({ type: 'varchar', name: 'image_url', nullable: true })
+  imageUrl: string;
 
-  @Column('tinyint', { name: 'status', default: () => "'1'" })
-  public status: boolean;
+  @Column('tinyint', { name: 'status', default: true })
+  status: boolean;
 
-  @Column('datetime', {
-    name: 'created_at',
-    default: () => "'CURRENT_TIMESTAMP(6)'",
-  })
-  public createdAt: Date;
+  @CreateDateColumn({ type: 'timestamp', name: 'created_at', default: () => 'CURRENT_TIMESTAMP' })
+  createdAt: Date;
 
-  @Column('datetime', {
-    name: 'updated_at',
-    default: () => "'CURRENT_TIMESTAMP(6)'",
-  })
-  public updatedAt: Date;
+  @UpdateDateColumn({ type: 'timestamp', name: 'updated_at', default: () => 'CURRENT_TIMESTAMP' })
+  updatedAt: Date;
 
   @OneToMany(() => Campaign, (campaign) => campaign.advertising)
-  public campaign: Campaign[];
+  campaign: Campaign[];
 
   @ManyToOne(() => Advertiser, (advertiser) => advertiser.advertising, {
     onDelete: 'NO ACTION',
     onUpdate: 'CASCADE',
   })
   @JoinColumn([{ name: 'advertiser', referencedColumnName: 'idx' }])
-  public advertiser: Advertiser;
+  advertiser: Advertiser;
 
   @ManyToOne(() => Tracker, (tracker) => tracker.advertising, {
     onDelete: 'NO ACTION',
     onUpdate: 'CASCADE',
   })
   @JoinColumn([{ name: 'tracker', referencedColumnName: 'idx' }])
-  public tracker: Tracker;
+  tracker: Tracker;
 }

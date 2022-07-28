@@ -4,29 +4,32 @@ import { UserLog } from '@entities/Entity';
 @Entity('user', { schema: 'mcpro' })
 export default class User {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
-  public idx: number;
+  idx: string;
 
   @Column('varchar', { name: 'id', length: 255 })
-  public id: string;
+  id: string;
 
   @Column('varchar', { name: 'password', length: 255 })
-  public password: string;
+  password: string;
 
   @Column('varchar', { name: 'type', length: 255 })
-  public type: string;
+  type: string;
 
   @Column('datetime', {
     name: 'created_at',
     default: () => "'CURRENT_TIMESTAMP(6)'",
   })
-  public createdAt: Date;
+  createdAt: Date;
 
   @Column('datetime', {
     name: 'updated_at',
     default: () => "'CURRENT_TIMESTAMP(6)'",
   })
-  public updatedAt: Date;
+  updatedAt: Date;
+
+  @Column('int', { name: 'type_idx', nullable: true })
+  typeIdx: number | null;
 
   @OneToMany(() => UserLog, (userLog) => userLog.user)
-  public userLog: UserLog[];
+  userLog: UserLog[];
 }

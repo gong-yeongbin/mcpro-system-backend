@@ -922,7 +922,7 @@ export class PostbackService {
     const postbackInstallMobiconnect: PostbackInstallMobiconnect = this.postbackInstallMobiconnectRepository.create({
       viewCode: request.query.pub_id,
       token: request.query.custom1,
-      pubId2: request.query.pub_id2,
+      pubId2: request.query.pub_id,
       subPubId: request.query.sub_pub_id,
       clickId: request.query.click_id,
       gaid: request.query.gaid,
