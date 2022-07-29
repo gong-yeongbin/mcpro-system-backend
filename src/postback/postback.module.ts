@@ -1,4 +1,5 @@
 import {
+  Postback,
   PostbackDaily,
   PostbackEventAdbrixremaster,
   PostbackEventAdjust,
@@ -34,7 +35,6 @@ import { Event, EventSchema } from 'src/schema/event';
 import { ImpressionCode, ImpressionCodeSchema } from 'src/schema/impressionCode';
 import { MobiconnectEvent, MobiconnectEventSchema } from 'src/schema/mobiconnect_event';
 import { MobiconnectInstall, MobiconnectInstallSchema } from 'src/schema/mobiconnect_install';
-import { Postback, PostbackSchema } from 'src/schema/postback';
 import { SingularEvent, SingularEventSchema } from 'src/schema/singular_event';
 import { SingularInstall, SingularInstallSchema } from 'src/schema/singular_install';
 import { TradingworksEvent, TradingworksEventSchema } from 'src/schema/tradingworks_event';
@@ -48,6 +48,7 @@ import { PostbackService } from './postback.service';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
+      Postback,
       PostbackRegisteredEvent,
       PostbackDaily,
       PostbackInstallAirbridge,
@@ -81,7 +82,6 @@ import { PostbackService } from './postback.service';
       { name: AdbrixremasterInstall.name, schema: AdbrixremasterInstallSchema },
       { name: AdbrixremasterEvent.name, schema: AdbrixremasterEventSchema },
       { name: Daily.name, schema: DailySchema },
-      { name: Postback.name, schema: PostbackSchema },
       { name: Event.name, schema: EventSchema },
       { name: ImpressionCode.name, schema: ImpressionCodeSchema },
       { name: Campaign.name, schema: CampaignSchema },

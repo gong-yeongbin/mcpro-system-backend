@@ -73,7 +73,6 @@ export class PostbackService {
     @InjectModel(MobiconnectEvent.name) private mobiconnectEventModel: Model<MobiconnectEventDocument>,
     @InjectModel(AdbrixremasterInstall.name) private adbrixremasterInstallModel: Model<AdbrixremasterInstallDocument>,
     @InjectModel(AdbrixremasterEvent.name) private adbrixremasterEventModel: Model<AdbrixremasterEventDocument>,
-    @InjectModel(Postback.name) private postbackModel: Model<PostbackDocument>,
     @InjectQueue('postback') private readonly postbackQueue: Queue,
     @InjectQueue('adbrixremasterEvent') private readonly adbrixremasterEventQueue: Queue,
     @InjectQueue('adbrixremasterInstall') private readonly adbrixremasterInstallQueue: Queue,
