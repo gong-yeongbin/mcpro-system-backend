@@ -10,6 +10,7 @@ export { default as Reservation } from '@entities/Reservation';
 export { default as Tracker } from '@entities/Tracker';
 export { default as User } from '@entities/User';
 export { default as UserLog } from '@entities/UserLog';
+export { default as Postback } from '@entities/Postback';
 export { default as PostbackEventAdbrixremaster } from '@entities/PostbackEventAdbrixremaster';
 export { default as PostbackInstallAdbrixremaster } from '@entities/PostbackInstallAdbrixremaster';
 export { default as PostbackInstallAdjust } from '@entities/PostbackInstallAdjust';
