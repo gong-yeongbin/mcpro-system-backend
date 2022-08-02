@@ -3,10 +3,12 @@ import { NextFunction } from 'express';
 import { RedisService } from 'nestjs-redis';
 import { Redis } from 'ioredis';
 import { v4 } from 'uuid';
+import { Queue } from 'bull';
+import { InjectQueue } from '@nestjs/bull';
 
 @Injectable()
 export class ImpressionCodeCacheMiddleware implements NestMiddleware {
-  constructor(private readonly redisService: RedisService) {}
+  constructor(private readonly redisService: RedisService, @InjectQueue('impressionCode') private readonly impressionCodeQueue: Queue) {}
 
   async use(request: any, response: any, next: NextFunction): Promise<void> {
     const token: string = request.query.token;
@@ -25,7 +27,17 @@ export class ImpressionCodeCacheMiddleware implements NestMiddleware {
 
     if (!impressionCode) {
       await redis.set(`${token}:${pub_id}:${sub_id}`, viewCode);
-      await redis.expire(`${token}:${pub_id}:${sub_id}`, 60 * 60 * 24);
+      await redis.expire(`${token}:${pub_id}:${sub_id}`, 60 * 60 * 12);
+
+      await this.impressionCodeQueue.add(
+        {
+          token: token,
+          pub_id: pub_id,
+          sub_id: sub_id,
+          impressionCode: viewCode,
+        },
+        { removeOnComplete: true, removeOnFail: true, attempts: 2 },
+      );
     }
 
     next();
