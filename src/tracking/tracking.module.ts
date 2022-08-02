@@ -10,9 +10,7 @@ import { Config, ConfigSchema } from 'src/schema/config';
 import { Daily, DailySchema } from 'src/schema/daily';
 import { TrackingController } from './tracking.controller';
 import { TrackingService } from './tracking.service';
-import { BullModule } from '@nestjs/bull';
 import { ImpressionCode, ImpressionCodeSchema } from 'src/schema/impressionCode';
-import { ImpressionCodeConsumer } from './impressionCode.consumer';
 
 @Module({
   imports: [
@@ -23,12 +21,9 @@ import { ImpressionCodeConsumer } from './impressionCode.consumer';
       { name: Daily.name, schema: DailySchema },
       { name: ImpressionCode.name, schema: ImpressionCodeSchema },
     ]),
-    BullModule.registerQueue({
-      name: 'impressionCode',
-    }),
   ],
   controllers: [TrackingController],
-  providers: [TrackingService, ImpressionCodeConsumer],
+  providers: [TrackingService],
 })
 export class TrackingModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

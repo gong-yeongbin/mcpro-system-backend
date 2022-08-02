@@ -2,7 +2,7 @@ import { Injectable, NestMiddleware, NotFoundException } from '@nestjs/common';
 import { NextFunction } from 'express';
 import { RedisService } from 'nestjs-redis';
 import { Redis } from 'ioredis';
-import { Campaign as Campaign1 } from '../entities/Entity';
+import { Campaign } from '../entities/Entity';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -11,8 +11,8 @@ import { Repository } from 'typeorm';
 export class CampaignCacheMiddleware implements NestMiddleware {
   constructor(
     private readonly redisService: RedisService,
-    @InjectRepository(Campaign1)
-    private readonly campaignRepository: Repository<Campaign1>,
+    @InjectRepository(Campaign)
+    private readonly campaignRepository: Repository<Campaign>,
   ) {}
 
   async use(request: any, response: any, next: NextFunction): Promise<void> {
@@ -23,7 +23,7 @@ export class CampaignCacheMiddleware implements NestMiddleware {
     let trackerTrackingUrl = await redis.hget(token, 'trackerTrackingUrl');
 
     if (!trackerTrackingUrl) {
-      const campaignEntity: Campaign1 = await this.campaignRepository.findOne({
+      const campaignEntity: Campaign = await this.campaignRepository.findOne({
         where: {
           token: token,
           status: true,
