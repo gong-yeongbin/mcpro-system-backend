@@ -24,7 +24,7 @@ export class TrackingService {
 
     const trackerTrackingUrl = await redis.hget(token, 'trackerTrackingUrl');
 
-    const viewCode: string = await redis.hget('view_code', `${token}/${pub_id}/${sub_id}`);
+    // const viewCode: string = await redis.hget('view_code', `${token}/${pub_id}/${sub_id}`);
     const impressionCode: string = await redis.get(`${token}:${pub_id}:${sub_id}`);
 
     const date: string = moment().tz('Asia/Seoul').format('YYYYMMDD');
@@ -49,13 +49,13 @@ export class TrackingService {
     return (
       trackerTrackingUrl
         .replace(/{clickid}/gi, click_id)
-        .replace(/{af_siteid}/gi, viewCode)
-        .replace(/{m_publisher}/gi, viewCode)
-        .replace(/{publisher_id}/gi, viewCode)
-        .replace(/{view_code}/gi, viewCode)
-        .replace(/{psid}/gi, viewCode)
-        .replace(/{cb_2}/gi, viewCode)
-        .replace(/{view_code}}/gi, viewCode)
+        .replace(/{af_siteid}/gi, impressionCode)
+        .replace(/{m_publisher}/gi, impressionCode)
+        .replace(/{publisher_id}/gi, impressionCode)
+        .replace(/{view_code}/gi, impressionCode)
+        .replace(/{psid}/gi, impressionCode)
+        .replace(/{cb_2}/gi, impressionCode)
+        .replace(/{view_code}}/gi, impressionCode)
         .replace(/{clickid}/gi, click_id)
         .replace(/{click_id}/gi, click_id)
         .replace(/{transaction_id}/gi, click_id)
