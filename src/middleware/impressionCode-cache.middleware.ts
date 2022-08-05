@@ -25,29 +25,29 @@ export class ImpressionCodeCacheMiddleware implements NestMiddleware {
     const impressionCode: string = await redis.get(`${token}:${pub_id}:${sub_id}`);
 
     if (!impressionCode) {
-      // let viewCode: string = await redis.hget('view_code', `${token}/${pub_id}/${sub_id}`);
-      // if (!viewCode) {
-      //   viewCode = v4().replace(/-/g, '');
-      //   await redis.hset('view_code', `${token}/${pub_id}/${sub_id}`, viewCode);
-      // }
-      // await redis.set(`${token}:${pub_id}:${sub_id}`, viewCode);
-      // await redis.expire(`${token}:${pub_id}:${sub_id}`, 60 * 60 * 24 * 1);
-
-      const postbackDailyEntity: PostbackDaily = await this.postbackDailyRepository
-        .createQueryBuilder('postbackDaily')
-        .where('postbackDaily.createdAt >:date AND postbackDaily.createdAt <:date + INTERVAL 1 DAY', {
-          date: moment().tz('Asia/Seoul').format('YYYY-MM-DD'),
-        })
-        .andWhere('postbackDaily.token', { token: token })
-        .andWhere('postbackDaily.pubId', { pubId: pub_id })
-        .andWhere('postbackDaily.subId', { subId: sub_id })
-        .getOne();
-
-      const impressionCode: string = postbackDailyEntity ? postbackDailyEntity.viewCode : v4().replace(/-/g, '');
-      await redis.hset('view_code', `${token}/${pub_id}/${sub_id}`, impressionCode);
-
-      await redis.set(`${token}:${pub_id}:${sub_id}`, impressionCode);
+      let viewCode: string = await redis.hget('view_code', `${token}/${pub_id}/${sub_id}`);
+      if (!viewCode) {
+        viewCode = v4().replace(/-/g, '');
+        await redis.hset('view_code', `${token}/${pub_id}/${sub_id}`, viewCode);
+      }
+      await redis.set(`${token}:${pub_id}:${sub_id}`, viewCode);
       await redis.expire(`${token}:${pub_id}:${sub_id}`, 60 * 60 * 24 * 1);
+
+      // const postbackDailyEntity: PostbackDaily = await this.postbackDailyRepository
+      //   .createQueryBuilder('postbackDaily')
+      //   .where('postbackDaily.createdAt >:date AND postbackDaily.createdAt <:date + INTERVAL 1 DAY', {
+      //     date: moment().tz('Asia/Seoul').format('YYYY-MM-DD'),
+      //   })
+      //   .andWhere('postbackDaily.token', { token: token })
+      //   .andWhere('postbackDaily.pubId', { pubId: pub_id })
+      //   .andWhere('postbackDaily.subId', { subId: sub_id })
+      //   .getOne();
+
+      // const impressionCode: string = postbackDailyEntity ? postbackDailyEntity.viewCode : v4().replace(/-/g, '');
+      // await redis.hset('view_code', `${token}/${pub_id}/${sub_id}`, impressionCode);
+
+      // await redis.set(`${token}:${pub_id}:${sub_id}`, impressionCode);
+      // await redis.expire(`${token}:${pub_id}:${sub_id}`, 60 * 60 * 24 * 1);
     }
 
     next();
