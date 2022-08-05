@@ -1,67 +1,61 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity('postback_daily', { schema: 'mcpro' })
 export default class PostbackDaily {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
-  public idx: number;
+  idx: number;
 
-  @Column('varchar', { name: 'token', nullable: true, length: 255 })
-  public token: string | null;
+  @Column({ type: 'varchar', name: 'token', nullable: true })
+  token: string;
 
-  @Column('varchar', { name: 'pub_id', length: 255 })
-  public pubId: string;
+  @Column({ type: 'varchar', name: 'pub_id' })
+  pubId: string;
 
-  @Column('varchar', { name: 'sub_id', nullable: true, length: 255 })
-  public subId: string | null;
+  @Column({ type: 'varchar', name: 'sub_id', nullable: true })
+  subId: string;
 
-  @Column('varchar', { name: 'view_code', nullable: true, length: 255 })
-  public viewCode: string | null;
+  @Column({ type: 'varchar', name: 'view_code' })
+  viewCode: string;
 
-  @Column('int', { name: 'click', nullable: true, default: () => "'0'" })
-  public click: number | null;
+  @Column({ type: 'int', name: 'click', default: 0 })
+  click: number;
 
-  @Column('int', { name: 'install', nullable: true, default: () => "'0'" })
-  public install: number | null;
+  @Column({ type: 'int', name: 'install', default: 0 })
+  install: number;
 
-  @Column('int', { name: 'registration', nullable: true, default: () => "'0'" })
-  public registration: number | null;
+  @Column({ type: 'int', name: 'registration', default: 0 })
+  registration: number;
 
-  @Column('int', { name: 'retention', nullable: true, default: () => "'0'" })
-  public retention: number | null;
+  @Column({ type: 'int', name: 'retention', default: 0 })
+  retention: number;
 
-  @Column('int', { name: 'purchase', nullable: true, default: () => "'0'" })
-  public purchase: number | null;
+  @Column({ type: 'int', name: 'purchase', default: 0 })
+  purchase: number;
 
-  @Column('int', { name: 'revenue', nullable: true, default: () => "'0'" })
-  public revenue: number | null;
+  @Column({ type: 'int', name: 'revenue', default: 0 })
+  revenue: number;
 
-  @Column('int', { name: 'etc1', nullable: true, default: () => "'0'" })
-  public etc1: number | null;
+  @Column({ type: 'int', name: 'etc1', default: 0 })
+  etc1: number;
 
-  @Column('int', { name: 'etc2', nullable: true, default: () => "'0'" })
-  public etc2: number | null;
+  @Column({ type: 'int', name: 'etc2', default: 0 })
+  etc2: number;
 
-  @Column('int', { name: 'etc3', nullable: true, default: () => "'0'" })
-  public etc3: number | null;
+  @Column({ type: 'int', name: 'etc3', default: 0 })
+  etc3: number;
 
-  @Column('int', { name: 'etc4', nullable: true, default: () => "'0'" })
-  public etc4: number | null;
+  @Column({ type: 'int', name: 'etc4', default: 0 })
+  etc4: number;
 
-  @Column('int', { name: 'etc5', nullable: true, default: () => "'0'" })
-  public etc5: number | null;
+  @Column({ type: 'int', name: 'etc5', default: 0 })
+  etc5: number;
 
-  @Column('int', { name: 'unregistered', nullable: true, default: () => "'0'" })
-  public unregistered: number | null;
+  @Column({ type: 'int', name: 'unregistered', default: 0 })
+  unregistered: number;
 
-  @Column('datetime', {
-    name: 'created_at',
-    default: () => "'CURRENT_TIMESTAMP(6)'",
-  })
-  public createdAt: Date;
+  @CreateDateColumn({ type: 'timestamp', name: 'created_at', default: () => 'CURRENT_TIMESTAMP' })
+  createdAt: Date;
 
-  @Column('datetime', {
-    name: 'updated_at',
-    default: () => "'CURRENT_TIMESTAMP(6)'",
-  })
-  public updatedAt: Date;
+  @UpdateDateColumn({ type: 'timestamp', name: 'updated_at', default: () => 'CURRENT_TIMESTAMP' })
+  updatedAt: Date;
 }

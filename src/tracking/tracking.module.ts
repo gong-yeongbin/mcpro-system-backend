@@ -1,7 +1,7 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Campaign as Campaign1 } from 'src/entities/Entity';
+import { Campaign as Campaign1, PostbackDaily } from 'src/entities/Entity';
 import { CampaignCacheMiddleware } from 'src/middleware/campaign-cache.middleware';
 import { ImpressionCodeCacheMiddleware } from 'src/middleware/impressionCode-cache.middleware';
 import { TrackingMiddleware } from 'src/middleware/tracking.middleware';
@@ -14,7 +14,7 @@ import { ImpressionCode, ImpressionCodeSchema } from 'src/schema/impressionCode'
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Campaign1]),
+    TypeOrmModule.forFeature([Campaign1, PostbackDaily]),
     MongooseModule.forFeature([
       { name: Campaign.name, schema: CampaignSchema },
       { name: Config.name, schema: ConfigSchema },

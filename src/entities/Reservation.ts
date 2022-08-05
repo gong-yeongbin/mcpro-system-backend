@@ -1,10 +1,13 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import { Campaign } from '@entities/Entity';
+import { Campaign } from './Entity';
 
 @Entity('reservation', { schema: 'mcpro' })
 export default class Reservation {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
   idx: number;
+
+  @Column({ type: 'varchar', name: 'token' })
+  token: string;
 
   @Column({ type: 'varchar', name: 'oldCampaignName' })
   oldCampaignName: string;
@@ -27,10 +30,7 @@ export default class Reservation {
   @Column({ type: 'text', name: 'newTrackerTrackingUrl' })
   newTrackerTrackingUrl: string;
 
-  @ManyToOne(() => Campaign, (campaign) => campaign.reservation, {
-    onDelete: 'NO ACTION',
-    onUpdate: 'NO ACTION',
-  })
-  @JoinColumn([{ name: 'campaign', referencedColumnName: 'idx' }])
+  @ManyToOne(() => Campaign, (campaign) => campaign.reservation)
+  @JoinColumn({ name: 'campaign' })
   campaign: Campaign;
 }

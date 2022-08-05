@@ -43,9 +43,6 @@ export default class Campaign {
   @JoinColumn([{ name: 'advertising', referencedColumnName: 'idx' }])
   advertising: Advertising;
 
-  @OneToMany(() => Reservation, (reservation) => reservation.campaign)
-  reservation: Reservation[];
-
   @ManyToOne(() => Media, (media) => media.campaign, {
     onDelete: 'NO ACTION',
     onUpdate: 'CASCADE',
@@ -55,4 +52,7 @@ export default class Campaign {
 
   @OneToMany(() => PostbackRegisteredEvent, (postbackRegisteredEvent) => postbackRegisteredEvent.token)
   postbackRegisteredEvent: PostbackRegisteredEvent[];
+
+  @OneToMany(() => Reservation, (reservation) => reservation.campaign)
+  reservation: Reservation[];
 }
