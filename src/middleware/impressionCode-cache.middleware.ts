@@ -3,17 +3,10 @@ import { NextFunction } from 'express';
 import { RedisService } from 'nestjs-redis';
 import { Redis } from 'ioredis';
 import { v4 } from 'uuid';
-import { InjectRepository } from '@nestjs/typeorm';
-import { PostbackDaily } from '@entities/Entity';
-import { Repository } from 'typeorm';
-import * as moment from 'moment-timezone';
 
 @Injectable()
 export class ImpressionCodeCacheMiddleware implements NestMiddleware {
-  constructor(
-    private readonly redisService: RedisService,
-    @InjectRepository(PostbackDaily) private readonly postbackDailyRepository: Repository<PostbackDaily>,
-  ) {}
+  constructor(private readonly redisService: RedisService) {}
 
   async use(request: any, response: any, next: NextFunction): Promise<void> {
     const token: string = request.query.token;
@@ -24,6 +17,7 @@ export class ImpressionCodeCacheMiddleware implements NestMiddleware {
 
     const isValidation: string = await redis.get(`${token}:${pub_id}:${sub_id}`);
     isValidation ? isValidation : await redis.set(`${token}:${pub_id}:${sub_id}`, v4().replace(/-/g, ''));
+
     await redis.expire(`${token}:${pub_id}:${sub_id}`, 60 * 60 * 24 * 2);
 
     await redis.hset('view_code', `${token}/${pub_id}/${sub_id}`, await redis.get(`${token}:${pub_id}:${sub_id}`));
