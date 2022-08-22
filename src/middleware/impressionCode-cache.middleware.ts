@@ -22,21 +22,9 @@ export class ImpressionCodeCacheMiddleware implements NestMiddleware {
     const redis: Redis = this.redisService.getClient();
 
     const isValidation: string = await redis.get(`${token}:${pub_id}:${sub_id}`);
-    // isValidation ? isValidation : await redis.set(`${token}:${pub_id}:${sub_id}`, v4().replace(/-/g, ''));
+    isValidation ? isValidation : await redis.set(`${token}:${pub_id}:${sub_id}`, v4().replace(/-/g, ''));
 
-    if (!isValidation) {
-      const impressionCode: string = v4().replace(/-/g, '');
-
-      await this.postbackDailyRepository.save({
-        token: token,
-        pubId: pub_id,
-        subId: sub_id,
-        viewCode: impressionCode,
-      });
-
-      await redis.set(`${token}:${pub_id}:${sub_id}`, impressionCode);
-      await redis.expire(`${token}:${pub_id}:${sub_id}`, 60 * 60 * 24 * 3);
-    }
+    await redis.expire(`${token}:${pub_id}:${sub_id}`, 60 * 60 * 24 * 3);
 
     await redis.hset('view_code', `${token}/${pub_id}/${sub_id}`, await redis.get(`${token}:${pub_id}:${sub_id}`));
 
