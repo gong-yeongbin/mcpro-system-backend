@@ -1,39 +1,33 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { Campaign } from '@entities/Entity';
 
 @Entity('postback_registered_event', { schema: 'mcpro' })
 export default class PostbackRegisteredEvent {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
-  public idx: number;
+  idx: number;
 
-  @Column('varchar', { name: 'tracker', nullable: true, length: 255 })
-  public tracker: string | null;
+  @Column({ type: 'varchar', name: 'tracker' })
+  tracker: string;
 
-  @Column('varchar', { name: 'admin', nullable: true, length: 255 })
-  public admin: string | null;
+  @Column({ type: 'varchar', name: 'admin' })
+  admin: string;
 
-  @Column('varchar', { name: 'media', nullable: true, length: 255 })
-  public media: string | null;
+  @Column({ type: 'varchar', name: 'media' })
+  media: string;
 
-  @Column('tinyint', { name: 'status', default: () => "'1'" })
-  public status: boolean;
+  @Column({ type: 'boolean', name: 'status', default: true })
+  status: boolean;
 
-  @Column('datetime', {
-    name: 'created_at',
-    default: () => "'CURRENT_TIMESTAMP(6)'",
-  })
-  public createdAt: Date;
+  @CreateDateColumn({ type: 'timestamp', name: 'created_at', default: () => 'CURRENT_TIMESTAMP' })
+  createdAt: Date;
 
-  @Column('datetime', {
-    name: 'updated_at',
-    default: () => "'CURRENT_TIMESTAMP(6)'",
-  })
-  public updatedAt: Date;
+  @UpdateDateColumn({ type: 'timestamp', name: 'updated_at', default: () => 'CURRENT_TIMESTAMP' })
+  updatedAt: Date;
 
   @ManyToOne(() => Campaign, (campaign) => campaign.postbackRegisteredEvent, {
     onDelete: 'NO ACTION',
     onUpdate: 'NO ACTION',
   })
   @JoinColumn([{ name: 'token', referencedColumnName: 'token' }])
-  public token: Campaign;
+  token: Campaign;
 }

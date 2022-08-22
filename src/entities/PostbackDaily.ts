@@ -5,7 +5,7 @@ export default class PostbackDaily {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'idx' })
   idx: number;
 
-  @Column({ type: 'varchar', name: 'token', nullable: true })
+  @Column({ type: 'varchar', name: 'token' })
   token: string;
 
   @Column({ type: 'varchar', name: 'pub_id' })

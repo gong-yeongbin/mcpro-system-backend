@@ -22,13 +22,11 @@ export class TrackingService {
     const idfa: string = query.idfa;
     const uuid: string = query.uuid;
 
-    const trackerTrackingUrl = await redis.hget(token, 'trackerTrackingUrl');
-
-    // const viewCode: string = await redis.hget('view_code', `${token}/${pub_id}/${sub_id}`);
     const impressionCode: string = await redis.get(`${token}:${pub_id}:${sub_id}`);
 
+    const trackerTrackingUrl = await redis.hget(token, 'trackerTrackingUrl');
+
     const date: string = moment().tz('Asia/Seoul').format('YYYYMMDD');
-    const clickCount: number = +(await redis.hget(date, `${token}/${pub_id}/${sub_id}`));
 
     const isClickValidation: number = +(await redis.hget(`${date}:click`, `${token}:${pub_id}:${sub_id}`));
 
@@ -37,13 +35,6 @@ export class TrackingService {
       await redis.expire(`${date}:click`, 60 * 60 * 24 * 1);
     } else {
       await redis.hincrby(`${date}:click`, `${token}:${pub_id}:${sub_id}`, 1);
-    }
-
-    if (!clickCount) {
-      await redis.hset(date, `${token}/${pub_id}/${sub_id}`, 1);
-      await redis.expire(date, 60 * 60 * 24 * 2);
-    } else {
-      await redis.hincrby(date, `${token}/${pub_id}/${sub_id}`, 1);
     }
 
     return (
