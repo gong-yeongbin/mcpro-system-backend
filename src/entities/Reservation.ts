@@ -9,10 +9,10 @@ export default class Reservation {
   @Column({ type: 'varchar', name: 'token' })
   token: string;
 
-  @Column({ type: 'varchar', name: 'oldCampaignName' })
+  @Column({ type: 'text', name: 'oldCampaignName' })
   oldCampaignName: string;
 
-  @Column({ type: 'varchar', name: 'newCampaignName' })
+  @Column({ type: 'text', name: 'newCampaignName' })
   newCampaignName: string;
 
   @Column({ type: 'boolean', name: 'status', default: false })
