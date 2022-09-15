@@ -51,6 +51,8 @@ export class TrackingService {
         .replace(/{click_id}/gi, click_id)
         .replace(/{transaction_id}/gi, click_id)
         .replace(/{cb_3}/gi, click_id)
+        .replace(/{sub1}/gi, token)
+        .replace(/{sub2}/gi, impressionCode)
         .replace(/{sub3}/gi, click_id)
         .replace(/{af_c_id}/gi, token)
         .replace(/{cb_1}/gi, token)
