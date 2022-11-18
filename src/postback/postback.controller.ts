@@ -61,4 +61,12 @@ export class PostbackController {
     if (type === 'install') await this.postbackService.installMobiconnect(request);
     else await this.postbackService.eventMobiconnect(request);
   }
+
+  @Get('ive/:type')
+  async ive(@Param() param: { type: string }, @Req() request: Request) {
+    const type: string = param.type;
+
+    if (type === 'install') await this.postbackService.installIve(request);
+    else await this.postbackService.eventIve(request);
+  }
 }

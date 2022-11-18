@@ -5,6 +5,7 @@ import {
   PostbackEventAdjust,
   PostbackEventAirbridge,
   PostbackEventAppsflyer,
+  PostbackEventIve,
   PostbackEventMobiconnect,
   PostbackEventSingular,
   PostbackEventTradingworks,
@@ -12,6 +13,7 @@ import {
   PostbackInstallAdjust,
   PostbackInstallAirbridge,
   PostbackInstallAppsflyer,
+  PostbackInstallIve,
   PostbackInstallMobiconnect,
   PostbackInstallSingular,
   PostbackInstallTradingworks,
@@ -33,6 +35,8 @@ import { Campaign, CampaignSchema } from 'src/schema/campaign';
 import { Daily, DailySchema } from 'src/schema/daily';
 import { Event, EventSchema } from 'src/schema/event';
 import { ImpressionCode, ImpressionCodeSchema } from 'src/schema/impressionCode';
+import { IveEvent, IveEventSchema } from 'src/schema/ive_event';
+import { IveInstall, IveInstallSchema } from 'src/schema/ive_install';
 import { MobiconnectEvent, MobiconnectEventSchema } from 'src/schema/mobiconnect_event';
 import { MobiconnectInstall, MobiconnectInstallSchema } from 'src/schema/mobiconnect_install';
 import { SingularEvent, SingularEventSchema } from 'src/schema/singular_event';
@@ -58,6 +62,7 @@ import { PostbackService } from './postback.service';
       PostbackInstallAdjust,
       PostbackInstallSingular,
       PostbackInstallMobiconnect,
+      PostbackInstallIve,
       PostbackEventAirbridge,
       PostbackEventTradingworks,
       PostbackEventAppsflyer,
@@ -65,6 +70,7 @@ import { PostbackService } from './postback.service';
       PostbackEventAdjust,
       PostbackEventSingular,
       PostbackEventMobiconnect,
+      PostbackEventIve,
     ]),
     MongooseModule.forFeature([
       { name: AirbridgeInstall.name, schema: AirbridgeInstallSchema },
@@ -81,6 +87,8 @@ import { PostbackService } from './postback.service';
       { name: MobiconnectEvent.name, schema: MobiconnectEventSchema },
       { name: AdbrixremasterInstall.name, schema: AdbrixremasterInstallSchema },
       { name: AdbrixremasterEvent.name, schema: AdbrixremasterEventSchema },
+      { name: IveInstall.name, schema: IveInstallSchema },
+      { name: IveEvent.name, schema: IveEventSchema },
       { name: Daily.name, schema: DailySchema },
       { name: Event.name, schema: EventSchema },
       { name: ImpressionCode.name, schema: ImpressionCodeSchema },

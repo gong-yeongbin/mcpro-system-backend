@@ -3,6 +3,7 @@ import {
   PostbackEventAdjust,
   PostbackEventAirbridge,
   PostbackEventAppsflyer,
+  PostbackEventIve,
   PostbackEventMobiconnect,
   PostbackEventSingular,
   PostbackEventTradingworks,
@@ -10,6 +11,7 @@ import {
   PostbackInstallAdjust,
   PostbackInstallAirbridge,
   PostbackInstallAppsflyer,
+  PostbackInstallIve,
   PostbackInstallMobiconnect,
   PostbackInstallSingular,
   PostbackInstallTradingworks,
@@ -40,6 +42,8 @@ import { AdbrixremasterEvent, AdbrixremasterEventDocument } from 'src/schema/adb
 import { Postback, PostbackDocument } from 'src/schema/postback';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
+import { IveInstall, IveInstallDocument } from 'src/schema/ive_install';
+import { IveEvent, IveEventDocument } from 'src/schema/ive_event';
 
 @Injectable()
 export class PostbackService {
@@ -59,6 +63,8 @@ export class PostbackService {
     @InjectRepository(PostbackEventSingular) private readonly postbackEventSingularRepository: Repository<PostbackEventSingular>,
     @InjectRepository(PostbackInstallMobiconnect) private readonly postbackInstallMobiconnectRepository: Repository<PostbackInstallMobiconnect>,
     @InjectRepository(PostbackEventMobiconnect) private readonly postbackEventMobiconnectRepository: Repository<PostbackEventMobiconnect>,
+    @InjectRepository(PostbackInstallIve) private readonly postbackInstallIveRepository: Repository<PostbackInstallIve>,
+    @InjectRepository(PostbackEventIve) private readonly postbackEventIveRepository: Repository<PostbackEventIve>,
     @InjectModel(AirbridgeInstall.name) private airbridgeInstallModel: Model<AirbridgeInstallDocument>,
     @InjectModel(AirbridgeEvent.name) private airbridgeEventModel: Model<AirbridgeEventDocument>,
     @InjectModel(TradingworksInstall.name) private tradingworksInstallModel: Model<TradingworksInstallDocument>,
@@ -73,6 +79,8 @@ export class PostbackService {
     @InjectModel(MobiconnectEvent.name) private mobiconnectEventModel: Model<MobiconnectEventDocument>,
     @InjectModel(AdbrixremasterInstall.name) private adbrixremasterInstallModel: Model<AdbrixremasterInstallDocument>,
     @InjectModel(AdbrixremasterEvent.name) private adbrixremasterEventModel: Model<AdbrixremasterEventDocument>,
+    @InjectModel(IveInstall.name) private iveInstallModel: Model<IveInstallDocument>,
+    @InjectModel(IveEvent.name) private iveEventModel: Model<IveEventDocument>,
     @InjectQueue('postback') private readonly postbackQueue: Queue,
     @InjectQueue('adbrixremasterEvent') private readonly adbrixremasterEventQueue: Queue,
     @InjectQueue('adbrixremasterInstall') private readonly adbrixremasterInstallQueue: Queue,
@@ -1023,5 +1031,91 @@ export class PostbackService {
       },
       { removeOnComplete: true, removeOnFail: true, attempts: 2 },
     );
+  }
+
+  async installIve(request: any) {
+    const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
+    console.log(`[ ive ---> mecrosspro ] install : ${originalUrl}`);
+
+    //-------------------------------------------------------------------------------------------------------
+    const postbackInstallIve: PostbackInstallIve = this.postbackInstallIveRepository.create({
+      pClk: request.query.p_clk,
+      pub: request.query.pub,
+      subPub: request.query.sub_pub,
+      ao: request.query.ao,
+      clickTime: request.query.click_time,
+      clickTs: request.query.click_ts,
+      installTime: request.query.install_time,
+      installTs: request.query.install_ts,
+      subParam1: request.query.sub_param1,
+      subParam2: request.query.sub_param2,
+      subParam3: request.query.sub_param3,
+      subParam4: request.query.sub_param4,
+      subParam5: request.query.sub_param5,
+      adid: request.query.adid,
+      idfa: request.query.idfa,
+      ip: request.query.ip,
+      os: request.query.os,
+      osVer: request.query.os_ver,
+      carrier: request.query.carrier,
+      brand: request.query.brand,
+      model: request.query.model,
+      country: request.query.country,
+      language: request.query.language,
+      viewCode: request.query.pub,
+      token: request.query.sub_param1,
+      originalUrl: originalUrl,
+    });
+
+    const date: string = moment().tz('Asia/Seoul').format('YYYY-MM-DD.HH:mm:ss.SSSSS');
+
+    const redis: Redis = this.redisService.getClient();
+    await redis.hset('ive:install', date, JSON.stringify(postbackInstallIve));
+    //-------------------------------------------------------------------------------------------------------
+    await this.iveInstallModel.create({
+      ...request.query,
+    });
+  }
+  async eventIve(request: any) {
+    const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
+    console.log(`[ ive ---> mecrosspro ] event : ${originalUrl}`);
+
+    //-------------------------------------------------------------------------------------------------------
+    const postbackEventIve: PostbackEventIve = this.postbackEventIveRepository.create({
+      pClk: request.query.p_clk,
+      pub: request.query.pub,
+      subPub: request.query.sub_pub,
+      eventName: request.query.event_name,
+      eventValue: request.query.event.value,
+      eventTime: request.query.event_time,
+      eventTs: request.query.event_ts,
+      subParam1: request.query.sub_param1,
+      subParam2: request.query.sub_param2,
+      subParam3: request.query.sub_param3,
+      subParam4: request.query.sub_param4,
+      subParam5: request.query.sub_param5,
+      adid: request.query.adid,
+      idfa: request.query.idfa,
+      platform: request.query.platform,
+      osVer: request.query.os_ver,
+      carrier: request.query.carrier,
+      brand: request.query.brand,
+      model: request.query.model,
+      country: request.query.country,
+      language: request.query.language,
+      ip: request.query.ip,
+      viewCode: request.query.pub,
+      token: request.query.sub_param1,
+      originalUrl: originalUrl,
+    });
+
+    const date: string = moment().tz('Asia/Seoul').format('YYYY-MM-DD.HH:mm:ss.SSSSS');
+
+    const redis: Redis = this.redisService.getClient();
+    await redis.hset('ive:event', date, JSON.stringify(postbackEventIve));
+    //-------------------------------------------------------------------------------------------------------
+    await this.iveEventModel.create({
+      ...request.query,
+    });
   }
 }
