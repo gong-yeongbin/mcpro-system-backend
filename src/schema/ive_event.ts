@@ -19,8 +19,8 @@ export class IveEvent {
   @Prop({ type: String })
   event_value: string;
 
-  @Prop({ type: Date })
-  event_time: Date;
+  @Prop({ type: Number })
+  event_time: number;
 
   @Prop({ type: Number })
   event_ts: number;

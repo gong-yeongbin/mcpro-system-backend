@@ -69,4 +69,12 @@ export class PostbackController {
     if (type === 'install') await this.postbackService.installIve(request);
     else await this.postbackService.eventIve(request);
   }
+
+  @Get('decotra/:type')
+  async decotra(@Param() param: { type: string }, @Req() request: Request) {
+    const type: string = param.type;
+
+    if (type === 'install') await this.postbackService.installDecotra(request);
+    else await this.postbackService.eventDecotra(request);
+  }
 }

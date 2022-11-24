@@ -3,6 +3,7 @@ import {
   PostbackEventAdjust,
   PostbackEventAirbridge,
   PostbackEventAppsflyer,
+  PostbackEventDecotra,
   PostbackEventIve,
   PostbackEventMobiconnect,
   PostbackEventSingular,
@@ -11,6 +12,7 @@ import {
   PostbackInstallAdjust,
   PostbackInstallAirbridge,
   PostbackInstallAppsflyer,
+  PostbackInstallDecotra,
   PostbackInstallIve,
   PostbackInstallMobiconnect,
   PostbackInstallSingular,
@@ -44,6 +46,8 @@ import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import { IveInstall, IveInstallDocument } from 'src/schema/ive_install';
 import { IveEvent, IveEventDocument } from 'src/schema/ive_event';
+import { DecotraInstall, DecotraInstallDocument } from 'src/schema/decotra_install';
+import { DecotraEvent, DecotraEventDocument } from 'src/schema/decotra_event';
 
 @Injectable()
 export class PostbackService {
@@ -65,6 +69,8 @@ export class PostbackService {
     @InjectRepository(PostbackEventMobiconnect) private readonly postbackEventMobiconnectRepository: Repository<PostbackEventMobiconnect>,
     @InjectRepository(PostbackInstallIve) private readonly postbackInstallIveRepository: Repository<PostbackInstallIve>,
     @InjectRepository(PostbackEventIve) private readonly postbackEventIveRepository: Repository<PostbackEventIve>,
+    @InjectRepository(PostbackInstallDecotra) private readonly postbackInstallDecotraRepository: Repository<PostbackInstallDecotra>,
+    @InjectRepository(PostbackEventDecotra) private readonly postbackEventDecotraRepository: Repository<PostbackEventDecotra>,
     @InjectModel(AirbridgeInstall.name) private airbridgeInstallModel: Model<AirbridgeInstallDocument>,
     @InjectModel(AirbridgeEvent.name) private airbridgeEventModel: Model<AirbridgeEventDocument>,
     @InjectModel(TradingworksInstall.name) private tradingworksInstallModel: Model<TradingworksInstallDocument>,
@@ -81,6 +87,8 @@ export class PostbackService {
     @InjectModel(AdbrixremasterEvent.name) private adbrixremasterEventModel: Model<AdbrixremasterEventDocument>,
     @InjectModel(IveInstall.name) private iveInstallModel: Model<IveInstallDocument>,
     @InjectModel(IveEvent.name) private iveEventModel: Model<IveEventDocument>,
+    @InjectModel(DecotraInstall.name) private decotraInstallModel: Model<DecotraInstallDocument>,
+    @InjectModel(DecotraEvent.name) private decotraEventModel: Model<DecotraEventDocument>,
     @InjectQueue('postback') private readonly postbackQueue: Queue,
     @InjectQueue('adbrixremasterEvent') private readonly adbrixremasterEventQueue: Queue,
     @InjectQueue('adbrixremasterInstall') private readonly adbrixremasterInstallQueue: Queue,
@@ -1115,6 +1123,69 @@ export class PostbackService {
     await redis.hset('ive:event', date, JSON.stringify(postbackEventIve));
     //-------------------------------------------------------------------------------------------------------
     await this.iveEventModel.create({
+      ...request.query,
+    });
+  }
+
+  async installDecotra(request: any) {
+    const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
+    console.log(`[ decotra ---> mecrosspro ] install : ${originalUrl}`);
+
+    //-------------------------------------------------------------------------------------------------------
+    const postbackInstallDecotra: PostbackInstallDecotra = this.postbackInstallDecotraRepository.create({
+      sub1: request.query.sub1,
+      sub2: request.query.sub2,
+      sub5: request.query.sub5,
+      sub7: request.query.sub7,
+      sub8: request.query.sub8,
+      countryCode: request.query.country_code,
+      deviceBrand: request.query.device_brand,
+      deviceCarrier: request.query.device_carrier,
+      deviceIp: request.query.device_ip,
+      deviceModel: request.query.device_model,
+      deviceType: request.query.device_type,
+      viewCode: request.query.sub2,
+      token: request.query.sub5,
+      originalUrl: originalUrl,
+    });
+
+    const date: string = moment().tz('Asia/Seoul').format('YYYY-MM-DD.HH:mm:ss.SSSSS');
+
+    const redis: Redis = this.redisService.getClient();
+    await redis.hset('decotra:install', date, JSON.stringify(postbackInstallDecotra));
+    //-------------------------------------------------------------------------------------------------------
+    await this.decotraInstallModel.create({
+      ...request.query,
+    });
+  }
+  async eventDecotra(request: any) {
+    const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
+    console.log(`[ decotra ---> mecrosspro ] event : ${originalUrl}`);
+
+    //-------------------------------------------------------------------------------------------------------
+    const postbackEventDecotra: PostbackEventDecotra = this.postbackEventDecotraRepository.create({
+      sub1: request.query.sub1,
+      sub2: request.query.sub2,
+      sub5: request.query.sub5,
+      sub7: request.query.sub7,
+      sub8: request.query.sub8,
+      countryCode: request.query.country_code,
+      deviceBrand: request.query.device_brand,
+      deviceCarrier: request.query.device_carrier,
+      deviceIp: request.query.device_ip,
+      deviceModel: request.query.device_model,
+      eventName: request.query.device_name,
+      viewCode: request.query.sub2,
+      token: request.query.sub5,
+      originalUrl: originalUrl,
+    });
+
+    const date: string = moment().tz('Asia/Seoul').format('YYYY-MM-DD.HH:mm:ss.SSSSS');
+
+    const redis: Redis = this.redisService.getClient();
+    await redis.hset('decotra:event', date, JSON.stringify(postbackEventDecotra));
+    //-------------------------------------------------------------------------------------------------------
+    await this.decotraEventModel.create({
       ...request.query,
     });
   }

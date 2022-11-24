@@ -5,6 +5,7 @@ import {
   PostbackEventAdjust,
   PostbackEventAirbridge,
   PostbackEventAppsflyer,
+  PostbackEventDecotra,
   PostbackEventIve,
   PostbackEventMobiconnect,
   PostbackEventSingular,
@@ -13,6 +14,7 @@ import {
   PostbackInstallAdjust,
   PostbackInstallAirbridge,
   PostbackInstallAppsflyer,
+  PostbackInstallDecotra,
   PostbackInstallIve,
   PostbackInstallMobiconnect,
   PostbackInstallSingular,
@@ -33,6 +35,8 @@ import { AppsflyerEvent, AppsflyerEventSchema } from 'src/schema/appsflyer_event
 import { AppsflyerInstall, AppsflyerInstallSchema } from 'src/schema/appsflyer_install';
 import { Campaign, CampaignSchema } from 'src/schema/campaign';
 import { Daily, DailySchema } from 'src/schema/daily';
+import { DecotraEvent, DecotraEventSchema } from 'src/schema/decotra_event';
+import { DecotraInstall, DecotraInstallSchema } from 'src/schema/decotra_install';
 import { Event, EventSchema } from 'src/schema/event';
 import { ImpressionCode, ImpressionCodeSchema } from 'src/schema/impressionCode';
 import { IveEvent, IveEventSchema } from 'src/schema/ive_event';
@@ -63,6 +67,7 @@ import { PostbackService } from './postback.service';
       PostbackInstallSingular,
       PostbackInstallMobiconnect,
       PostbackInstallIve,
+      PostbackInstallDecotra,
       PostbackEventAirbridge,
       PostbackEventTradingworks,
       PostbackEventAppsflyer,
@@ -71,6 +76,7 @@ import { PostbackService } from './postback.service';
       PostbackEventSingular,
       PostbackEventMobiconnect,
       PostbackEventIve,
+      PostbackEventDecotra,
     ]),
     MongooseModule.forFeature([
       { name: AirbridgeInstall.name, schema: AirbridgeInstallSchema },
@@ -89,6 +95,8 @@ import { PostbackService } from './postback.service';
       { name: AdbrixremasterEvent.name, schema: AdbrixremasterEventSchema },
       { name: IveInstall.name, schema: IveInstallSchema },
       { name: IveEvent.name, schema: IveEventSchema },
+      { name: DecotraInstall.name, schema: DecotraInstallSchema },
+      { name: DecotraEvent.name, schema: DecotraEventSchema },
       { name: Daily.name, schema: DailySchema },
       { name: Event.name, schema: EventSchema },
       { name: ImpressionCode.name, schema: ImpressionCodeSchema },

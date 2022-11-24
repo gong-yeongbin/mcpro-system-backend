@@ -16,14 +16,14 @@ export class IveInstall {
   @Prop({ type: String })
   ao: string;
 
-  @Prop({ type: Date })
-  click_time: Date;
+  @Prop({ type: Number })
+  click_time: number;
 
   @Prop({ type: Number })
   click_ts: number;
 
-  @Prop({ type: Date })
-  install_time: Date;
+  @Prop({ type: Number })
+  install_time: number;
 
   @Prop({ type: Number })
   install_ts: number;
