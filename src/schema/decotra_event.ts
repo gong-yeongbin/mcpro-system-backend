@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 export type DecotraEventDocument = DecotraEvent & Document;
 
-@Schema({ versionKey: false, collection: 'decotra_install', timestamps: { createdAt: 'createdAt', updatedAt: false } })
+@Schema({ versionKey: false, collection: 'decotra_event', timestamps: { createdAt: 'createdAt', updatedAt: false } })
 export class DecotraEvent {
   //click_id
   @Prop({ type: String })
