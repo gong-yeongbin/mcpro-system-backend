@@ -35,7 +35,7 @@ export class CampaignCacheMiddleware implements NestMiddleware {
       trackerTrackingUrl = campaignEntity.trackerTrackingUrl;
 
       await redis.hset(token, 'trackerTrackingUrl', trackerTrackingUrl);
-      await redis.expire(token, 60 * 60);
+      await redis.expire(token, 60 * 15);
     }
 
     next();
