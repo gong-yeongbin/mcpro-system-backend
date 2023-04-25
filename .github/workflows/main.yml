@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
@@ -20,7 +20,7 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      - name: Npm Build
+      - name: Build
         run: npm run build
 
       - name: Make zip file
