@@ -26,7 +26,7 @@ export class CampaignCacheMiddleware implements NestMiddleware {
       const campaignEntity: Campaign = await this.campaignRepository.findOne({
         where: {
           token: token,
-          status: true,
+          block: false,
         },
       });
 
