@@ -11,6 +11,7 @@ import { Daily, DailySchema } from 'src/schema/daily';
 import { TrackingController } from './tracking.controller';
 import { TrackingService } from './tracking.service';
 import { ImpressionCode, ImpressionCodeSchema } from 'src/schema/impressionCode';
+import { TrackingLog, TrackingLogSchema } from 'src/schema/tracking_log';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { ImpressionCode, ImpressionCodeSchema } from 'src/schema/impressionCode'
       { name: Config.name, schema: ConfigSchema },
       { name: Daily.name, schema: DailySchema },
       { name: ImpressionCode.name, schema: ImpressionCodeSchema },
+      { name: TrackingLog.name, schema: TrackingLogSchema },
     ]),
   ],
   controllers: [TrackingController],
