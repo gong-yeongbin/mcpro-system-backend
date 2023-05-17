@@ -49,7 +49,6 @@ export class TrackingController {
   private async saveData() {
     const data_length: number = this.collectedData.length;
     const save_data: ITrackingLog[] = this.collectedData.splice(0, data_length);
-
     await this.TrackingLogModel.insertMany(save_data);
   }
 
