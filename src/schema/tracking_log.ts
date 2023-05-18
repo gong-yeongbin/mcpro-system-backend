@@ -30,4 +30,4 @@ export class TrackingLog {
 }
 
 export const TrackingLogSchema = SchemaFactory.createForClass(TrackingLog);
-TrackingLogSchema.index({ createdAt: 1 }, { expires: 60 * 60 * 24 * 30 });
+TrackingLogSchema.index({ createdAt: 1 }, { expires: 60 * 60 * 24 * 7 });

@@ -55,6 +55,6 @@ export class TrackingController {
   onModuleInit() {
     setInterval(() => {
       this.saveData();
-    }, 100000);
+    }, 60000);
   }
 }
