@@ -29,16 +29,16 @@ export class TrackingController {
   @Get()
   @Redirect()
   async tracking(@Req() request: Request, @Query() query: TrackingDto) {
-    // this.collectedData.push({
-    //   token: query.token,
-    //   click_id: query.click_id,
-    //   pub_id: query.pub_id,
-    //   sub_id: query.sub_id,
-    //   adid: query.adid,
-    //   idfa: query.idfa,
-    //   url: request.url,
-    //   createdAt: moment().tz('Asia/Seoul').toISOString(true),
-    // });
+    this.collectedData.push({
+      token: query.token,
+      click_id: query.click_id,
+      pub_id: query.pub_id,
+      sub_id: query.sub_id,
+      adid: query.adid,
+      idfa: query.idfa,
+      url: request.url,
+      createdAt: moment().tz('Asia/Seoul').toISOString(true),
+    });
 
     const redirectUrl: string = await this.trackingService.tracking(request, query);
 
@@ -52,9 +52,9 @@ export class TrackingController {
     await this.TrackingLogModel.insertMany(save_data);
   }
 
-  // onModuleInit() {
-  //   setInterval(() => {
-  //     this.saveData();
-  //   }, 60000);
-  // }
+  onModuleInit() {
+    setInterval(() => {
+      this.saveData();
+    }, 60000);
+  }
 }
