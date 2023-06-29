@@ -39,14 +39,17 @@ export class TrackingController {
   private async saveData() {
     const data_length: number = this.collectedData.length;
     const save_data: ITrackingLog[] = this.collectedData.splice(0, data_length);
-    this.TrackingLogModel.insertMany(save_data)
-      .then((result) => {})
-      .catch((err) => {});
+
+    try {
+      await this.TrackingLogModel.insertMany(save_data);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   onModuleInit() {
     setInterval(() => {
       this.saveData();
-    }, 60000);
+    }, 600000);
   }
 }

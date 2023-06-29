@@ -7,7 +7,7 @@ export class TrackingLog {
   @Prop({ type: String })
   token: string;
 
-  @Prop({ type: String, unique: true })
+  @Prop({ type: String })
   adid: string;
 
   @Prop({ type: String })
@@ -15,4 +15,3 @@ export class TrackingLog {
 }
 
 export const TrackingLogSchema = SchemaFactory.createForClass(TrackingLog);
-// , { expires: 60 * 60 * 24 * 1 }
