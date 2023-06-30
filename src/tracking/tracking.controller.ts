@@ -24,11 +24,11 @@ export class TrackingController {
   @Get()
   @Redirect()
   async tracking(@Req() request: Request, @Query() query: TrackingDto) {
-    this.collectedData.push({
-      token: query.token,
-      adid: query.adid,
-      idfa: query.idfa,
-    });
+    // this.collectedData.push({
+    //   token: query.token,
+    //   adid: query.adid,
+    //   idfa: query.idfa,
+    // });
 
     const redirectUrl: string = await this.trackingService.tracking(request, query);
 
@@ -47,9 +47,9 @@ export class TrackingController {
     }
   }
 
-  onModuleInit() {
-    setInterval(() => {
-      this.saveData();
-    }, 30000);
-  }
+  // onModuleInit() {
+  //   setInterval(() => {
+  //     this.saveData();
+  //   }, 30000);
+  // }
 }
