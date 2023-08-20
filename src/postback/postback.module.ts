@@ -52,6 +52,8 @@ import { AdbrixremasterInstallConsumer } from './adbrixremasterInstall.consumer'
 import { PostbackConsumer } from './postback.consumer';
 import { PostbackController } from './postback.controller';
 import { PostbackService } from './postback.service';
+import { NswitchInstall, NswitchInstallSchema } from 'src/schema/nswitch_install';
+import { NswitchEvent, NswitchEventSchema } from 'src/schema/nswitch_event';
 
 @Module({
   imports: [
@@ -97,6 +99,8 @@ import { PostbackService } from './postback.service';
       { name: IveEvent.name, schema: IveEventSchema },
       { name: DecotraInstall.name, schema: DecotraInstallSchema },
       { name: DecotraEvent.name, schema: DecotraEventSchema },
+      { name: NswitchInstall.name, schema: NswitchInstallSchema },
+      { name: NswitchEvent.name, schema: NswitchEventSchema },
       { name: Daily.name, schema: DailySchema },
       { name: Event.name, schema: EventSchema },
       { name: ImpressionCode.name, schema: ImpressionCodeSchema },

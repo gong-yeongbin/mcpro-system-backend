@@ -68,6 +68,9 @@ export class TrackingService {
         .replace(/{idfa}/gi, idfa)
         .replace(/{m_sub_publisher}/, '')
         .replace(/{cb_param2}/gi, '')
+        .replace(/{custom1}/gi, token)
+        .replace(/{custom2}/gi, click_id)
+        .replace(/{custom3}/gi, impressionCode)
         .replace(/{cb_5}/gi, uuid) + `&uuid=${uuid}`
     );
   }

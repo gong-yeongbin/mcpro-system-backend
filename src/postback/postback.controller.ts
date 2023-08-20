@@ -77,4 +77,12 @@ export class PostbackController {
     if (type === 'install') await this.postbackService.installDecotra(request);
     else await this.postbackService.eventDecotra(request);
   }
+
+  @Get('nswitch/:type')
+  async nswitch(@Param() param: { type: string }, @Req() request: Request) {
+    const type: string = param.type;
+
+    if (type === 'install') await this.postbackService.installNswitch(request);
+    else await this.postbackService.eventNswitch(request);
+  }
 }

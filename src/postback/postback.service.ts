@@ -48,6 +48,8 @@ import { IveInstall, IveInstallDocument } from 'src/schema/ive_install';
 import { IveEvent, IveEventDocument } from 'src/schema/ive_event';
 import { DecotraInstall, DecotraInstallDocument } from 'src/schema/decotra_install';
 import { DecotraEvent, DecotraEventDocument } from 'src/schema/decotra_event';
+import { NswitchInstall, NswitchInstallDocument } from 'src/schema/nswitch_install';
+import { NswitchEvent, NswitchEventDocument } from 'src/schema/nswitch_event';
 
 @Injectable()
 export class PostbackService {
@@ -89,6 +91,8 @@ export class PostbackService {
     @InjectModel(IveEvent.name) private iveEventModel: Model<IveEventDocument>,
     @InjectModel(DecotraInstall.name) private decotraInstallModel: Model<DecotraInstallDocument>,
     @InjectModel(DecotraEvent.name) private decotraEventModel: Model<DecotraEventDocument>,
+    @InjectModel(NswitchInstall.name) private nswitchInstallModel: Model<NswitchInstallDocument>,
+    @InjectModel(NswitchEvent.name) private nswitchEventModel: Model<NswitchEventDocument>,
     @InjectQueue('postback') private readonly postbackQueue: Queue,
     @InjectQueue('adbrixremasterEvent') private readonly adbrixremasterEventQueue: Queue,
     @InjectQueue('adbrixremasterInstall') private readonly adbrixremasterInstallQueue: Queue,
@@ -1186,6 +1190,26 @@ export class PostbackService {
     await redis.hset('decotra:event', date, JSON.stringify(postbackEventDecotra));
     //-------------------------------------------------------------------------------------------------------
     await this.decotraEventModel.create({
+      ...request.query,
+    });
+  }
+
+  async installNswitch(request: any) {
+    const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
+    console.log(`[ nswitch ---> mecrosspro ] install : ${originalUrl}`);
+
+    //-------------------------------------------------------------------------------------------------------
+    await this.nswitchInstallModel.create({
+      ...request.query,
+    });
+  }
+
+  async eventNswitch(request: any) {
+    const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
+    console.log(`[ nswitch ---> mecrosspro ] install : ${originalUrl}`);
+
+    //-------------------------------------------------------------------------------------------------------
+    await this.nswitchEventModel.create({
       ...request.query,
     });
   }
