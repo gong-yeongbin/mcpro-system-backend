@@ -6,6 +6,7 @@ import {
   PostbackEventDecotra,
   PostbackEventIve,
   PostbackEventMobiconnect,
+  PostbackEventNswitch,
   PostbackEventSingular,
   PostbackEventTradingworks,
   PostbackInstallAdbrixremaster,
@@ -15,6 +16,7 @@ import {
   PostbackInstallDecotra,
   PostbackInstallIve,
   PostbackInstallMobiconnect,
+  PostbackInstallNswitch,
   PostbackInstallSingular,
   PostbackInstallTradingworks,
 } from '@entities/Entity';
@@ -73,6 +75,8 @@ export class PostbackService {
     @InjectRepository(PostbackEventIve) private readonly postbackEventIveRepository: Repository<PostbackEventIve>,
     @InjectRepository(PostbackInstallDecotra) private readonly postbackInstallDecotraRepository: Repository<PostbackInstallDecotra>,
     @InjectRepository(PostbackEventDecotra) private readonly postbackEventDecotraRepository: Repository<PostbackEventDecotra>,
+    @InjectRepository(PostbackInstallNswitch) private readonly postbackInstallNswitchRepository: Repository<PostbackInstallNswitch>,
+    @InjectRepository(PostbackEventNswitch) private readonly postbackEventNswitchRepository: Repository<PostbackEventNswitch>,
     @InjectModel(AirbridgeInstall.name) private airbridgeInstallModel: Model<AirbridgeInstallDocument>,
     @InjectModel(AirbridgeEvent.name) private airbridgeEventModel: Model<AirbridgeEventDocument>,
     @InjectModel(TradingworksInstall.name) private tradingworksInstallModel: Model<TradingworksInstallDocument>,
@@ -1198,19 +1202,158 @@ export class PostbackService {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
     console.log(`[ nswitch ---> mecrosspro ] install : ${originalUrl}`);
 
+    const postbackInstallNswitch: PostbackInstallNswitch = this.postbackInstallNswitchRepository.create({
+      viewCode: request.query.publisher_id,
+      token: request.query.cb_param1,
+      nsw_click_time: request.query.nsw_click_time,
+      nsw_conv_time: request.query.nsw_conv_time,
+      nsw_country_code: request.query.nsw_country_code,
+      nsw_google_aid: request.query.nsw_google_aid,
+      nsw_idfa: request.query.nsw_idfa,
+      nsw_gpr_click_time: request.query.nsw_gpr_click_time,
+      nsw_gpr_install_time: request.query.nsw_gpr_install_time,
+      nsw_installer: request.query.nsw_installer,
+      nsw_ip: request.query.nsw_ip,
+      nsw_lang: request.query.nsw_lang,
+      nsw_match_type: request.query.nsw_match_type,
+      nsw_model: request.query.nsw_model,
+      nsw_net: request.query.nsw_net,
+      nsw_net_op: request.query.nsw_net_op,
+      nsw_os_ver: request.query.nsw_os_ver,
+      nsw_tsdk_ver: request.query.nsw_tsdk_ver,
+      nsw_sub_media_id: request.query.nsw_sub_media_id,
+      custom1: request.query.custom1,
+      custom2: request.query.custom2,
+      custom3: request.query.custom3,
+      originalUrl: originalUrl,
+    });
+
+    const date: string = moment().tz('Asia/Seoul').format('YYYY-MM-DD.HH:mm:ss.SSSSS');
+
+    const redis: Redis = this.redisService.getClient();
+    await redis.hset('nswitch:install', date, JSON.stringify(postbackInstallNswitch));
     //-------------------------------------------------------------------------------------------------------
     await this.nswitchInstallModel.create({
-      ...request.query,
+      nsw_click_time: request.query.nsw_click_time,
+      nsw_conv_time: request.query.nsw_conv_time,
+      nsw_country_code: request.query.nsw_country_code,
+      nsw_google_aid: request.query.nsw_google_aid,
+      nsw_idfa: request.query.nsw_idfa,
+      nsw_gpr_click_time: request.query.nsw_gpr_click_time,
+      nsw_gpr_install_time: request.query.nsw_gpr_install_time,
+      nsw_installer: request.query.nsw_installer,
+      nsw_ip: request.query.nsw_ip,
+      nsw_lang: request.query.nsw_lang,
+      nsw_match_type: request.query.nsw_match_type,
+      nsw_model: request.query.nsw_model,
+      nsw_net: request.query.nsw_net,
+      nsw_net_op: request.query.nsw_net_op,
+      nsw_os_ver: request.query.nsw_os_ver,
+      nsw_tsdk_ver: request.query.nsw_tsdk_ver,
+      nsw_sub_media_id: request.query.nsw_sub_media_id,
+      custom1: request.query.custom1,
+      custom2: request.query.custom2,
+      custom3: request.query.custom3,
     });
+
+    await this.postbackQueue.add(
+      {
+        token: request.query.custom1,
+        impressionCode: request.query.custom3,
+        click_id: request.query.custom2,
+        event_name: 'install',
+        carrier: request.query.nsw_model,
+        country: request.query.nsw_country_code,
+        language: request.query.nsw_lang,
+        ip: request.query.nsw_ip,
+        adid: request.query.nsw_google_aid,
+        click_time: moment(request.query.nsw_click_time).format('YYYY-MM-DD HH:mm:ss'),
+        install_time: moment(request.query.nsw_conv_time).format('YYYY-MM-DD HH:mm:ss'),
+      },
+      { removeOnComplete: true, removeOnFail: true, attempts: 2 },
+    );
   }
 
   async eventNswitch(request: any) {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
-    console.log(`[ nswitch ---> mecrosspro ] install : ${originalUrl}`);
+    console.log(`[ nswitch ---> mecrosspro ] event : ${originalUrl}`);
 
+    const postbackEventNswitch: PostbackEventNswitch = this.postbackEventNswitchRepository.create({
+      viewCode: request.query.publisher_id,
+      token: request.query.cb_param1,
+      nsw_click_time: request.query.nsw_click_time,
+      nsw_conv_time: request.query.nsw_conv_time,
+      nsw_country_code: request.query.nsw_country_code,
+      nsw_google_aid: request.query.nsw_google_aid,
+      nsw_idfa: request.query.nsw_idfa,
+      nsw_gpr_click_time: request.query.nsw_gpr_click_time,
+      nsw_gpr_install_time: request.query.nsw_gpr_install_time,
+      nsw_installer: request.query.nsw_installer,
+      nsw_ip: request.query.nsw_ip,
+      nsw_lang: request.query.nsw_lang,
+      nsw_match_type: request.query.nsw_match_type,
+      nsw_model: request.query.nsw_model,
+      nsw_net: request.query.nsw_net,
+      nsw_net_op: request.query.nsw_net_op,
+      nsw_os_ver: request.query.nsw_os_ver,
+      nsw_tsdk_ver: request.query.nsw_tsdk_ver,
+      nsw_sub_media_id: request.query.nsw_sub_media_id,
+      nsw_event_id: request.query.nsw_event_id,
+      nsw_event_price: request.query.nsw_event_price,
+      nsw_event_time: request.query.nsw_event_time,
+      custom1: request.query.custom1,
+      custom2: request.query.custom2,
+      custom3: request.query.custom3,
+      originalUrl: originalUrl,
+    });
+
+    const date: string = moment().tz('Asia/Seoul').format('YYYY-MM-DD.HH:mm:ss.SSSSS');
+
+    const redis: Redis = this.redisService.getClient();
+    await redis.hset('nswitch:event', date, JSON.stringify(postbackEventNswitch));
     //-------------------------------------------------------------------------------------------------------
     await this.nswitchEventModel.create({
-      ...request.query,
+      nsw_click_time: request.query.nsw_click_time,
+      nsw_conv_time: request.query.nsw_conv_time,
+      nsw_country_code: request.query.nsw_country_code,
+      nsw_google_aid: request.query.nsw_google_aid,
+      nsw_idfa: request.query.nsw_idfa,
+      nsw_gpr_click_time: request.query.nsw_gpr_click_time,
+      nsw_gpr_install_time: request.query.nsw_gpr_install_time,
+      nsw_installer: request.query.nsw_installer,
+      nsw_ip: request.query.nsw_ip,
+      nsw_lang: request.query.nsw_lang,
+      nsw_match_type: request.query.nsw_match_type,
+      nsw_model: request.query.nsw_model,
+      nsw_net: request.query.nsw_net,
+      nsw_net_op: request.query.nsw_net_op,
+      nsw_os_ver: request.query.nsw_os_ver,
+      nsw_tsdk_ver: request.query.nsw_tsdk_ver,
+      nsw_sub_media_id: request.query.nsw_sub_media_id,
+      nsw_event_id: request.query.nsw_event_id,
+      nsw_event_price: request.query.nsw_event_price,
+      nsw_event_time: request.query.nsw_event_time,
+      custom1: request.query.custom1,
+      custom2: request.query.custom2,
+      custom3: request.query.custom3,
     });
+
+    await this.postbackQueue.add(
+      {
+        token: request.query.custom1,
+        carrier: request.query.nsw_model,
+        country: request.query.nsw_country_code,
+        language: request.query.nsw_lang,
+        ip: request.query.nsw_ip,
+        adid: request.query.nsw_google_aid ? request.query.nsw_google_aid : request.query.nsw_idfa,
+        click_id: request.query.custom2,
+        impressionCode: request.query.custom3,
+        event_name: request.query.nsw_event_id,
+        install_time: moment(moment.utc(request.query.nsw_conv_time).toDate()).format('YYYY-MM-DD HH:mm:ss'),
+        event_time: moment(moment.utc(request.query.nsw_event_time).toDate()).format('YYYY-MM-DD HH:mm:ss'),
+        revenue: request.query.nsw_event_price == 'N/A' ? 0 : request.query.nsw_event_price,
+      },
+      { removeOnComplete: true, removeOnFail: true, attempts: 2 },
+    );
   }
 }

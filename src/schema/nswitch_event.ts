@@ -69,6 +69,9 @@ export class NswitchEvent {
 
   @Prop({ type: String })
   custom2: string;
+
+  @Prop({ type: String })
+  custom3: string;
 }
 
 export const NswitchEventSchema = SchemaFactory.createForClass(NswitchEvent);

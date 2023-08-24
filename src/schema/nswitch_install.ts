@@ -60,6 +60,9 @@ export class NswitchInstall {
 
   @Prop({ type: String })
   custom2: string;
+
+  @Prop({ type: String })
+  custom3: string;
 }
 
 export const NswitchInstallSchema = SchemaFactory.createForClass(NswitchInstall);

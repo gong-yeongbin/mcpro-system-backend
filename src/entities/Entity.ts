@@ -27,3 +27,5 @@ export { default as PostbackInstallIve } from '@entities/PostbackInstallIve';
 export { default as PostbackEventIve } from '@entities/PostbackEventIve';
 export { default as PostbackInstallDecotra } from '@entities/PostbackInstallDecotra';
 export { default as PostbackEventDecotra } from '@entities/PostbackEventDecotra';
+export { default as PostbackEventNswitch } from '@entities/PostbackEventNswitch';
+export { default as PostbackInstallNswitch } from '@entities/PostbackInstallNswitch';

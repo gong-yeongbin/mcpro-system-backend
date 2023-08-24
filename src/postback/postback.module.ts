@@ -20,6 +20,8 @@ import {
   PostbackInstallSingular,
   PostbackInstallTradingworks,
   PostbackRegisteredEvent,
+  PostbackEventNswitch,
+  PostbackInstallNswitch,
 } from '@entities/Entity';
 import { BullModule } from '@nestjs/bull';
 import { Module } from '@nestjs/common';
@@ -70,6 +72,7 @@ import { NswitchEvent, NswitchEventSchema } from 'src/schema/nswitch_event';
       PostbackInstallMobiconnect,
       PostbackInstallIve,
       PostbackInstallDecotra,
+      PostbackInstallNswitch,
       PostbackEventAirbridge,
       PostbackEventTradingworks,
       PostbackEventAppsflyer,
@@ -79,6 +82,7 @@ import { NswitchEvent, NswitchEventSchema } from 'src/schema/nswitch_event';
       PostbackEventMobiconnect,
       PostbackEventIve,
       PostbackEventDecotra,
+      PostbackEventNswitch,
     ]),
     MongooseModule.forFeature([
       { name: AirbridgeInstall.name, schema: AirbridgeInstallSchema },
