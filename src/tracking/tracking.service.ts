@@ -10,7 +10,7 @@ export class TrackingService {
   constructor(private readonly redisService: RedisService) {}
   async tracking(request: any, query: TrackingDto): Promise<string> {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
-    console.log(`[ media ---> mecrosspro ] ${originalUrl}`);
+    // console.log(`[ media ---> mecrosspro ] ${originalUrl}`);
 
     const redis: Redis = this.redisService.getClient();
 
