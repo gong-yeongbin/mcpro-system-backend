@@ -1203,8 +1203,8 @@ export class PostbackService {
     console.log(`[ nswitch ---> mecrosspro ] install : ${originalUrl}`);
 
     const postbackInstallNswitch: PostbackInstallNswitch = this.postbackInstallNswitchRepository.create({
-      viewCode: request.query.publisher_id,
-      token: request.query.cb_param1,
+      viewCode: request.query.custom3,
+      token: request.query.custom1,
       nsw_click_time: request.query.nsw_click_time,
       nsw_conv_time: request.query.nsw_conv_time,
       nsw_country_code: request.query.nsw_country_code,
@@ -1234,6 +1234,8 @@ export class PostbackService {
     await redis.hset('nswitch:install', date, JSON.stringify(postbackInstallNswitch));
     //-------------------------------------------------------------------------------------------------------
     await this.nswitchInstallModel.create({
+      viewCode: request.query.custom3,
+      token: request.query.custom1,
       nsw_click_time: request.query.nsw_click_time,
       nsw_conv_time: request.query.nsw_conv_time,
       nsw_country_code: request.query.nsw_country_code,
@@ -1279,8 +1281,8 @@ export class PostbackService {
     console.log(`[ nswitch ---> mecrosspro ] event : ${originalUrl}`);
 
     const postbackEventNswitch: PostbackEventNswitch = this.postbackEventNswitchRepository.create({
-      viewCode: request.query.publisher_id,
-      token: request.query.cb_param1,
+      viewCode: request.query.custom3,
+      token: request.query.custom1,
       nsw_click_time: request.query.nsw_click_time,
       nsw_conv_time: request.query.nsw_conv_time,
       nsw_country_code: request.query.nsw_country_code,
@@ -1313,6 +1315,8 @@ export class PostbackService {
     await redis.hset('nswitch:event', date, JSON.stringify(postbackEventNswitch));
     //-------------------------------------------------------------------------------------------------------
     await this.nswitchEventModel.create({
+      viewCode: request.query.custom3,
+      token: request.query.custom1,
       nsw_click_time: request.query.nsw_click_time,
       nsw_conv_time: request.query.nsw_conv_time,
       nsw_country_code: request.query.nsw_country_code,
