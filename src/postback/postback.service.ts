@@ -27,31 +27,8 @@ import { decodeUnicode } from 'src/util';
 import { Repository } from 'typeorm';
 import * as moment from 'moment-timezone';
 import { Redis } from 'ioredis';
-import { InjectModel } from '@nestjs/mongoose';
-import { AirbridgeInstall, AirbridgeInstallDocument } from 'src/schema/airbridge_install';
-import { Model } from 'mongoose';
-import { AirbridgeEvent, AirbridgeEventDocument } from 'src/schema/airbridge_event';
-import { TradingworksInstall, TradingworksInstallDocument } from 'src/schema/tradingworks_install';
-import { TradingworksEvent, TradingworksEventDocument } from 'src/schema/tradingworks_event';
-import { SingularInstall, SingularInstallDocument } from 'src/schema/singular_install';
-import { SingularEvent, SingularEventDocument } from 'src/schema/singular_event';
-import { AppsflyerInstall, AppsflyerInstallDocument } from 'src/schema/appsflyer_install';
-import { AppsflyerEvent, AppsflyerEventDocument } from 'src/schema/appsflyer_event';
-import { AdjustEvent, AdjustEventDocument } from 'src/schema/adjust_event';
-import { AdjustInstall, AdjustInstallDocument } from 'src/schema/adjust_install';
-import { MobiconnectInstall, MobiconnectInstallDocument } from 'src/schema/mobiconnect_install';
-import { MobiconnectEvent, MobiconnectEventDocument } from 'src/schema/mobiconnect_event';
-import { AdbrixremasterInstall, AdbrixremasterInstallDocument } from 'src/schema/adbrixremaster_install';
-import { AdbrixremasterEvent, AdbrixremasterEventDocument } from 'src/schema/adbrixremaster_event';
-import { Postback, PostbackDocument } from 'src/schema/postback';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
-import { IveInstall, IveInstallDocument } from 'src/schema/ive_install';
-import { IveEvent, IveEventDocument } from 'src/schema/ive_event';
-import { DecotraInstall, DecotraInstallDocument } from 'src/schema/decotra_install';
-import { DecotraEvent, DecotraEventDocument } from 'src/schema/decotra_event';
-import { NswitchInstall, NswitchInstallDocument } from 'src/schema/nswitch_install';
-import { NswitchEvent, NswitchEventDocument } from 'src/schema/nswitch_event';
 
 @Injectable()
 export class PostbackService {
@@ -77,26 +54,6 @@ export class PostbackService {
     @InjectRepository(PostbackEventDecotra) private readonly postbackEventDecotraRepository: Repository<PostbackEventDecotra>,
     @InjectRepository(PostbackInstallNswitch) private readonly postbackInstallNswitchRepository: Repository<PostbackInstallNswitch>,
     @InjectRepository(PostbackEventNswitch) private readonly postbackEventNswitchRepository: Repository<PostbackEventNswitch>,
-    @InjectModel(AirbridgeInstall.name) private airbridgeInstallModel: Model<AirbridgeInstallDocument>,
-    @InjectModel(AirbridgeEvent.name) private airbridgeEventModel: Model<AirbridgeEventDocument>,
-    @InjectModel(TradingworksInstall.name) private tradingworksInstallModel: Model<TradingworksInstallDocument>,
-    @InjectModel(TradingworksEvent.name) private tradingworksEventModel: Model<TradingworksEventDocument>,
-    @InjectModel(SingularInstall.name) private singularInstallModel: Model<SingularInstallDocument>,
-    @InjectModel(SingularEvent.name) private singularEventModel: Model<SingularEventDocument>,
-    @InjectModel(AppsflyerInstall.name) private appsflyerInstallModel: Model<AppsflyerInstallDocument>,
-    @InjectModel(AppsflyerEvent.name) private appsflyerEventModel: Model<AppsflyerEventDocument>,
-    @InjectModel(AdjustInstall.name) private adjustInstallModel: Model<AdjustInstallDocument>,
-    @InjectModel(AdjustEvent.name) private adjustEventModel: Model<AdjustEventDocument>,
-    @InjectModel(MobiconnectInstall.name) private mobiconnectInstallModel: Model<MobiconnectInstallDocument>,
-    @InjectModel(MobiconnectEvent.name) private mobiconnectEventModel: Model<MobiconnectEventDocument>,
-    @InjectModel(AdbrixremasterInstall.name) private adbrixremasterInstallModel: Model<AdbrixremasterInstallDocument>,
-    @InjectModel(AdbrixremasterEvent.name) private adbrixremasterEventModel: Model<AdbrixremasterEventDocument>,
-    @InjectModel(IveInstall.name) private iveInstallModel: Model<IveInstallDocument>,
-    @InjectModel(IveEvent.name) private iveEventModel: Model<IveEventDocument>,
-    @InjectModel(DecotraInstall.name) private decotraInstallModel: Model<DecotraInstallDocument>,
-    @InjectModel(DecotraEvent.name) private decotraEventModel: Model<DecotraEventDocument>,
-    @InjectModel(NswitchInstall.name) private nswitchInstallModel: Model<NswitchInstallDocument>,
-    @InjectModel(NswitchEvent.name) private nswitchEventModel: Model<NswitchEventDocument>,
     @InjectQueue('postback') private readonly postbackQueue: Queue,
     @InjectQueue('adbrixremasterEvent') private readonly adbrixremasterEventQueue: Queue,
     @InjectQueue('adbrixremasterInstall') private readonly adbrixremasterInstallQueue: Queue,
@@ -155,12 +112,6 @@ export class PostbackService {
     const redis: Redis = this.redisService.getClient();
     await redis.hset('airbridge:install', date, JSON.stringify(postbackInstallAirbridge));
     //-------------------------------------------------------------------------------------------------------
-
-    await this.airbridgeInstallModel.create({
-      ...request.query,
-      limitAdTracking: Boolean(request.query.limitAdTracking),
-      isUnique: Boolean(request.query.isUnique),
-    });
 
     await this.postbackQueue.add(
       {
@@ -262,12 +213,6 @@ export class PostbackService {
     await redis.hset('airbridge:event', date, JSON.stringify(postbackEventAirbridge));
 
     //-------------------------------------------------------------------------------------------------------
-    await this.airbridgeEventModel.create({
-      ...request.query,
-      limitAdTracking: Boolean(request.query.limitAdTracking),
-      isUnique: Boolean(request.query.isUnique),
-      inAppPurchased: Boolean(request.query.inAppPurchased),
-    });
 
     let revenue: number = 0;
     let currency: string;
@@ -329,9 +274,6 @@ export class PostbackService {
     await redis.hset('tradingworks:install', date, JSON.stringify(postbackInstallTradingworks));
 
     //-------------------------------------------------------------------------------------------------------
-    await this.tradingworksInstallModel.create({
-      ...request.query,
-    });
 
     await this.postbackQueue.add(
       {
@@ -376,9 +318,6 @@ export class PostbackService {
     await redis.hset('tradingworks:event', date, JSON.stringify(postbackEventTradingworks));
 
     //-------------------------------------------------------------------------------------------------------
-    await this.tradingworksEventModel.create({
-      ...request.query,
-    });
 
     await this.postbackQueue.add(
       {
@@ -422,10 +361,6 @@ export class PostbackService {
     const redis: Redis = this.redisService.getClient();
     await redis.hset('appsflyer:install', date, JSON.stringify(postbackInstallAppsflyer));
     //-------------------------------------------------------------------------------------------------------
-
-    await this.appsflyerInstallModel.create({
-      ...request.query,
-    });
 
     await this.postbackQueue.add(
       {
@@ -475,10 +410,6 @@ export class PostbackService {
     await redis.hset('appsflyer:event', date, JSON.stringify(postbackEventAppsflyer));
 
     //-------------------------------------------------------------------------------------------------------
-    await this.appsflyerEventModel.create({
-      ...request.query,
-      event_revenue: request.query.event_revenue == 'N/A' ? 0 : request.query.event_revenue,
-    });
 
     await this.postbackQueue.add(
       {
@@ -561,11 +492,6 @@ export class PostbackService {
     // const redis: Redis = this.redisService.getClient();
     // await redis.hset('adbrixremaster:install', date, JSON.stringify(postbackInstallAdbrixremaster));
     //-------------------------------------------------------------------------------------------------------
-    await this.adbrixremasterInstallModel.create({
-      ...request.query,
-      a_server_datetime: request.query.a_server_datetime.replace('+', ' '),
-      event_datetime: request.query.event_datetime.replace('+', ' '),
-    });
 
     await this.postbackQueue.add(
       {
@@ -647,11 +573,6 @@ export class PostbackService {
     // await redis.hset('adbrixremaster:event', date, JSON.stringify(postbackEventAdbrixremaster));
 
     //-------------------------------------------------------------------------------------------------------
-    await this.adbrixremasterEventModel.create({
-      ...request.query,
-      attr_event_datetime: request.query.attr_event_datetime.replace('+', ' '),
-      event_datetime: request.query.event_datetime.replace('+', ' '),
-    });
 
     let revenue: number = 0;
     let currency: string = '';
@@ -731,9 +652,6 @@ export class PostbackService {
     const redis: Redis = this.redisService.getClient();
     await redis.hset('adjust:install', date, JSON.stringify(postbackInstallAdjust));
     //-------------------------------------------------------------------------------------------------------
-    await this.adjustInstallModel.create({
-      ...request.query,
-    });
 
     await this.postbackQueue.add(
       {
@@ -755,10 +673,6 @@ export class PostbackService {
   async eventAdjust(request: any) {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
     console.log(`[ adjust ---> mecrosspro ] event : ${originalUrl}`);
-
-    await this.adjustEventModel.create({
-      ...request.query,
-    });
 
     const postbackEventAdjust: PostbackEventAdjust = this.postbackEventAdjustRepository.create({
       eventToken: request.query.event_token,
@@ -860,9 +774,6 @@ export class PostbackService {
     const redis: Redis = this.redisService.getClient();
     await redis.hset('singular:install', date, JSON.stringify(postbackIntallSingular));
     //-------------------------------------------------------------------------------------------------------
-    await this.singularInstallModel.create({
-      ...request.query,
-    });
 
     await this.postbackQueue.add(
       {
@@ -915,9 +826,6 @@ export class PostbackService {
     const redis: Redis = this.redisService.getClient();
     await redis.hset('singular:event', date, JSON.stringify(postbackEventSingular));
     //-------------------------------------------------------------------------------------------------------
-    await this.singularEventModel.create({
-      ...request.query,
-    });
 
     await this.postbackQueue.add(
       {
@@ -969,9 +877,6 @@ export class PostbackService {
     const redis: Redis = this.redisService.getClient();
     await redis.hset('mobiconnect:install', date, JSON.stringify(postbackInstallMobiconnect));
     //-------------------------------------------------------------------------------------------------------
-    await this.mobiconnectInstallModel.create({
-      ...request.query,
-    });
 
     await this.postbackQueue.add(
       {
@@ -1025,9 +930,6 @@ export class PostbackService {
     await redis.hset('mobiconnect:event', date, JSON.stringify(postbackEventMobiconnect));
 
     //-------------------------------------------------------------------------------------------------------
-    await this.mobiconnectEventModel.create({
-      ...request.query,
-    });
 
     await this.postbackQueue.add(
       {
@@ -1088,9 +990,6 @@ export class PostbackService {
     const redis: Redis = this.redisService.getClient();
     await redis.hset('ive:install', date, JSON.stringify(postbackInstallIve));
     //-------------------------------------------------------------------------------------------------------
-    await this.iveInstallModel.create({
-      ...request.query,
-    });
   }
   async eventIve(request: any) {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
@@ -1130,9 +1029,6 @@ export class PostbackService {
     const redis: Redis = this.redisService.getClient();
     await redis.hset('ive:event', date, JSON.stringify(postbackEventIve));
     //-------------------------------------------------------------------------------------------------------
-    await this.iveEventModel.create({
-      ...request.query,
-    });
   }
 
   async installDecotra(request: any) {
@@ -1162,9 +1058,6 @@ export class PostbackService {
     const redis: Redis = this.redisService.getClient();
     await redis.hset('decotra:install', date, JSON.stringify(postbackInstallDecotra));
     //-------------------------------------------------------------------------------------------------------
-    await this.decotraInstallModel.create({
-      ...request.query,
-    });
   }
   async eventDecotra(request: any) {
     const originalUrl: string = decodeUnicode(`${request.protocol}://${request.headers.host}${request.url}`);
@@ -1193,9 +1086,6 @@ export class PostbackService {
     const redis: Redis = this.redisService.getClient();
     await redis.hset('decotra:event', date, JSON.stringify(postbackEventDecotra));
     //-------------------------------------------------------------------------------------------------------
-    await this.decotraEventModel.create({
-      ...request.query,
-    });
   }
 
   async installNswitch(request: any) {
@@ -1233,30 +1123,6 @@ export class PostbackService {
     const redis: Redis = this.redisService.getClient();
     await redis.hset('nswitch:install', date, JSON.stringify(postbackInstallNswitch));
     //-------------------------------------------------------------------------------------------------------
-    await this.nswitchInstallModel.create({
-      viewCode: request.query.custom3,
-      token: request.query.custom1,
-      nsw_click_time: request.query.nsw_click_time,
-      nsw_conv_time: request.query.nsw_conv_time,
-      nsw_country_code: request.query.nsw_country_code,
-      nsw_google_aid: request.query.nsw_google_aid,
-      nsw_idfa: request.query.nsw_idfa,
-      nsw_gpr_click_time: request.query.nsw_gpr_click_time,
-      nsw_gpr_install_time: request.query.nsw_gpr_install_time,
-      nsw_installer: request.query.nsw_installer,
-      nsw_ip: request.query.nsw_ip,
-      nsw_lang: request.query.nsw_lang,
-      nsw_match_type: request.query.nsw_match_type,
-      nsw_model: request.query.nsw_model,
-      nsw_net: request.query.nsw_net,
-      nsw_net_op: request.query.nsw_net_op,
-      nsw_os_ver: request.query.nsw_os_ver,
-      nsw_tsdk_ver: request.query.nsw_tsdk_ver,
-      nsw_sub_media_id: request.query.nsw_sub_media_id,
-      custom1: request.query.custom1,
-      custom2: request.query.custom2,
-      custom3: request.query.custom3,
-    });
 
     await this.postbackQueue.add(
       {
@@ -1314,33 +1180,6 @@ export class PostbackService {
     const redis: Redis = this.redisService.getClient();
     await redis.hset('nswitch:event', date, JSON.stringify(postbackEventNswitch));
     //-------------------------------------------------------------------------------------------------------
-    await this.nswitchEventModel.create({
-      viewCode: request.query.custom3,
-      token: request.query.custom1,
-      nsw_click_time: request.query.nsw_click_time,
-      nsw_conv_time: request.query.nsw_conv_time,
-      nsw_country_code: request.query.nsw_country_code,
-      nsw_google_aid: request.query.nsw_google_aid,
-      nsw_idfa: request.query.nsw_idfa,
-      nsw_gpr_click_time: request.query.nsw_gpr_click_time,
-      nsw_gpr_install_time: request.query.nsw_gpr_install_time,
-      nsw_installer: request.query.nsw_installer,
-      nsw_ip: request.query.nsw_ip,
-      nsw_lang: request.query.nsw_lang,
-      nsw_match_type: request.query.nsw_match_type,
-      nsw_model: request.query.nsw_model,
-      nsw_net: request.query.nsw_net,
-      nsw_net_op: request.query.nsw_net_op,
-      nsw_os_ver: request.query.nsw_os_ver,
-      nsw_tsdk_ver: request.query.nsw_tsdk_ver,
-      nsw_sub_media_id: request.query.nsw_sub_media_id,
-      nsw_event_id: request.query.nsw_event_id,
-      nsw_event_price: request.query.nsw_event_price,
-      nsw_event_time: request.query.nsw_event_time,
-      custom1: request.query.custom1,
-      custom2: request.query.custom2,
-      custom3: request.query.custom3,
-    });
 
     await this.postbackQueue.add(
       {

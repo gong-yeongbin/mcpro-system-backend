@@ -5,25 +5,11 @@ import { Campaign as Campaign1, PostbackDaily } from 'src/entities/Entity';
 import { CampaignCacheMiddleware } from 'src/middleware/campaign-cache.middleware';
 import { ImpressionCodeCacheMiddleware } from 'src/middleware/impressionCode-cache.middleware';
 import { TrackingMiddleware } from 'src/middleware/tracking.middleware';
-import { Campaign, CampaignSchema } from 'src/schema/campaign';
-import { Config, ConfigSchema } from 'src/schema/config';
-import { Daily, DailySchema } from 'src/schema/daily';
 import { TrackingController } from './tracking.controller';
 import { TrackingService } from './tracking.service';
-import { ImpressionCode, ImpressionCodeSchema } from 'src/schema/impressionCode';
-import { TrackingLog, TrackingLogSchema } from 'src/schema/tracking_log';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Campaign1, PostbackDaily]),
-    MongooseModule.forFeature([
-      { name: Campaign.name, schema: CampaignSchema },
-      { name: Config.name, schema: ConfigSchema },
-      { name: Daily.name, schema: DailySchema },
-      { name: ImpressionCode.name, schema: ImpressionCodeSchema },
-      { name: TrackingLog.name, schema: TrackingLogSchema },
-    ]),
-  ],
+  imports: [TypeOrmModule.forFeature([Campaign1, PostbackDaily])],
   controllers: [TrackingController],
   providers: [TrackingService],
 })
